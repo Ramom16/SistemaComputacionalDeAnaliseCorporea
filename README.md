@@ -3,15 +3,6 @@
 Bem-vindo ao **Sistema de Análise Corporal e Metabólica**.  
 Este repositório contém a documentação e implementação de um sistema voltado para academias, com foco em análise física e recomendações de treino.
 
-![Status](https://img.shields.io/badge/status-em%20desenvolvimento-yellow)
-![Dev Status](https://img.shields.io/badge/dev%20status-coding%20💻-blue)
-![Node.js](https://img.shields.io/badge/Node.js-18+-green)
-![React Native](https://img.shields.io/badge/React%20Native-mobile-blue)
-![Database](https://img.shields.io/badge/database-MySQL-blue)
-![License](https://img.shields.io/badge/license-Acadêmico-lightgrey)
-
----
-
 ## Objetivo
 
 Projeto acadêmico com o objetivo de desenvolver um sistema capaz de realizar:
