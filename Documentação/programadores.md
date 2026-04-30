@@ -41,3 +41,21 @@ O sistema foi desenvolvido seguindo uma arquitetura em camadas, separando respon
 
 #### Tecnologias
 - MySQL
+
+### Estrutura do Banco
+- usuario
+- dados_corporais
+- calculo
+- treino
+- treino_exercicio
+
+## Fluxo do Sistema
+Usuário → Frontend → Backend → Banco de Dados
+                      ↓
+                 Processamento
+                      ↓
+              Cálculo (IMC, TMB, NDC)
+                      ↓
+               Geração de Treino
+                      ↓
+                Retorno ao usuário
