@@ -21,7 +21,6 @@ Desenvolvimento Web e Mobile
 APIs REST
 Metodologias ágeis (Scrum)
 
----
 
 ## Tecnologias Utilizadas
 
@@ -49,13 +48,11 @@ MySQL / PostgreSQL
 Vercel  
 AWS / Render  
 
----
 
 ## Documentação
 
 A documentação do projeto está organizada por tipo de usuário:
 
----
 
 ### Para Programadores
 
@@ -66,7 +63,6 @@ Estrutura do sistema
 Modelagem do banco de dados  
 Integração Front-End / Back-End  
 
----
 
 ### Para Usuários
 
@@ -77,7 +73,6 @@ Recomendações de treino
 Exercícios com vídeos  
 Acompanhamento de evolução  
 
----
 
 ### Para Administradores
 
@@ -87,7 +82,6 @@ Controle de usuários
 Monitoramento de dados  
 Manutenção do sistema  
 
----
 
 ##  Funcionalidades
 
@@ -97,7 +91,6 @@ Geração de treinos iniciais
 Exibição de exercícios  
 Histórico de evolução  
 
----
 
 ## Problema
 
@@ -106,7 +99,6 @@ Avaliações manuais e desorganizadas
 Treinos genéricos  
 Dificuldade de acompanhamento  
 
----
 
 ## Solução
 
@@ -117,7 +109,6 @@ Organiza dados
 Auxilia na tomada de decisão  
 Melhora o acompanhamento físico  
 
----
 
 ## Equipe
 
@@ -128,7 +119,6 @@ Melhora o acompanhamento físico
 **Database:** Davi Custódio da Silva  
 **QA:** André Fernandes  
 
----
 
 ## Metodologia
 
@@ -137,7 +127,6 @@ Sprints semanais
 Kanban (Trello / ClickUp)  
 Reuniões de planejamento, review e retrospectiva  
 
----
 
 ## Observações
 
@@ -146,7 +135,6 @@ Não substitui profissionais da saúde
 Utiliza ferramentas gratuitas  
 Sem fins lucrativos  
 
----
 
 ## Status do Projeto
 
