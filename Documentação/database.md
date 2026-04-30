@@ -2,77 +2,113 @@
 
 Este documento vai apresentar o modelo de banco de dados do sistema, com foco nas entidades e seus relacionamentos
 
-## Entidade: USUARIO
-
+## Entidade: USUARIOS
 ### Descrição
-A entidade usuario vai representar os clientes(usuarios) do nosso sistema
+A entidade usuarios representa as pessoas que utilizam o sistema, armazenando suas informações de acesso e identificação
 
 ### Atributos
-- id_usuario (PK)
+- idUsuario (PK)
+- nome (NOT NULL)
+- email (NOT NULL)
+- senha_hash (NOT NULL)
+- data_cadastro
+- ativo
+- email_verificado
+- ultimo_login
+- criado_em
+
+
+## Entidade: PERFIL
+### Descrição
+Define os tipos de perfil do sistema, como administrador ou usuário comum
+
+### Atributos
+- idPerfil (PK)
 - nome
-- email
-- senha
+
+
+## Entidade: USUARIOS_PERFIL
+### Descrição
+Tabela associativa responsável por relacionar usuários aos seus perfis
+
+### Atributos
+- idUsuario (PK, FK)
+- idPerfil (PK, FK)
+
 
 ## Entidade: DADOS_CORPORAIS
-
 ### Descrição
-Armazenação de dados corporais do usuário, utilizando como base para os cálculos metabólicos
+Armazena os dados físicos do usuário, utilizados como base para os cálculos metabólicos
 
 ### Atributos
-- id_dados (PK)
-- peso
-- altura
+- idDados (PK)
+- idUsuario (FK)
+- peso (NOT NULL)
+- altura (NOT NULL)
+- genero
 - idade
 - nivel_atividade
 - data_registro
-- id_usuario (FK)
 
-## Entidade: CALCULO
 
-## Descrição
-Armazena os resultados dos cálculos realizados com base nos dados corporais, como IMC, TMB e NDC.
+## Entidade: CALCULOS
+### Descrição
+Armazena os resultados dos cálculos realizados com base nos dados corporais, como IMC, TMB e NDC
 
 ### Atributos
-- id_calculo (PK)
-- id_dados (FK)
+- idCalculo (PK)
+- idDados (FK)
 - imc
 - tmb
 - ndc
 - data_calculo
 
-## Entidade: TREINO
 
-## Descrição
-Representa os treinos gerados pelo sistema com base nos cálculos e objetivos do usuário.
+## Entidade: TREINOS
+### Descrição
+
+Representa os treinos gerados pelo sistema com base nos cálculos e objetivos do usuário
 
 ### Atributos
-- id_treino (PK)
+- idTreino (PK)
+- idCalculo (FK)
 - objetivo
 - nivel
-- data_criacao
-- id_calculo
+- dataCriacao
 
-## Entidade: EXERCICIO
 
+## Entidade: EXERCICIOS
 ### Descrição
-Armazena os exercícios disponíveis no sistema, incluindo informações para execução.
+Armazena os exercícios disponíveis no sistema, incluindo informações para execução
 
 ### Atributos
-- id_exercicio (PK)
+- idExercicio (PK)
 - nome
 - descricao
-- video
+- caminho_video
 
-## Entidade: TREINO_EXERCICIO 
 
+## Entidade: TREINOS_EXERCICIOS
 ### Descrição
-Tabela associativa responsável por relacionar treinos e exercícios, permitindo a criação de rotinas personalizadas.
+Tabela associativa responsável por relacionar treinos e exercícios, permitindo a criação de rotinas personalizadas
 
 ### Atributos
-- id_treino(FK)
-- id_exercicio(FK)
+- idTreino (PK, FK)
+- idExercicio (PK, FK)
 - series
-- descanso
 - repeticoes
+- descanso_segundos
 - grupo_muscular
 - tipo
+### Relacionamentos
+Um usuario pode possuir vários dados corporais
+Um usuario pode possuir múltiplos perfis
+Dados corporais geram cálculos
+Um cálculo pode gerar treinos
+Um treino contém vários exercícios
+Um exercício pode estar em vários treinos
+### Observações
+A relação entre usuarios e perfis é muitos-para-muitos, resolvida por usuarios_perfil
+A relação entre treinos e exercícios é muitos-para-muitos, resolvida por treinos_exercicios
+O sistema utiliza dados corporais como base para cálculos metabólicos
+A modelagem foi feita para evitar redundância e garantir flexibilidade
