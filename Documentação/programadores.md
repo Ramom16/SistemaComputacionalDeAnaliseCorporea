@@ -50,12 +50,4 @@ O sistema foi desenvolvido seguindo uma arquitetura em camadas, separando respon
 - treino_exercicio
 
 ## Fluxo do Sistema
-Usuário → Frontend → Backend → Banco de Dados
-                      ↓
-                 Processamento
-                      ↓
-              Cálculo (IMC, TMB, NDC)
-                      ↓
-               Geração de Treino
-                      ↓
-                Retorno ao usuário
+Usuário → Frontend → Backend → Banco de Dados → Processamento Cálculo → (IMC, TMB, NDC) → Geração de Treino → Retorno ao usuário
