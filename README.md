@@ -58,10 +58,11 @@ A documentação do projeto está organizada por tipo de usuário:
 
 Informações técnicas para desenvolvimento do sistema:
 
-API (Endpoints e regras de negócio)  
-Estrutura do sistema  
-Modelagem do banco de dados  
-Integração Front-End / Back-End  
+- [Especificação Técnica e Arquitetura](./DOCS/Documentação/Especificacao_Tecnica.md): Contém o Diagrama Entidade-Relacionamento (DER), Diagrama de Classes, Funcionalidades vs Lógica e o Design System simplificado.
+- API (Endpoints e regras de negócio)  
+- Estrutura do sistema  
+- Modelagem do banco de dados  
+- Integração Front-End / Back-End  
 
 
 ### Para Usuários
