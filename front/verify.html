@@ -107,7 +107,7 @@
                 msg.innerText = "Token não encontrado na URL.";
                 return;
             }
-            const link = "https://7406-2804-868-d057-4274-2886-64c9-196e-1bb6.ngrok-free.app";
+            const link = "http://localhost:3000";
             const path = "/auth/verificar-email?token="
 
             try {
@@ -152,7 +152,7 @@
                 btnReenviar.disabled = true;
                 btnReenviar.innerText = "Enviando...";
 
-                const response = await fetch("https://7406-2804-868-d057-4274-2886-64c9-196e-1bb6.ngrok-free.app/auth/reenviar-email", {
+                const response = await fetch("http://localhost:3000/auth/reenviar-email", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json"

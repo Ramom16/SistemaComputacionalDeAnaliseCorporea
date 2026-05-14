@@ -1,7 +1,28 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: "https://c312-2804-868-d057-4274-2886-64c9-196e-1bb6.ngrok-free.app"
+  baseURL: import.meta.env.VITE_API_URL || "http://localhost:3000"
 });
+
+// Interceptor para adicionar token automaticamente
+api.interceptors.request.use((config) => {
+  const token = localStorage.getItem("token");
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
+// Interceptor para tratar erros globalmente
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      localStorage.removeItem("token");
+      window.location.href = "/login";
+    }
+    return Promise.reject(error);
+  }
+);
 
 export default api;
