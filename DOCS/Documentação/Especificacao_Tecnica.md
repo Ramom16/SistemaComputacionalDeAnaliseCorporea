@@ -93,82 +93,8 @@ erDiagram
     }
 ```
 
-## 2. Diagrama de Classes
 
-O diagrama de classes estrutura os principais componentes lógicos (entidades e regras de negócio) que serão implementados nas camadas de back-end (Node.js/Express) e front-end/mobile.
-
-```mermaid
-classDiagram
-    class Usuario {
-        -int id
-        -String nome
-        -String email
-        -String senhaHash
-        -Date dataNascimento
-        -boolean ativo
-        -boolean emailVerificado
-        +registrar()
-        +login()
-        +atualizarPerfil()
-        +verificarEmail()
-    }
-
-    class DadosCorporais {
-        -int idDados
-        -int idUsuario
-        -double pesoKg
-        -double alturaCm
-        -Genero genero
-        -int idade
-        -NivelAtividade nivelAtividade
-        +registrarDados()
-        +atualizarDados()
-    }
-
-    class CalculosMetabolicos {
-        -int idCalculo
-        -int idDados
-        -double imc
-        -double tmb
-        -double ndc
-        +calcularIMC()
-        +calcularTMB()
-        +calcularNDC()
-    }
-
-    class Treino {
-        -int idTreino
-        -int idCalculo
-        -Objetivo objetivo
-        -Nivel nivel
-        +gerarTreino()
-        +atualizarTreino()
-    }
-
-    class Exercicio {
-        -int idExercicio
-        -String nome
-        -String descricao
-        -String caminhoVideo
-        +obterDetalhes()
-    }
-    
-    class TreinoExercicio {
-        -int series
-        -int repeticoes
-        -int descansoSegundos
-        -String grupoMuscular
-        -TipoExercicio tipo
-    }
-
-    Usuario "1" *-- "*" DadosCorporais : possui
-    DadosCorporais "1" *-- "*" CalculosMetabolicos : gera
-    CalculosMetabolicos "1" *-- "*" Treino : baseia
-    Treino "1" *-- "*" TreinoExercicio : contem
-    Exercicio "1" *-- "*" TreinoExercicio : pertence
-```
-
-## 3. Relacionamento: Funcionalidades, Dados e Lógica
+## 2. Relacionamento: Funcionalidades, Dados e Lógica
 
 A matriz abaixo detalha como os requisitos propostos se conectam à estrutura de banco e à lógica de programação.
 
@@ -180,11 +106,11 @@ A matriz abaixo detalha como os requisitos propostos se conectam à estrutura de
 | **Acompanhamento de Evolução** | `dados_corporais`, `calculos` | Consultas cronológicas (`ORDER BY data_registro DESC`) extraindo gráficos de evolução de Peso, IMC e NDC. |
 | **Exibição de Exercícios** | `exercicios`, `treinos_exercicios` | Front-end renderiza a lista de exercícios do treino atual, carregando o campo `caminho_video` para um media player. |
 
-## 4. Design System Simplificado
+## 3. Design System Simplificado
 
 Este é o padrão visual fundamental utilizado na construção das interfaces Web (React/HTML/CSS) e Mobile (React Native).
 
-### 4.1. Cores (Color Palette)
+### 3.1. Cores (Color Palette)
 
 - **Primary Color:** `#FF5722` (Laranja Forte) - Utilizado para CTAs, botões principais e destaques. Traz a energia e dinâmica de exercícios físicos.
 - **Secondary Color:** `#1E293B` (Azul Escuro/Slate) - Cor de fundo de cabeçalhos, barras laterais e elementos de forte contraste.
@@ -193,7 +119,7 @@ Este é o padrão visual fundamental utilizado na construção das interfaces We
 - **Success Color:** `#22C55E` - Para feedbacks positivos, como "Treino Concluído" ou aumento de performance.
 - **Danger/Error Color:** `#EF4444` - Para alertas ou exclusão de dados.
 
-### 4.2. Tipografia
+### 3.2. Tipografia
 
 - **Fonte Principal (Headings e Body):** `Inter` ou `Roboto`.
 - **Pesos:** 
@@ -201,7 +127,7 @@ Este é o padrão visual fundamental utilizado na construção das interfaces We
   - Medium (500) para botões e links.
   - Bold (700) para Títulos (H1, H2, H3).
 
-### 4.3. Componentes Visuais
+### 3.3. Componentes Visuais
 
 - **Botões (Buttons):**
   - *Primary:* Fundo `#FF5722`, texto `#FFFFFF`, cantos arredondados (border-radius: 8px), sem borda. Hover: brilho ou leve escurecimento (`#E64A19`).
