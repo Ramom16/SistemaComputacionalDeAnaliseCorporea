@@ -4,10 +4,16 @@ import { gerarHashSenha, compararSenha } from "../utils/senhaHash.js";
 import { gerarEmailTokenJWT, gerarTokenLogin } from "../utils/gerarTokens.js";
 import { enviarEmailVerificacao } from "../services/emailService.js";
 import { Usuario } from "../models/Usuarios.js";
+import { envTokenExpiraMinutos } from "../config/env.js";
 
 /**
  * Controlador de autenticação e verificação de email.
  */
+const conversorMinutos = 60*1000
+const expira_em_minutos = new Date(
+  Date.now() + envTokenExpiraMinutos.ValidadeTokenMinutos * conversorMinutos
+);
+
 const authController = {
 
   /**
@@ -49,7 +55,7 @@ const authController = {
       //  IMPORTANTE: gerar token com id do usuário
       const token = gerarEmailTokenJWT(novoUsuario.id);
 
-      const expira_em = new Date(Date.now() + 1000 * 60 * 0.5); // 6 segundos
+      const expira_em = new Date(Date.now() + expira_em_minutos); // tempo determinado no arquivo .env
 
       await emailTokenRepository.criar(novoUsuario.id, token, expira_em);
 
