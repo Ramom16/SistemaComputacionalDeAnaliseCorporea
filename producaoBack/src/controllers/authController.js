@@ -49,7 +49,7 @@ const authController = {
       //  IMPORTANTE: gerar token com id do usuário
       const token = gerarEmailTokenJWT(novoUsuario.id);
 
-      const expira_em = new Date(Date.now() + 1000 * 60 * 60); // 1 hora
+      const expira_em = new Date(Date.now() + 1000 * 60 * 0.1); // 6 segundos
 
       await emailTokenRepository.criar(novoUsuario.id, token, expira_em);
 
@@ -141,11 +141,20 @@ const authController = {
       }
 
       if (new Date(tokenEncontrado.expira_em) < new Date()) {
-        // Token expirado: remove o token e desativa o usuário correspondente
-        await emailTokenRepository.deletar(tokenEncontrado.id);
-        await usuariosRepository.desativar(tokenEncontrado.usuarioId);
 
-        return res.status(400).json({ erro: "Token expirado" });
+        // remove todos os tokens do usuário
+        await emailTokenRepository.deletarPorUsuario(
+          tokenEncontrado.usuarioId
+        );
+
+        // remove o usuário não verificado
+        await usuariosRepository.deletar(
+          tokenEncontrado.usuarioId
+        );
+
+        return res.status(400).json({
+          erro: "Token expirado. Usuário removido."
+        });
       }
 
       await usuariosRepository.verificarEmail(tokenEncontrado.usuarioId);
