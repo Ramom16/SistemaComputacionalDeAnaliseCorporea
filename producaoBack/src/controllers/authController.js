@@ -41,8 +41,6 @@ const authController = {
         data_nascimento
       });
 
-      
-      
       const novoUsuario = await usuariosRepository.criar(usuario);
 
       // apagar tokens antigos
