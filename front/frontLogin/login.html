@@ -3,137 +3,72 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Login</title>
-
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
-    body {
-      font-family: Arial, sans-serif;
-      background: #f4f4f4;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
-    }
-
-    .container {
-      background: white;
-      width: 400px;
-      padding: 30px;
-      border-radius: 10px;
-      box-shadow: 0px 0px 10px rgba(0,0,0,0.1);
-    }
-
-    h2 {
-      text-align: center;
-      margin-bottom: 20px;
-      color: #333;
-    }
-
-    input {
-      padding: 10px;
-      width: 100%;
-      margin-bottom: 15px;
-      border: 1px solid #ddd;
-      border-radius: 5px;
-      font-size: 14px;
-    }
-
-    button {
-      padding: 10px 20px;
-      width: 100%;
-      border: none;
-      background: #007bff;
-      color: white;
-      border-radius: 5px;
-      cursor: pointer;
-      font-size: 16px;
-    }
-
-    button:disabled {
-      background: gray;
-      cursor: not-allowed;
-    }
-
-    button:hover:not(:disabled) {
-      background: #0056b3;
-    }
-
-    #msg {
-      text-align: center;
-      margin-top: 15px;
-      font-weight: bold;
-      color: #333;
-    }
-
-    .erro {
-      color: #dc3545;
-    }
-
-    .sucesso {
-      color: #28a745;
-    }
-
-    .link-cadastro {
-      text-align: center;
-      margin-top: 15px;
-    }
-
-    .link-cadastro a {
-      color: #007bff;
-      text-decoration: none;
-    }
-
-    .link-cadastro a:hover {
-      text-decoration: underline;
-    }
-
-    .retorno {
-      display: none;
-      text-align: center;
-      margin-top: 15px;
-    }
-
-    .retorno-info {
-      background: #f8f9fa;
-      padding: 10px;
-      border-radius: 5px;
-      margin-top: 10px;
-    }
-  </style>
+  <title>IRONFIT - Login</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Oswald:wght@500;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/login.css">
 </head>
 <body>
 
-  <div class="container">
-    <h2>Login</h2>
-
-    <form id="formLogin">
-      <input type="email" id="email" placeholder="Email" required />
-      <input type="password" id="senha" placeholder="Senha" required />
-      <button type="submit" id="btnLogin">Entrar</button>
-    </form>
-
-    <p id="msg"></p>
-
-    <div class="retorno" id="retorno">
-      <div class="retorno-info">
-        <p><strong>Token:</strong></p>
-        <p id="token" style="word-break: break-all; font-size: 12px;"></p>
+  <header class="navbar">
+    <a href="../index.html" class="logo">
+      <div class="logo-icon">
+        <span class="logo-bar"></span>
+        <span class="logo-bar"></span>
+        <span class="logo-bar"></span>
       </div>
-      <div class="retorno-info" style="margin-top: 10px;">
-        <p id="retornoUsuario"></p>
+      <span class="logo-text">IRONFIT</span>
+    </a>
+    <nav>
+      <ul class="nav-links">
+        <li><a href="../index.html">Início</a></li>
+        <li><a href="login.html" style="color: var(--primary-yellow);">Login</a></li>
+        <li><a href="cadastro.html">Cadastrar</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <section class="login-hero">
+    <div class="login-wrapper">
+      <div class="login-container">
+        <div class="login-header">
+          <h2>Acesse sua<br>conta</h2>
+          <p>Entre para continuar sua jornada</p>
+          <div class="accent-line"></div>
+        </div>
+
+        <form id="formLogin">
+          <div class="form-group">
+            <label for="email">E-mail</label>
+            <input type="email" id="email" placeholder="seu@email.com" required />
+          </div>
+          <div class="form-group">
+            <label for="senha">Senha</label>
+            <input type="password" id="senha" placeholder="Sua senha" required />
+          </div>
+          <button type="submit" id="btnLogin" class="btn-login">Entrar</button>
+        </form>
+
+        <p id="msg"></p>
+
+        <div class="retorno" id="retorno">
+          <div class="retorno-info">
+            <p><strong>Token de Acesso:</strong></p>
+            <p id="token" style="word-break: break-all; font-size: 12px; margin-top: 4px; color: var(--primary-yellow);"></p>
+          </div>
+          <div class="retorno-info" style="margin-top: 10px;">
+            <p id="retornoUsuario"></p>
+          </div>
+        </div>
+
+        <div class="link-cadastro">
+          <span>Não tem conta? </span>
+          <a href="cadastro.html">Cadastre-se</a>
+        </div>
       </div>
     </div>
-
-    <div class="link-cadastro">
-      <a href="cadastro.html">Não tem conta? Cadastre-se</a>
-    </div>
-  </div>
+  </section>
 
   <script>
     const form = document.getElementById("formLogin");
@@ -154,7 +89,8 @@
       const email = document.getElementById("email").value;
       const senha = document.getElementById("senha").value;
       const link = "https://7406-2804-868-d057-4274-2886-64c9-196e-1bb6.ngrok-free.app";
-      const path = "/auth/login"
+      const path = "/auth/login";
+      
       try {
         const response = await fetch(link+path, {
           method: "POST",
