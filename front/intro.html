@@ -1,0 +1,225 @@
+<!doctype html>
+<html lang="pt-br">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>NEONFIT - Treinos Personalizados</title>
+    <meta
+      name="description"
+      content="Sistema computacional de análise corpórea com treinos personalizados, análise metabólica e acompanhamento corporal."
+    />
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600&display=swap"
+      rel="stylesheet"
+    />
+
+    <link rel="stylesheet" href="styles/intro.css" />
+  </head>
+  <body>
+    <!-- 
+       NAVBAR
+  -->
+    <nav class="navbar" id="navbar">
+      <a href="#" class="navbar-logo">
+        <span class="navbar-logo-icon">
+          <!-- Ícone do logo (ondas estilizadas em amarelo) -->
+          <svg
+            viewBox="0 0 32 32"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M4 20C8 14 12 26 16 20C20 14 24 26 28 20"
+              stroke="#E8E032"
+              stroke-width="3"
+              stroke-linecap="round"
+            />
+            <path
+              d="M4 14C8 8 12 20 16 14C20 8 24 20 28 14"
+              stroke="#E8E032"
+              stroke-width="3"
+              stroke-linecap="round"
+            />
+          </svg>
+        </span>
+        <span class="navbar-logo-text">NEONFIT</span>
+      </a>
+      <ul class="navbar-links">
+        <li><a href="#como-funciona">Como funciona</a></li>
+        <li><a href="#entrega">Funcionalidades</a></li>
+        <li><a href="#contato">Contato</a></li>
+        <li><a href="login.html">Login</a></li>
+      </ul>
+    </nav>
+
+    <!-- 
+       HERO SECTION
+   -->
+    <section class="hero" id="hero">
+      <div class="hero-bg">
+        <img
+          src="https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=1920&q=80"
+          alt="Fundo academia"
+        />
+      </div>
+      <div class="hero-content fade-in">
+        <h1>Treinos Personalizados Para Você</h1>
+        <!-- Botão "Começar agora" direciona para login.html -->
+        <a href="login.html" class="hero-cta" id="btn-comecar">Começar agora</a>
+      </div>
+    </section>
+
+    <!-- 
+       SEÇÃO: COMO FUNCIONA O SISTEMA
+  -->
+    <section class="section-como-funciona" id="como-funciona">
+      <div class="como-funciona-wrapper">
+        <div class="como-funciona-texto fade-in">
+          <h2>Como Funciona O Sistema</h2>
+          <p>
+            O sistema realiza uma análise corporal com base em dados como peso,
+            altura, idade e nível de atividade física. A partir dessas
+            informações, são calculados indicadores como IMC, TMB e NDC.
+          </p>
+          <p>
+            Após escolher seu objetivo, como emagrecimento, ganho de massa
+            muscular ou manutenção do peso, o usuário recebe recomendações de
+            treinos personalizados e exercícios com vídeos demonstrativos.
+          </p>
+          <a href="#" class="link-saiba-mais">Saiba mais</a>
+        </div>
+        <div class="como-funciona-imagem fade-in">
+          <img
+            src="https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?w=600&q=80"
+            alt="Pessoa treinando"
+          />
+        </div>
+      </div>
+    </section>
+
+    <!-- Linha divisória amarela -->
+    <div class="divider"></div>
+
+    <!-- 
+       SEÇÃO: O QUE O SISTEMA ENTREGA
+   -->
+    <section class="section-entrega" id="entrega">
+      <div class="section-entrega-bg">
+        <img
+          src="https://images.unsplash.com/photo-1571902943202-507ec2618e8f?w=1920&q=80"
+          alt="Fundo academia escuro"
+        />
+      </div>
+      <div class="section-entrega-content">
+        <h2 class="fade-in">O Que O Sistema Entrega</h2>
+        <p class="fade-in">
+          Estamos empenhados em oferecer a melhor experiência e treino.
+        </p>
+
+        <div class="cards-entrega">
+          <!-- Card 1: Treinos Personalizados -->
+          <div class="card-entrega fade-in">
+            <img
+              src="https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?w=400&q=80"
+              alt="Treinos personalizados"
+            />
+            <div class="card-entrega-overlay">
+              <h3>Treinos<br />Personalizados</h3>
+            </div>
+          </div>
+
+          <!-- Card 2: Análise Metabólica -->
+          <div class="card-entrega fade-in">
+            <img
+              src="https://images.unsplash.com/photo-1599058917765-a780eda07a3e?w=400&q=80"
+              alt="Análise metabólica"
+            />
+            <div class="card-entrega-overlay">
+              <h3>Análise<br />Metabólica</h3>
+            </div>
+          </div>
+
+          <!-- Card 3: Acompanhamento Corporal -->
+          <div class="card-entrega fade-in">
+            <img
+              src="https://images.unsplash.com/photo-1549060279-7e168fcee0c2?w=400&q=80"
+              alt="Acompanhamento corporal"
+            />
+            <div class="card-entrega-overlay">
+              <h3>Acompanhamento<br />Corporal</h3>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Linha divisória amarela -->
+    <div class="divider"></div>
+
+    <!-- 
+       SEÇÃO: ENTRE EM CONTATO
+   -->
+    <section class="section-contato" id="contato">
+      <div class="section-contato-bg">
+        <img
+          src="https://images.unsplash.com/photo-1526506118085-60ce8714f8c5?w=1920&q=80"
+          alt="Fundo contato"
+        />
+      </div>
+      <div class="section-contato-content fade-in">
+        <h2>Entre Em Contato Ainda Hoje</h2>
+      </div>
+    </section>
+
+    <!-- 
+       FOOTER -->
+    <footer class="footer">
+      <p class="footer-label">E-mail</p>
+      <p class="footer-email">
+        <a href="mailto:alo@sitebacana.com.br">alo@sitebacana.com.br</a>
+      </p>
+    </footer>
+
+    <!-- 
+       JAVASCRIPT: Animações de scroll (fade-in)
+   -->
+    <script>
+      // Intersection Observer para animações de entrada
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add("visible");
+            }
+          });
+        },
+        {
+          threshold: 0.15,
+          rootMargin: "0px 0px -50px 0px",
+        },
+      );
+
+      // Observar todos os elementos com classe .fade-in
+      document.querySelectorAll(".fade-in").forEach((el) => {
+        observer.observe(el);
+      });
+
+      // Navbar: adicionar fundo ao rolar
+      const navbar = document.getElementById("navbar");
+      window.addEventListener("scroll", () => {
+        if (window.scrollY > 60) {
+          navbar.style.background = "rgba(17, 17, 17, 0.95)";
+          navbar.style.backdropFilter = "blur(10px)";
+        } else {
+          navbar.style.background =
+            "linear-gradient(180deg, rgba(0,0,0,0.7) 0%, transparent 100%)";
+          navbar.style.backdropFilter = "none";
+        }
+      });
+    </script>
+  </body>
+</html>
