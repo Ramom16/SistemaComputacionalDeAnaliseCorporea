@@ -25,9 +25,7 @@ export class Usuario {
         this.id = id;
     }
 
-    // ==========================
     // GETTERS
-    // ==========================
     get id() {
         return this.#id;
     }
@@ -56,9 +54,7 @@ export class Usuario {
         return this.#email_verificado;
     }
 
-    // ==========================
     // SETTERS
-    // ==========================
     set nome(value) {
         this.#validarNome(value);
         this.#nome = value.trim();
@@ -98,9 +94,7 @@ export class Usuario {
         }
     }
 
-    // ==========================
     // VALIDAÇÕES
-    // ==========================
     #validarNome(value) {
         if (!value || value.trim().length < 3 || value.trim().length > 60) {
             throw new Error("Nome deve ter entre 3 e 60 caracteres");
@@ -163,9 +157,7 @@ export class Usuario {
         }
     }
 
-    // ==========================
     // FACTORY METHODS
-    // ==========================
     static criar({
         nome,
         email,

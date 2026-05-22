@@ -11,7 +11,15 @@ dotenv.config();
 const app = express();
 
 // MIDDLEWARES GLOBAIS
-app.use(cors({ origin: "*" }));
+const corsOptions = {
+  origin: [
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+    process.env.FRONT_URL,
+  ],
+  credentials: true
+};
+app.use(cors(corsOptions));
 app.use(express.json());
 
 // ROTAS PÚBLICAS

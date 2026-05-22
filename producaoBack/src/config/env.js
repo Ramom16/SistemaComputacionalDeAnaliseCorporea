@@ -11,3 +11,14 @@ export const env = {
 
 if (!env.DATABASE_URL) throw new Error("DATABASE_URL não definido no .env");
 if (!env.JWT_SECRET) throw new Error("JWT_SECRET não definido no .env");
+
+// src/config/env.js
+
+export const envTokenExpiraMinutos = {
+  ValidadeTokenMinutos: Number(
+    process.env.EMAIL_TOKEN_EXPIRATION_MINUTES || 3
+    
+  ),
+  
+
+};

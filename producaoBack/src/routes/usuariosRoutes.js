@@ -3,7 +3,7 @@ import usuariosController from "../controllers/usuariosController.js";
 
 const router = express.Router();
 
-router.post("/", usuariosController.criarUsuario);
+// Rota para buscar usuários - GET /usuarios ou /usuarios?id=xxx
 router.get("/", usuariosController.selecionarUsuario);
 
 export default router;

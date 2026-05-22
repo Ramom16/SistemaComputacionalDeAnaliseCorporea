@@ -4,10 +4,16 @@ import { gerarHashSenha, compararSenha } from "../utils/senhaHash.js";
 import { gerarEmailTokenJWT, gerarTokenLogin } from "../utils/gerarTokens.js";
 import { enviarEmailVerificacao } from "../services/emailService.js";
 import { Usuario } from "../models/Usuarios.js";
+import { envTokenExpiraMinutos } from "../config/env.js";
 
 /**
  * Controlador de autenticação e verificação de email.
  */
+const conversorMinutos = 60*1000
+const expira_em_minutos = new Date(
+  Date.now() + envTokenExpiraMinutos.ValidadeTokenMinutos * conversorMinutos
+);
+
 const authController = {
 
   /**
@@ -49,7 +55,7 @@ const authController = {
       //  IMPORTANTE: gerar token com id do usuário
       const token = gerarEmailTokenJWT(novoUsuario.id);
 
-      const expira_em = new Date(Date.now() + 1000 * 60 * 60); // 1 hora
+      const expira_em = new Date(Date.now() + expira_em_minutos); // tempo determinado no arquivo .env
 
       await emailTokenRepository.criar(novoUsuario.id, token, expira_em);
 
@@ -141,11 +147,20 @@ const authController = {
       }
 
       if (new Date(tokenEncontrado.expira_em) < new Date()) {
-        // Token expirado: remove o token e desativa o usuário correspondente
-        await emailTokenRepository.deletar(tokenEncontrado.id);
-        await usuariosRepository.desativar(tokenEncontrado.usuarioId);
 
-        return res.status(400).json({ erro: "Token expirado" });
+        // remove todos os tokens do usuário
+        await emailTokenRepository.deletarPorUsuario(
+          tokenEncontrado.usuarioId
+        );
+
+        // remove o usuário não verificado
+        await usuariosRepository.deletar(
+          tokenEncontrado.usuarioId
+        );
+
+        return res.status(400).json({
+          erro: "Token expirado. Usuário removido."
+        });
       }
 
       await usuariosRepository.verificarEmail(tokenEncontrado.usuarioId);
