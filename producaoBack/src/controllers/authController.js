@@ -1,21 +1,18 @@
 import usuariosRepository from "../repositories/usuariosRepository.js";
 import emailTokenRepository from "../repositories/emailTokenRepository.js";
+
 import { gerarHashSenha, compararSenha } from "../utils/senhaHash.js";
 import { gerarEmailTokenJWT, gerarTokenLogin } from "../utils/gerarTokens.js";
-import { enviarEmailVerificacao } from "../services/emailService.js";
-import { Usuario } from "../models/Usuarios.js";
-import { envTokenExpiraMinutos } from "../config/env.js";
 
+import { enviarEmailVerificacao } from "../services/emailService.js";
+
+import { Usuario } from "../models/Usuarios.js";
+
+import { envTokenExpiraMinutos } from "../config/env.js";
 /**
  * Controlador de autenticação e verificação de email.
  */
-const conversorMinutos = 60*1000
-const expira_em_minutos = new Date(
-  Date.now() + envTokenExpiraMinutos.ValidadeTokenMinutos * conversorMinutos
-);
-
 const authController = {
-
   /**
    * Cria um usuário, gera token de verificação e envia e-mail.
    * @param {import('express').Request} req
@@ -23,92 +20,163 @@ const authController = {
    */
   criar: async (req, res) => {
     try {
+
       const { nome, email, senha, data_nascimento } = req.body;
 
+      // validações básicas
       if (!senha || senha.trim() === "") {
-        return res.status(400).json({ erro: "Adicione uma senha válida" });
+        return res.status(400).json({
+          erro: "Adicione uma senha válida"
+        });
       }
 
       if (!nome || !email || !data_nascimento) {
-        return res.status(400).json({ erro: "Nome, email e data de nascimento são obrigatórios" });
+        return res.status(400).json({
+          erro: "Nome, email e data de nascimento são obrigatórios"
+        });
       }
 
-      const existe = await usuariosRepository.buscarPorEmail(email);
+      // verifica email existente
+      const existe = await usuariosRepository.buscarPorEmail(
+        email.trim().toLowerCase()
+      );
+
       if (existe) {
-        return res.status(400).json({ erro: "Email já cadastrado" });
+        return res.status(400).json({
+          erro: "Email já cadastrado"
+        });
       }
 
+      // gera hash
       const senha_hash = await gerarHashSenha(senha);
 
+      // cria objeto usuário
       const usuario = Usuario.criar({
         nome,
-        email,
+        email: email.trim().toLowerCase(),
         senha_hash,
         data_nascimento
       });
 
+      // salva usuário
       const novoUsuario = await usuariosRepository.criar(usuario);
 
-      // apagar tokens antigos
-      await emailTokenRepository.deletarPorUsuario(novoUsuario.id);
+      // remove tokens antigos
+      await emailTokenRepository.deletarPorUsuario(
+        novoUsuario.id
+      );
 
-      //  IMPORTANTE: gerar token com id do usuário
-      const token = gerarEmailTokenJWT(novoUsuario.id);
+      // gera token
+      const token = gerarEmailTokenJWT(
+        novoUsuario.id
+      );
 
-      const expira_em = new Date(Date.now() + expira_em_minutos); // tempo determinado no arquivo .env
+      // calcula expiração
+      const conversorMinutos = 60 * 1000;
 
-      await emailTokenRepository.criar(novoUsuario.id, token, expira_em);
+      const expira_em = new Date(
+        Date.now() +
+        envTokenExpiraMinutos.ValidadeTokenMinutos *
+        conversorMinutos
+      );
 
-      const link = `${process.env.FRONT_URL}?token=${token}`;
+      // DEBUG (opcional)
+      console.log("Tempo token:",
+        envTokenExpiraMinutos.ValidadeTokenMinutos
+      );
 
-      await enviarEmailVerificacao(novoUsuario.email, link);
+      console.log("Data expiração:",
+        expira_em
+      );
+
+      // salva token
+      await emailTokenRepository.criar(
+        novoUsuario.id,
+        token,
+        expira_em
+      );
+
+      // gera link
+      const link =
+        `${process.env.FRONT_URL}?token=${token}`;
+
+      // envia email
+      await enviarEmailVerificacao(
+        novoUsuario.email,
+        link
+      );
 
       return res.status(201).json({
         msg: "Usuário criado! Verifique seu email para ativar a conta."
       });
 
     } catch (error) {
-      return res.status(400).json({ erro: error.message });
+
+      console.error(error);
+
+      return res.status(400).json({
+        erro: error.message
+      });
     }
   },
 
   /**
-   * Login do usuário com email e senha.
+   * Login do usuário.
    * @param {import('express').Request} req
    * @param {import('express').Response} res
    */
   login: async (req, res) => {
     try {
+
       const { email, senha } = req.body;
 
       if (!email || !senha) {
-        return res.status(400).json({ erro: "Email e senha são obrigatórios" });
+        return res.status(400).json({
+          erro: "Email e senha são obrigatórios"
+        });
       }
 
-      const usuario = await usuariosRepository.buscarPorEmail(email.trim().toLowerCase());
+      const usuario =
+        await usuariosRepository.buscarPorEmail(
+          email.trim().toLowerCase()
+        );
 
       if (!usuario) {
-        return res.status(401).json({ erro: "Credenciais inválidas" });
+        return res.status(401).json({
+          erro: "Credenciais inválidas"
+        });
       }
 
       if (!usuario.ativo) {
-        return res.status(403).json({ erro: "Conta desativada. Entre em contato com o administrador." });
+        return res.status(403).json({
+          erro: "Conta desativada. Entre em contato com o administrador."
+        });
       }
 
       if (!usuario.email_verificado) {
-        return res.status(403).json({ erro: "Email não verificado. Verifique seu email primeiro." });
+        return res.status(403).json({
+          erro: "Email não verificado. Verifique seu email primeiro."
+        });
       }
 
-      const senhaValida = await compararSenha(senha, usuario.senha_hash);
+      const senhaValida =
+        await compararSenha(
+          senha,
+          usuario.senha_hash
+        );
 
       if (!senhaValida) {
-        return res.status(401).json({ erro: "Credenciais inválidas" });
+        return res.status(401).json({
+          erro: "Credenciais inválidas"
+        });
       }
 
-      // Atualizar último login
-      await usuariosRepository.atualizarUltimoLogin(usuario.id);
+      // atualiza último login
+      await usuariosRepository.atualizarUltimoLogin(
+        usuario.id
+      );
 
-      // Gerar token de acesso
+      // gera token login
       const token = gerarTokenLogin(usuario);
 
       return res.status(200).json({
@@ -122,38 +190,54 @@ const authController = {
       });
 
     } catch (error) {
-      return res.status(400).json({ erro: error.message });
+
+      console.error(error);
+
+      return res.status(400).json({
+        erro: error.message
+      });
     }
   },
 
   /**
-   * Verifica o email do usuário usando o token informado na querystring.
-   * Se o token estiver expirado, remove o token e desativa o usuário.
+   * Verifica email.
    * @param {import('express').Request} req
    * @param {import('express').Response} res
    */
   verificarEmail: async (req, res) => {
     try {
+
       const { token } = req.query;
 
       if (!token) {
-        return res.status(400).json({ erro: "Token não informado" });
+        return res.status(400).json({
+          erro: "Token não informado"
+        });
       }
 
-      const tokenEncontrado = await emailTokenRepository.buscarPorToken(token);
+      const tokenEncontrado =
+        await emailTokenRepository.buscarPorToken(
+          token
+        );
 
       if (!tokenEncontrado) {
-        return res.status(400).json({ erro: "Token inválido ou já utilizado" });
+        return res.status(400).json({
+          erro: "Token inválido ou já utilizado"
+        });
       }
 
-      if (new Date(tokenEncontrado.expira_em) < new Date()) {
+      // verifica expiração
+      if (
+        new Date(tokenEncontrado.expira_em)
+        < new Date()
+      ) {
 
-        // remove todos os tokens do usuário
+        // remove tokens
         await emailTokenRepository.deletarPorUsuario(
           tokenEncontrado.usuarioId
         );
 
-        // remove o usuário não verificado
+        // remove usuário não verificado
         await usuariosRepository.deletar(
           tokenEncontrado.usuarioId
         );
@@ -163,52 +247,108 @@ const authController = {
         });
       }
 
-      await usuariosRepository.verificarEmail(tokenEncontrado.usuarioId);
+      // verifica email
+      await usuariosRepository.verificarEmail(
+        tokenEncontrado.usuarioId
+      );
 
-      await emailTokenRepository.deletar(tokenEncontrado.id);
+      // remove token usado
+      await emailTokenRepository.deletar(
+        tokenEncontrado.id
+      );
 
-      return res.status(200).json({ msg: "Email verificado com sucesso!" });
+      return res.status(200).json({
+        msg: "Email verificado com sucesso!"
+      });
 
     } catch (error) {
-      return res.status(400).json({ erro: error.message });
+
+      console.error(error);
+
+      return res.status(400).json({
+        erro: error.message
+      });
     }
   },
 
   /**
-   * Reenvia o email de verificação gerando um novo token.
-   * Remove tokens antigos do usuário e envia novo link.
+   * Reenvia email de verificação.
    * @param {import('express').Request} req
    * @param {import('express').Response} res
    */
   reenviarEmail: async (req, res) => {
     try {
+
       const { email } = req.body;
 
-      if (!email || typeof email !== "string" || email.trim() === "") {
-        return res.status(400).json({ erro: "Informe o email" });
+      if (
+        !email ||
+        typeof email !== "string" ||
+        email.trim() === ""
+      ) {
+        return res.status(400).json({
+          erro: "Informe o email"
+        });
       }
 
-      const usuario = await usuariosRepository.buscarPorEmail(email.trim().toLowerCase());
+      const usuario =
+        await usuariosRepository.buscarPorEmail(
+          email.trim().toLowerCase()
+        );
 
-      // Mensagem genérica para não revelar se o email existe
+      // evita enumeração de emails
       if (!usuario) {
-        return res.status(200).json({ msg: "Se o email existir, enviaremos um novo link de verificação." });
+        return res.status(200).json({
+          msg: "Se o email existir, enviaremos um novo link de verificação."
+        });
       }
 
-      // Recria o token (remove tokens antigos do usuário)
-      await emailTokenRepository.deletarPorUsuario(usuario.id);
+      // remove tokens antigos
+      await emailTokenRepository.deletarPorUsuario(
+        usuario.id
+      );
 
-      const token = gerarEmailTokenJWT(usuario.id);
-      const expira_em = new Date(Date.now() + 1000 * 60 * 60); // 1 hora
+      // gera novo token
+      const token =
+        gerarEmailTokenJWT(usuario.id);
 
-      await emailTokenRepository.criar(usuario.id, token, expira_em);
+      // nova expiração
+      const conversorMinutos = 60 * 1000;
 
-      const link = `${process.env.FRONT_URL}?token=${token}`;
-      await enviarEmailVerificacao(usuario.email, link);
+      const expira_em = new Date(
+        Date.now() +
+        envTokenExpiraMinutos.ValidadeTokenMinutos *
+        conversorMinutos
+      );
 
-      return res.status(200).json({ msg: "Novo link de verificação enviado para seu email." });
+      // salva token
+      await emailTokenRepository.criar(
+        usuario.id,
+        token,
+        expira_em
+      );
+
+      // link
+      const link =
+        `${process.env.FRONT_URL}?token=${token}`;
+
+      // envia email
+      await enviarEmailVerificacao(
+        usuario.email,
+        link
+      );
+
+      return res.status(200).json({
+        msg: "Novo link de verificação enviado para seu email."
+      });
+
     } catch (error) {
-      return res.status(400).json({ erro: error.message });
+
+      console.error(error);
+
+      return res.status(400).json({
+        erro: error.message
+      });
     }
   }
 };

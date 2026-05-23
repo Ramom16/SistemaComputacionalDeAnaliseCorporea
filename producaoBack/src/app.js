@@ -1,6 +1,6 @@
+import dotenv from "dotenv";
 import express from "express";
 import cors from "cors";
-import dotenv from "dotenv";
 import { autenticarToken } from "./middlewares/autenticarToken.js";
 
 import authRoutes from "./routes/authRoutes.js";
@@ -15,6 +15,7 @@ const corsOptions = {
   origin: [
     "http://localhost:5173",
     "http://127.0.0.1:5173",
+    
     process.env.FRONT_URL,
   ],
   credentials: true
