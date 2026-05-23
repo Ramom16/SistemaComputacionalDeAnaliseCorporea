@@ -1,3 +1,3 @@
-const apiBaseURL = import.meta.env.VITE_API_URL || "https://seu-backend.vercel.app";
+const apiBaseURL = import.meta.env.VITE_API_URL || "http:localhost:3000";
 
 export default apiBaseURL;
