@@ -152,7 +152,7 @@
                 btnReenviar.disabled = true;
                 btnReenviar.innerText = "Enviando...";
 
-                const response = await fetch("http://localhost:8081/auth/reenviar-email", {
+                const response = await fetch("http://localhost:3000/auth/reenviar-email", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json"
