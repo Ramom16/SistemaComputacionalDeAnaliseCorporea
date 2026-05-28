@@ -89,24 +89,24 @@ const DadosCorporaisController = {
     },
     // BUSCAR POR USUÁRIO
     buscarPorUsuario: async (req, res) => {
-        try {
-            const { idUsuario } = req.params;
-            const dados =
-                await DadosCorporaisRepository.findByUsuario(
-                    Number(idUsuario)
-                );
-            if (!dados) {
-                return res.status(404).json({
-                    erro: "Dados não encontrados"
-                });
-            }
-            return res.status(200).json(dados);
-        } catch (error) {
-            return res.status(500).json({
-                erro: error.message
-            });
+    try {
+        const idUsuario = Number(req.params.idUsuario);
+
+        if (!idUsuario || isNaN(idUsuario)) {
+            return res.status(400).json({erro: "ID do usuário inválido"});
         }
-    },
+        const dados =
+            await DadosCorporaisRepository.findByUsuario(idUsuario);
+        if (!dados) {return res.status(404).json(
+            {erro: "Dados não encontrados"});
+        }
+        return res.status(200).json(dados);
+    } catch (error) {
+        return res.status(500).json({
+            erro: error.message
+        });
+    }
+},
 
     // UPDATE
     atualizar: async (req, res) => {

@@ -5,8 +5,8 @@ import express from "express";
 const dadosRoutes = express.Router();
 
 dadosRoutes.get('/', dadosCorporaisController.listar);
-dadosRoutes.get("/:id" , dadosCorporaisController.buscarPorId);
-dadosRoutes.get("/", dadosCorporaisController.buscarPorUsuario);
+dadosRoutes.get("/:idDados" , dadosCorporaisController.buscarPorId);
+dadosRoutes.get("/:idUsuario", dadosCorporaisController.buscarPorUsuario);
 
 dadosRoutes.post('/', dadosCorporaisController.criar);
 
