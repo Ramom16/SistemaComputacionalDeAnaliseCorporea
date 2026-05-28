@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IRONFIT - Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;700;900&family=Barlow:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="dashboard.css">
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <header class="navbar">
+    <a href="#" class="logo">
+      <div class="logo-icon">
+        <span class="logo-bar"></span>
+        <span class="logo-bar"></span>
+        <span class="logo-bar"></span>
+      </div>
+      <span class="logo-text">IRONFIT</span>
+    </a>
+    <div class="nav-user">
+      <span class="nav-greeting">Olá, <span id="nav-name">Usuário</span></span>
+      <button class="btn-logout" onclick="window.location.href='login.html'">SAIR</button>
+    </div>
+  </header>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <div class="page-header">
+      <h1>Sua <span>Análise</span> Corporal</h1>
+      <p>Preencha seus dados para gerar seu IMC, TMB e NDC personalizados.</p>
+    </div>
+
+    <!-- FORMULÁRIO -->
+    <div class="form-card">
+      <h2>Dados Pessoais</h2>
+
+      <div class="form-grid">
+
+        <div class="form-group">
+          <label for="peso">Peso (kg)</label>
+          <input type="number" id="peso" placeholder="Ex: 75" min="30" max="300" step="0.1">
+        </div>
+
+        <div class="form-group">
+          <label for="altura">Altura (cm)</label>
+          <input type="number" id="altura" placeholder="Ex: 175" min="100" max="250">
+        </div>
+
+        <div class="form-group">
+          <label for="idade">Idade</label>
+          <input type="number" id="idade" placeholder="Ex: 22" min="10" max="100">
+        </div>
+
+        <div class="form-group">
+          <label>Sexo</label>
+          <div class="sex-toggle">
+            <button class="sex-btn active" id="btn-m" onclick="setSexo('M')">♂ Masculino</button>
+            <button class="sex-btn" id="btn-f" onclick="setSexo('F')">♀ Feminino</button>
+          </div>
+        </div>
+
+        <div class="form-group full">
+          <label for="atividade">Nível de Atividade Física</label>
+          <div class="select-wrapper">
+            <select id="atividade">
+              <option value="" disabled selected>Selecione seu nível...</option>
+              <option value="1.2">Sedentário (pouco ou nenhum exercício)</option>
+              <option value="1.375">Levemente ativo (exercício 1–3x/semana)</option>
+              <option value="1.55">Moderadamente ativo (exercício 3–5x/semana)</option>
+              <option value="1.725">Muito ativo (exercício 6–7x/semana)</option>
+              <option value="1.9">Extremamente ativo (atleta / trabalho físico intenso)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group full">
+          <label for="objetivo">Objetivo</label>
+          <div class="select-wrapper">
+            <select id="objetivo">
+              <option value="" disabled selected>Selecione seu objetivo...</option>
+              <option value="emagrecer">Emagrecimento</option>
+              <option value="massa">Ganho de Massa Muscular</option>
+              <option value="manter">Manutenção do Peso</option>
+            </select>
+          </div>
+        </div>
+
+      </div>
+
+      <p class="error-msg" id="error-msg">⚠ Preencha todos os campos antes de gerar a análise.</p>
+
+      <button class="btn-generate" id="btn-gerar" onclick="gerarAnalise()">
+        Gerar Análise
+      </button>
+    </div>
+
+    <!-- RESULTADOS (slide suave) -->
+    <div class="results-section" id="results-section">
+      <div class="results-inner">
+        <p class="results-title">Resultados</p>
+        <div class="results-grid">
+
+          <div class="result-card imc" id="card-imc">
+            <p class="result-label">IMC</p>
+            <p class="result-value" id="imc-valor">—</p>
+            <p class="result-unit">kg/m²</p>
+            <span class="result-badge" id="imc-badge">—</span>
+            <p class="result-desc" id="imc-desc"></p>
+          </div>
+
+          <div class="result-card tmb" id="card-tmb">
+            <p class="result-label">TMB</p>
+            <p class="result-value" id="tmb-valor">—</p>
+            <p class="result-unit">kcal / dia em repouso</p>
+            <p class="result-desc" id="tmb-desc"></p>
+          </div>
+
+          <div class="result-card ndc" id="card-ndc">
+            <p class="result-label">NDC</p>
+            <p class="result-value" id="ndc-valor">—</p>
+            <p class="result-unit">kcal / dia necessárias</p>
+            <p class="result-desc" id="ndc-desc"></p>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <script>
+    let sexoSelecionado = 'M';
+
+    function setSexo(s) {
+      sexoSelecionado = s;
+      document.getElementById('btn-m').classList.toggle('active', s === 'M');
+      document.getElementById('btn-f').classList.toggle('active', s === 'F');
+    }
+
+    function gerarAnalise() {
+      const peso     = parseFloat(document.getElementById('peso').value);
+      const altura   = parseFloat(document.getElementById('altura').value);
+      const idade    = parseInt(document.getElementById('idade').value);
+      const atividade = parseFloat(document.getElementById('atividade').value);
+      const objetivo  = document.getElementById('objetivo').value;
+      const errorMsg  = document.getElementById('error-msg');
+
+      // Validação
+      if (!peso || !altura || !idade || !atividade || !objetivo) {
+        errorMsg.style.display = 'block';
+        return;
+      }
+      errorMsg.style.display = 'none';
+
+      const alturaM = altura / 100;
+
+      // ── IMC ──
+      const imc = peso / (alturaM * alturaM);
+
+      let imcBadge, imcBadgeClass, imcDesc;
+      if (imc < 18.5) {
+        imcBadge = 'Abaixo do peso'; imcBadgeClass = 'badge-baixo';
+        imcDesc = 'Seu peso está abaixo do recomendado para sua altura.';
+      } else if (imc < 25) {
+        imcBadge = 'Peso normal'; imcBadgeClass = 'badge-normal';
+        imcDesc = 'Seu peso está dentro da faixa saudável.';
+      } else if (imc < 30) {
+        imcBadge = 'Sobrepeso'; imcBadgeClass = 'badge-sobrepeso';
+        imcDesc = 'Seu peso está levemente acima do ideal.';
+      } else {
+        imcBadge = 'Obesidade'; imcBadgeClass = 'badge-obesidade';
+        imcDesc = 'Recomenda-se atenção à alimentação e exercícios.';
+      }
+
+      // ── TMB (Fórmula de Harris-Benedict revisada) ──
+      let tmb;
+      if (sexoSelecionado === 'M') {
+        tmb = 88.362 + (13.397 * peso) + (4.799 * altura) - (5.677 * idade);
+      } else {
+        tmb = 447.593 + (9.247 * peso) + (3.098 * altura) - (4.330 * idade);
+      }
+
+      // ── NDC ──
+      let ndc = tmb * atividade;
+
+      // Ajuste por objetivo
+      let ndcDesc;
+      if (objetivo === 'emagrecer') {
+        ndc -= 500;
+        ndcDesc = 'Déficit de 500 kcal aplicado para emagrecimento saudável.';
+      } else if (objetivo === 'massa') {
+        ndc += 300;
+        ndcDesc = 'Superávit de 300 kcal aplicado para ganho de massa muscular.';
+      } else {
+        ndcDesc = 'Calorias para manter seu peso atual.';
+      }
+
+      // ── Atualiza DOM ──
+      document.getElementById('imc-valor').textContent  = imc.toFixed(1);
+      document.getElementById('tmb-valor').textContent  = Math.round(tmb);
+      document.getElementById('ndc-valor').textContent  = Math.round(ndc);
+
+      const badge = document.getElementById('imc-badge');
+      badge.textContent  = imcBadge;
+      badge.className    = 'result-badge ' + imcBadgeClass;
+
+      document.getElementById('imc-desc').textContent = imcDesc;
+      document.getElementById('tmb-desc').textContent = `Energia mínima que seu corpo precisa por dia em estado de repouso.`;
+      document.getElementById('ndc-desc').textContent = ndcDesc;
+
+      // ── Slide suave ──
+      const section = document.getElementById('results-section');
+      section.classList.add('visible');
+
+      // Anima os cards com delay
+      setTimeout(() => {
+        document.querySelectorAll('.result-card').forEach(c => c.classList.add('animate'));
+        section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 100);
+    }
+  </script>
+
+</body>
+</html>
