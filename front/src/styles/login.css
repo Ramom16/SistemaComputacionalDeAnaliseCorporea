@@ -33,15 +33,6 @@ body {
   line-height: 1.6;
 }
 
-/* Common Text Styling */
-.title-slanted {
-  font-family: var(--font-title);
-  font-weight: 900;
-  font-style: italic;
-  text-transform: uppercase;
-  letter-spacing: -0.02em;
-}
-
 /* Navbar */
 .navbar {
   position: absolute;
@@ -111,8 +102,8 @@ body {
   color: var(--primary-yellow);
 }
 
-/* HERO / CADASTRO SECTION */
-.cadastro-hero {
+/* HERO / LOGIN SECTION */
+.login-hero {
   position: relative;
   min-height: 100vh;
   display: flex;
@@ -124,7 +115,7 @@ body {
   padding: 120px 20px;
 }
 
-.cadastro-hero::before {
+.login-hero::before {
   content: '';
   position: absolute;
   top: 0;
@@ -136,17 +127,17 @@ body {
 }
 
 /* Form Container */
-.cadastro-wrapper {
+.login-wrapper {
   position: relative;
   z-index: 2;
   width: 100%;
-  max-width: 480px;
+  max-width: 450px;
   opacity: 0;
   transform: translateY(30px);
   animation: fadeInUp 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
-.cadastro-container {
+.login-container {
   background: rgba(18, 18, 18, 0.85);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
@@ -156,12 +147,12 @@ body {
   box-shadow: 0 25px 60px rgba(0, 0, 0, 0.6);
 }
 
-.cadastro-header {
+.login-header {
   text-align: center;
   margin-bottom: 40px;
 }
 
-.cadastro-header h2 {
+.login-header h2 {
   font-family: var(--font-title);
   font-weight: 900;
   font-style: italic;
@@ -173,7 +164,7 @@ body {
   margin-bottom: 8px;
 }
 
-.cadastro-header p {
+.login-header p {
   color: var(--text-gray);
   font-size: 0.95rem;
   font-weight: 300;
@@ -228,13 +219,8 @@ body {
   box-shadow: 0 0 0 3px rgba(255, 230, 0, 0.1);
 }
 
-/* Date input styling */
-.form-group input[type="date"] {
-  color-scheme: dark;
-}
-
 /* Submit Button */
-.btn-cadastro {
+.btn-login {
   width: 100%;
   padding: 16px 44px;
   background-color: var(--primary-yellow);
@@ -253,24 +239,24 @@ body {
   letter-spacing: 1px;
 }
 
-.btn-cadastro:hover:not(:disabled) {
+.btn-login:hover:not(:disabled) {
   transform: translateY(-2px) scale(1.02);
   box-shadow: 0 8px 30px rgba(255, 230, 0, 0.6);
   background-color: #fff;
 }
 
-.btn-cadastro:active:not(:disabled) {
+.btn-login:active:not(:disabled) {
   transform: translateY(0) scale(0.98);
 }
 
-.btn-cadastro:disabled {
+.btn-login:disabled {
   background: rgba(255, 255, 255, 0.15);
   color: var(--text-gray);
   cursor: not-allowed;
   box-shadow: none;
 }
 
-/* Message */
+/* Messages */
 #msg {
   text-align: center;
   margin-top: 20px;
@@ -287,20 +273,44 @@ body {
   color: #4ade80;
 }
 
-/* Login Link */
-.link-login {
+/* API Return Boxes (.retorno) */
+.retorno {
+  display: none;
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.retorno-info {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 14px;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  color: var(--text-gray);
+  text-align: left;
+}
+
+.retorno-info strong {
+  color: var(--text-white);
+  font-family: var(--font-title);
+  letter-spacing: 0.5px;
+}
+
+/* Cadastro Link */
+.link-cadastro {
   text-align: center;
   margin-top: 24px;
   padding-top: 24px;
   border-top: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-.link-login span {
+.link-cadastro span {
   color: var(--text-gray);
   font-size: 0.9rem;
 }
 
-.link-login a {
+.link-cadastro a {
   color: var(--primary-yellow);
   text-decoration: none;
   font-family: var(--font-title);
@@ -313,7 +323,7 @@ body {
   position: relative;
 }
 
-.link-login a::after {
+.link-cadastro a::after {
   content: '';
   position: absolute;
   bottom: -2px;
@@ -324,11 +334,11 @@ body {
   transition: width 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.link-login a:hover {
+.link-cadastro a:hover {
   color: #fff;
 }
 
-.link-login a:hover::after {
+.link-cadastro a:hover::after {
   width: 100%;
 }
 
@@ -357,21 +367,21 @@ body {
     gap: 20px;
   }
 
-  .cadastro-container {
+  .login-container {
     padding: 36px 24px;
   }
 
-  .cadastro-header h2 {
+  .login-header h2 {
     font-size: 1.8rem;
   }
 }
 
 @media (max-width: 480px) {
-  .cadastro-hero {
+  .login-hero {
     padding: 100px 16px;
   }
 
-  .cadastro-container {
+  .login-container {
     padding: 32px 20px;
   }
 }
