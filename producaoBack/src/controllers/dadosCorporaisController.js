@@ -68,7 +68,7 @@ const DadosCorporaisController = {
     buscarPorId: async (req, res) => {
         try {
 
-            const { idDados } = req.params;
+            const { idDados } = req.params.id;
 
             const dados = await DadosCorporaisRepository.findById(Number(idDados));
 
