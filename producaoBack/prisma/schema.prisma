@@ -54,7 +54,9 @@ model DadosCorporais {
   genero        Genero
   idade         Int
   nivel_atividade NivelAtividade
-  data_registro DateTime @default(now()) @db.Timestamp(0)
+  data_registro_Inicial DateTime @default(now()) @db.Timestamp(0)
+  data_atualizacao_dados DateTime @updateAt
+
 
   usuario Usuario @relation(fields: [idUsuario], references: [id])
   calculos Calculo[]
