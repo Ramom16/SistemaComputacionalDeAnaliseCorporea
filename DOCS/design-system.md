@@ -1,4 +1,4 @@
-# 🎨 NEONFIT — Design System
+# 🎨 IronFIT — Design System
 
 > Guia visual e técnico para manter a consistência de UI/UX em todo o projeto  
 > **Sistema Computacional de Análise Corpórea**
@@ -9,7 +9,7 @@
 
 | Item | Valor |
 |------|-------|
-| **Nome do projeto** | NEONFIT |
+| **Nome do projeto** | IronFIT |
 | **Conceito** | Fitness moderno, dark & bold |
 | **Tom visual** | Premium, escuro com acentos vibrantes |
 | **Ícone / Logo** | Ondas estilizadas em amarelo (SVG inline) |
@@ -352,4 +352,4 @@ front/
 - [ ] Criar componente de navbar reutilizável
 - [ ] Adicionar menu hamburger para mobile
 - [ ] Implementar sistema de grid/spacing tokens
-- [ ] Adicionar favicon personalizado NEONFIT
+- [ ] Adicionar favicon personalizado IronFIT
