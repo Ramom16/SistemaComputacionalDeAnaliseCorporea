@@ -3,7 +3,9 @@ import DadosCorporaisRepository from "../repositories/dadosCorporaisRepository.j
 
 const DadosCorporaisController = {
 
+    // CREATE
     criar: async (req, res) => {
+
         try {
 
             const {
@@ -11,29 +13,35 @@ const DadosCorporaisController = {
                 peso_kg,
                 altura_cm,
                 genero,
-                idade
+                idade,
+                nivel_atividade
             } = req.body;
 
             if (
-                !idUsuario ||
+                idUsuario === undefined ||
                 peso_kg === undefined ||
                 altura_cm === undefined ||
-                !genero ||
-                idade === undefined
+                genero === undefined ||
+                idade === undefined ||
+                nivel_atividade === undefined
             ) {
                 return res.status(400).json({
                     erro: "Todos os campos são obrigatórios"
                 });
             }
+
             const dadosCorporais = DadosCorporais.criar({
-                idUsuario,
-                peso_kg,
-                altura_cm,
+                idUsuario: Number(idUsuario),
+                peso_kg: Number(peso_kg),
+                altura_cm: Number(altura_cm),
                 genero,
-                idade
+                idade: Number(idade),
+                nivel_atividade
             });
 
-            const resultado = await DadosCorporaisRepository.create(dadosCorporais);
+            const resultado = await DadosCorporaisRepository.create(
+                dadosCorporais
+            );
 
             return res.status(201).json({
                 mensagem: "Dados corporais cadastrados com sucesso",
@@ -45,11 +53,12 @@ const DadosCorporaisController = {
             return res.status(400).json({
                 erro: error.message
             });
-
         }
     },
 
-    listar: async (req, res) => {
+    // LISTAR
+    listar: async (_, res) => {
+
         try {
 
             const dados = await DadosCorporaisRepository.findAll();
@@ -61,16 +70,19 @@ const DadosCorporaisController = {
             return res.status(500).json({
                 erro: error.message
             });
-
         }
     },
 
+    // BUSCAR POR ID
     buscarPorId: async (req, res) => {
+
         try {
 
-            const { idDados } = req.params.id;
+            const { idDados } = req.params;
 
-            const dados = await DadosCorporaisRepository.findById(Number(idDados));
+            const dados = await DadosCorporaisRepository.findById(
+                Number(idDados)
+            );
 
             if (!dados) {
                 return res.status(404).json({
@@ -85,16 +97,19 @@ const DadosCorporaisController = {
             return res.status(500).json({
                 erro: error.message
             });
-
         }
     },
 
+    // BUSCAR POR USUÁRIO
     buscarPorUsuario: async (req, res) => {
+
         try {
 
             const { idUsuario } = req.params;
 
-            const dados = await DadosCorporaisRepository.findByUsuario(Number(idUsuario));
+            const dados = await DadosCorporaisRepository.findByUsuario(
+                Number(idUsuario)
+            );
 
             if (!dados) {
                 return res.status(404).json({
@@ -109,11 +124,12 @@ const DadosCorporaisController = {
             return res.status(500).json({
                 erro: error.message
             });
-
         }
     },
 
+    // UPDATE
     atualizar: async (req, res) => {
+
         try {
 
             const { idUsuario } = req.params;
@@ -122,21 +138,24 @@ const DadosCorporaisController = {
                 peso_kg,
                 altura_cm,
                 genero,
-                idade
+                idade,
+                nivel_atividade
             } = req.body;
 
             const dadosCorporais = DadosCorporais.editar({
                 idUsuario: Number(idUsuario),
-                peso_kg,
-                altura_cm,
+                peso_kg: Number(peso_kg),
+                altura_cm: Number(altura_cm),
                 genero,
-                idade
-            }, idUsuario);
+                idade: Number(idade),
+                nivel_atividade
+            }, Number(idUsuario));
 
-            const resultado = await DadosCorporaisRepository.atualizarDados(
-                Number(idUsuario),
-                dadosCorporais
-            );
+            const resultado =
+                await DadosCorporaisRepository.atualizarDados(
+                    Number(idUsuario),
+                    dadosCorporais
+                );
 
             return res.status(200).json({
                 mensagem: "Dados atualizados com sucesso",
@@ -148,18 +167,20 @@ const DadosCorporaisController = {
             return res.status(400).json({
                 erro: error.message
             });
-
         }
     },
 
+    // DELETE
     deletar: async (req, res) => {
+
         try {
 
             const { idUsuario } = req.params;
 
-            const existe = await DadosCorporaisRepository.findByUsuario(
-                Number(idUsuario)
-            );
+            const existe =
+                await DadosCorporaisRepository.findByUsuario(
+                    Number(idUsuario)
+                );
 
             if (!existe) {
                 return res.status(404).json({
@@ -167,7 +188,9 @@ const DadosCorporaisController = {
                 });
             }
 
-            await DadosCorporaisRepository.delete(Number(idUsuario));
+            await DadosCorporaisRepository.delete(
+                Number(idUsuario)
+            );
 
             return res.status(200).json({
                 mensagem: "Dados deletados com sucesso"
@@ -178,10 +201,8 @@ const DadosCorporaisController = {
             return res.status(500).json({
                 erro: error.message
             });
-
         }
     }
-
 };
 
 export default DadosCorporaisController;
