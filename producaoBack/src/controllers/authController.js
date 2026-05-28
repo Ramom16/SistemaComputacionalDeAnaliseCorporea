@@ -10,7 +10,6 @@ import { envTokenExpiraMinutos } from "../config/env.js";
  * Controlador de autenticação e verificação de email.
  */
 const conversorMinutos = 60 * 1000;
-
 const expira_em_minutos =
     envTokenExpiraMinutos.ValidadeTokenMinutos
     * conversorMinutos;
