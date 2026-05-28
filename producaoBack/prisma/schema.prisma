@@ -65,12 +65,13 @@ model DadosCorporais {
 }
 
 model Calculo {
-  idCalculo     Int      @id @default(autoincrement())
-  idDados       Int
-  imc           Decimal  @db.Decimal(10, 2)
-  tmb           Decimal  @db.Decimal(10, 2)
-  ndc           Decimal  @db.Decimal(10, 2)
-  data_calculo  DateTime @default(now()) @db.Timestamp(0)
+  idCalculo                Int      @id @default(autoincrement())
+  idDados                  Int
+  imc                      Decimal  @db.Decimal(10, 2)
+  tmb                      Decimal  @db.Decimal(10, 2)
+  ndc                      Decimal  @db.Decimal(10, 2)
+  data_calculo             DateTime @default(now()) @db.Timestamp(0)
+  data_atualizacao_calculo DateTime @updateAt
 
   dados   DadosCorporais @relation(fields: [idDados], references: [idDados])
   treinos Treino[]
