@@ -10,7 +10,7 @@ dadosRoutes.get("/", dadosCorporaisController.buscarPorUsuario);
 
 dadosRoutes.post('/', dadosCorporaisController.criar);
 
-dadosRoutes.put("/", dadosCorporaisController.atualizar);
+dadosRoutes.put("/:idUsuario", dadosCorporaisController.atualizar);
 
 dadosRoutes.delete("/", dadosCorporaisController.deletar);
 

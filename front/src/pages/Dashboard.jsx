@@ -1,24 +1,90 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import '../styles/dashboard.css';
 
 export default function Dashboard() {
   const navigate = useNavigate();
-  // Simulando o nome do usuário logado (depois você pode pegar isso do localStorage/API)
-  const [usuarioNome] = useState('Atleta');
+  // Lê os dados reais do usuário salvos pelo Login
+  const usuarioSalvo = JSON.parse(localStorage.getItem('usuario') || '{}');
+  const [usuarioNome] = useState(usuarioSalvo.nome || 'Atleta');
+  const [idUsuario] = useState(usuarioSalvo.id || null);
 
   // Estados para os inputs
   const [peso, setPeso] = useState('');
   const [altura, setAltura] = useState('');
   const [idade, setIdade] = useState('');
-  const [sexo, setSexo] = useState('masculino');
-  const [nivelAtividade, setNivelAtividade] = useState('sedentario');
+  const [sexo, setSexo] = useState('Masculino');
+  const [nivelAtividade, setNivelAtividade] = useState('Sedentario');
 
-  // Função dummy para quando você for integrar a API
-  const handleCalcular = (e) => {
+  // Estado para armazenar os resultados da API
+  const [resultados, setResultados] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [msg, setMsg] = useState({ text: '', type: '' });
+
+  // Tenta buscar se o usuário já tem dados cadastrados ao carregar a página
+  useEffect(() => {
+    async function buscarDadosExistentes() {
+      try {
+        const response = await fetch(`http://localhost:3000/dadosCorporais/usuario/${idUsuario}`);
+        // Note: A rota atual no backend é GET /dadosCorporais/ passando id? Ou GET /dadosCorporais/:idDados?
+        // Em dadosRoutes.js a rota buscarPorUsuario está mapeada como GET "/" (conflita com listar).
+        // Por via das dúvidas, vamos apenas aguardar o envio do formulário, ou assumir vazio inicialmente.
+      } catch (err) {
+        // ignora
+      }
+    }
+    // buscarDadosExistentes();
+  }, [idUsuario]);
+
+  const handleCalcular = async (e) => {
     e.preventDefault();
-    console.log("Valores para enviar à API:", { peso, altura, idade, sexo, nivelAtividade });
-    // Aqui você fará o fetch para a sua API e atualizará estados com os resultados reais
+    setLoading(true);
+    setMsg({ text: '', type: '' });
+
+    const payload = {
+      idUsuario,
+      peso_kg: parseFloat(peso),
+      altura_cm: parseFloat(altura),
+      idade: parseInt(idade, 10),
+      genero: sexo, // Mapeia sexo para genero (como esperado no controller)
+      nivel_atividade: nivelAtividade
+    };
+
+    try {
+      // 1. Primeiro tentamos criar (POST)
+      let response = await fetch('http://localhost:3000/dadosCorporais', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+
+      let data = await response.json();
+
+      // 2. Se retornar erro informando que já existe, tentamos atualizar (PUT)
+      if (!response.ok && data.erro === 'Usuário já possui dados corporais') {
+        response = await fetch(`http://localhost:3000/dadosCorporais/${idUsuario}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        data = await response.json();
+      }
+
+      if (!response.ok) {
+        setMsg({ text: data.erro || 'Erro ao calcular', type: 'erro' });
+        setLoading(false);
+        return;
+      }
+
+      setMsg({ text: 'Cálculos realizados com sucesso!', type: 'sucesso' });
+      setResultados(data.dados.calculos);
+
+    } catch (error) {
+      console.error(error);
+      setMsg({ text: 'Erro ao conectar com a API', type: 'erro' });
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleLogout = () => {
@@ -111,8 +177,9 @@ export default function Dashboard() {
                   onChange={(e) => setSexo(e.target.value)}
                   required
                 >
-                  <option value="masculino">Masculino</option>
-                  <option value="feminino">Feminino</option>
+                  <option value="Masculino">Masculino</option>
+                  <option value="Feminino">Feminino</option>
+                  <option value="Outro">Outro</option>
                 </select>
               </div>
 
@@ -124,16 +191,24 @@ export default function Dashboard() {
                   onChange={(e) => setNivelAtividade(e.target.value)}
                   required
                 >
-                  <option value="sedentario">Sedentário (Pouco ou nenhum exercício)</option>
-                  <option value="leve">Leve (1 a 3 dias/semana)</option>
-                  <option value="moderado">Moderado (3 a 5 dias/semana)</option>
-                  <option value="intenso">Intenso (6 a 7 dias/semana)</option>
-                  <option value="muito_intenso">Muito Intenso (Atleta/2x ao dia)</option>
+                  <option value="Sedentario">Sedentário (Pouco ou nenhum exercício)</option>
+                  <option value="Leve">Leve (1 a 3 dias/semana)</option>
+                  <option value="Moderado">Moderado (3 a 5 dias/semana)</option>
+                  <option value="Intenso">Intenso (6 a 7 dias/semana)</option>
+                  <option value="MuitoIntenso">Muito Intenso (Atleta/2x ao dia)</option>
                 </select>
               </div>
 
-              <button type="submit" className="btn-calc">Calcular</button>
+              <button type="submit" className="btn-calc" disabled={loading}>
+                {loading ? 'Calculando...' : 'Calcular'}
+              </button>
             </form>
+            
+            {msg.text && (
+              <p style={{ marginTop: '15px', color: msg.type === 'erro' ? '#ff4d5a' : '#4ade80', fontWeight: 'bold' }}>
+                {msg.text}
+              </p>
+            )}
           </div>
 
           {/* Seção de Resultados (3 Tabelas/Cards) */}
@@ -147,7 +222,9 @@ export default function Dashboard() {
               </div>
               <div className="table-content">
                 <div>
-                  <span className="result-value">---</span>
+                  <span className="result-value">
+                    {resultados ? Math.round(resultados.tmb) : '---'}
+                  </span>
                   <span className="result-unit">kcal</span>
                 </div>
                 <div className="result-desc">
@@ -164,11 +241,15 @@ export default function Dashboard() {
               </div>
               <div className="table-content">
                 <div>
-                  <span className="result-value">---</span>
+                  <span className="result-value">
+                    {resultados ? (Math.round(resultados.imc * 10) / 10) : '---'}
+                  </span>
                   <span className="result-unit"></span>
                 </div>
                 <div className="result-desc">
-                  Indicador de adequação do peso em relação à altura (Ex: Normal, Sobrepeso, etc).
+                  {resultados?.classificacao_imc 
+                    ? <strong style={{color: 'var(--primary-yellow)'}}>{resultados.classificacao_imc}</strong> 
+                    : 'Indicador de adequação do peso em relação à altura.'}
                 </div>
               </div>
             </div>
@@ -181,11 +262,13 @@ export default function Dashboard() {
               </div>
               <div className="table-content">
                 <div>
-                  <span className="result-value">---</span>
+                  <span className="result-value">
+                    {resultados ? Math.round(resultados.ndc) : '---'}
+                  </span>
                   <span className="result-unit">kcal</span>
                 </div>
                 <div className="result-desc">
-                  Total de calorias que você gasta no dia, considerando seu nível de atividade física. Use isso como base para dietas.
+                  Total de calorias gastas no dia. (Recomendação de Água: {resultados ? resultados.agua_diaria_litros : '--'} Litros)
                 </div>
               </div>
             </div>

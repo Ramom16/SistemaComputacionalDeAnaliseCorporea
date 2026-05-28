@@ -37,7 +37,10 @@ export default function Login() {
         nome: data.usuario?.nome || 'Usuário'
       });
       
-      // localStorage.setItem('token', data.token);
+      // Salvar dados do usuário no localStorage para uso em outras páginas
+      localStorage.setItem('token', data.token);
+      localStorage.setItem('usuario', JSON.stringify(data.usuario));
+
       setTimeout(() => {
         window.location.href = '/dashboard';
       }, 1500);

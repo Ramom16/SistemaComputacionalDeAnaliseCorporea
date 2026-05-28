@@ -6,8 +6,6 @@ import RecuperarSenha from './pages/RecuperarSenha';
 import Verify from './pages/Verify';
 import Dashboard from './pages/Dashboard';
 
-// Removendo App.css padrão do Vite se não for mais usado globalmente
-import './App.css'; 
 
 function App() {
   return (
