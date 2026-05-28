@@ -9,8 +9,8 @@ import dadosRoutes from "./dadosRoutes.js";
 const router = express.Router();
 
 
-app.use("/auth", authRoutes);
-app.use("/usuarios", usuariosRoutes);
-app.use("/dadosCorporais", dadosRoutes );
+router.use("/auth", authRoutes);
+router.use("/usuarios", usuariosRoutes);
+router.use("/dadosCorporais", dadosRoutes );
 
 export default router

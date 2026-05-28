@@ -50,12 +50,12 @@ model DadosCorporais {
   idDados       Int      @id @default(autoincrement())
   idUsuario     Int      @unique
   peso_kg       Decimal  @db.Decimal(10, 2)
-  altura_cm     Decimal  @db.Decimal(4, 2)
+  altura_cm     Decimal  @db.Decimal(5, 2)
   genero        Genero
   idade         Int
   nivel_atividade NivelAtividade
   data_registro_Inicial DateTime @default(now()) @db.Timestamp(0)
-  data_atualizacao_dados DateTime @updateAt
+  data_atualizacao_dados DateTime @updatedAt
 
 
   usuario Usuario @relation(fields: [idUsuario], references: [id])
@@ -71,7 +71,7 @@ model Calculo {
   tmb                      Decimal  @db.Decimal(10, 2)
   ndc                      Decimal  @db.Decimal(10, 2)
   data_calculo             DateTime @default(now()) @db.Timestamp(0)
-  data_atualizacao_calculo DateTime @updateAt
+  data_atualizacao_calculo DateTime @updatedAt
 
   dados   DadosCorporais @relation(fields: [idDados], references: [idDados])
   treinos Treino[]

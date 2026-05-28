@@ -1,25 +1,29 @@
-export class DadosCorporais {   
-#idUsuario    
-#peso_kg      
-#altura_cm    
-#genero      
-#idade        
+export class DadosCorporais {
+
+    #idUsuario;
+    #peso_kg;
+    #altura_cm;
+    #genero;
+    #idade;
+    #nivel_atividade;
 
     constructor(
         idUsuario,
         peso_kg,
         altura_cm,
         genero,
-        idade
+        idade,
+        nivel_atividade
     ) {
-        this.#idUsuario = idUsuario;
-        this.#peso_kg = peso_kg;
-        this.#altura_cm = altura_cm;
-        this.#genero = genero;
-        this.#idade = idade;
+
+        this.idUsuario = idUsuario;
+        this.peso_kg = peso_kg;
+        this.altura_cm = altura_cm;
+        this.genero = genero;
+        this.idade = idade;
+        this.nivel_atividade = nivel_atividade;
     }
     // GETTERS
-
     get idUsuario() {
         return this.#idUsuario;
     }
@@ -35,8 +39,11 @@ export class DadosCorporais {
     get idade() {
         return this.#idade;
     }
+    get nivel_atividade() {
+        return this.#nivel_atividade;
+    }
+    // SETTERS
 
-    //SETTERS
     set idUsuario(value) {
         this.#validarIdUsuario(value);
         this.#idUsuario = value;
@@ -57,81 +64,101 @@ export class DadosCorporais {
         this.#validarIdade(value);
         this.#idade = value;
     }
+    set nivel_atividade(value) {
+        this.#validarNivelAtividade(value);
+        this.#nivel_atividade = value;
+    }
+    // VALIDAÇÕES
 
-    //VALIDAÇÕES
-    #validarPeso(peso) {
-        if (typeof peso !== 'number' || peso <= 0) {
-            throw new Error('Peso deve ser um número positivo.');
+    #validarIdUsuario(idUsuario) {
+        if (idUsuario === undefined || typeof idUsuario !== "number") {
+            throw new Error("ID do usuário inválido");
         }
     }
-    
-    #validarIdUsuario(idUsuario) {
-        if (!idUsuario) {
-            throw new Error('ID do usuário é obrigatório.');
+
+    #validarPeso(peso) {
+
+        if (typeof peso !== "number" ||peso <= 0) {
+            throw new Error("Peso inválido");
         }
     }
 
     #validarAltura(altura) {
-        if (typeof altura !== 'number' || altura <= 0) {
-            throw new Error('Altura deve ser um número positivo.');
+        if (typeof altura !== "number" ||altura <= 0) {
+            throw new Error("Altura inválida");
         }
     }
-
     #validarGenero(genero) {
-        const generosValidos = ['masculino', 'feminino', 'outro'];
-        if (!generosValidos.includes(genero.toLowerCase())) {
-            throw new Error('Gênero deve ser "masculino", "feminino" ou "outro".');
+
+        const generosValidos = [
+            "Masculino",
+            "Feminino",
+            "Outro"
+        ];
+
+        if (!generosValidos.includes(genero)) {
+            throw new Error("Gênero inválido");
         }
     }
+
     #validarIdade(idade) {
-        if (typeof idade !== 'number' || idade < 0) {
-            throw new Error('Idade deve ser um número não negativo.');
+        if (typeof idade !== "number" ||idade <= 0) {
+            throw new Error("Idade inválida");
         }
     }
 
-    //FACTORY METHODS
+    #validarNivelAtividade(nivel) {
 
-    static criar({ 
-        idUsuario, 
-        peso_kg, 
-        altura_cm, 
-        genero, 
-        idade }) 
-    {
-        if (!idUsuario || !peso_kg || !altura_cm || !genero || idade === undefined) {
-            throw new Error("Dados obrigatórios faltando");
+        const niveisValidos = [
+            "Sedentario",
+            "Leve",
+            "Moderado",
+            "Intenso",
+            "MuitoIntenso"
+        ];
+
+        if (!niveisValidos.includes(nivel)) {
+            throw new Error("Nível de atividade inválido");
         }
-        return new DadosCorporais(
-            idUsuario,
-            peso_kg,
-            altura_cm,
-            genero,
-            idade
-        );
     }
 
-    static editar({ 
-        idUsuario, 
+    // FACTORY METHODS
+
+    static criar({
+        idUsuario,
         peso_kg,
         altura_cm,
         genero,
-        idade }, id){
-        
-            if (!id) {
-        throw new Error("ID é obrigatório para edição");
-        }
-
-        if (!idUsuario || !peso_kg || !altura_cm || !genero || idade === undefined) {
-            throw new Error("Dados obrigatórios faltando");
-        }
+        idade,
+        nivel_atividade
+    }) {
 
         return new DadosCorporais(
-            idUsuario,
-            peso_kg,
-            altura_cm,
+            Number(idUsuario),
+            Number(peso_kg),
+            Number(altura_cm),
             genero,
-            idade
+            Number(idade),
+            nivel_atividade
         );
     }
+    static editar({
+        idUsuario,
+        peso_kg,
+        altura_cm,
+        genero,
+        idade,
+        nivel_atividade
+    }) {
 
+        return new DadosCorporais(
+            Number(idUsuario),
+            Number(peso_kg),
+            Number(altura_cm),
+            genero,
+            Number(idade),
+            nivel_atividade
+        );
+    }
 }
+

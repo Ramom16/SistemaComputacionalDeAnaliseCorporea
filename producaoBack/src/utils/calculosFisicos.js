@@ -6,16 +6,15 @@ export function calcularIMC(peso, alturaCm) {
         (peso / (alturaM ** 2)).toFixed(2)
     );
 }
-
 export function calcularTMB(
     peso,
     alturaCm,
     idade,
     genero
 ) {
-
-    if (genero === "masculino") {
-
+    if (
+        genero.toLowerCase() === "masculino"
+    ) {
         return Number(
             (
                 (10 * peso) +
@@ -25,7 +24,6 @@ export function calcularTMB(
             ).toFixed(2)
         );
     }
-
     return Number(
         (
             (10 * peso) +
@@ -35,20 +33,17 @@ export function calcularTMB(
         ).toFixed(2)
     );
 }
-
 export function calcularNDC(
     tmb,
     nivelAtividade
 ) {
-
     const fatores = {
-        sedentario: 1.2,
-        leve: 1.375,
-        moderado: 1.55,
-        intenso: 1.725,
-        muitoIntenso: 1.9
+        Sedentario: 1.2,
+        Leve: 1.375,
+        Moderado: 1.55,
+        Intenso: 1.725,
+        MuitoIntenso: 1.9
     };
-
     return Number(
         (
             tmb * fatores[nivelAtividade]
