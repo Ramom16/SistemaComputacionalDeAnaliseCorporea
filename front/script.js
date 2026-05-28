@@ -54,4 +54,25 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
   });
+
+  // Lógica para abrir/fechar as descrições dos cards
+  const deliveryItems = document.querySelectorAll(".delivery-item");
+  deliveryItems.forEach(item => {
+    const card = item.querySelector(".delivery-card");
+    const desc = item.querySelector(".delivery-description");
+    
+    if (card && desc) {
+      card.addEventListener("click", () => {
+        desc.classList.toggle("active");
+        
+        // Fechar os outros ao abrir um
+        deliveryItems.forEach(otherItem => {
+          if (otherItem !== item) {
+            const otherDesc = otherItem.querySelector(".delivery-description");
+            if (otherDesc) otherDesc.classList.remove("active");
+          }
+        });
+      });
+    }
+  });
 });
