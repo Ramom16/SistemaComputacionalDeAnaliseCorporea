@@ -70,10 +70,10 @@ const DadosCorporaisController = {
     // BUSCAR POR ID
     buscarPorId: async (req, res) => {
         try {
-            const { idDados } = req.params;
+            const { id } = req.params;
             const dados =
                 await DadosCorporaisRepository.findById(
-                    Number(idDados)
+                    Number(id)
                 );
             if (!dados) {
                 return res.status(404).json({
@@ -90,10 +90,10 @@ const DadosCorporaisController = {
     // BUSCAR POR USUÁRIO
     buscarPorUsuario: async (req, res) => {
         try {
-            const { idUsuario } = req.params;
+            const { id } = req.params;
             const dados =
                 await DadosCorporaisRepository.findByUsuario(
-                    Number(idUsuario)
+                    Number(id)
                 );
             if (!dados) {
                 return res.status(404).json({
