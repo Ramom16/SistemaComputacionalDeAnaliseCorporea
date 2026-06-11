@@ -90,13 +90,15 @@ const DadosCorporaisController = {
     // BUSCAR POR USUÁRIO
     buscarPorUsuario: async (req, res) => {
     try {
-        const idUsuario = Number(req.params.idUsuario);
+        const idUsuario = Number(req.params.id);
+
+        console.log("ID recebido:", idUsuario);
 
         if (!idUsuario || isNaN(idUsuario)) {
             return res.status(400).json({erro: "ID do usuário inválido"});
         }
-        const dados =
-            await DadosCorporaisRepository.findByUsuario(idUsuario);
+        const dados = await DadosCorporaisRepository.findByUsuario(idUsuario);
+         console.log("Dados encontrados:", dados);
         if (!dados) {return res.status(404).json(
             {erro: "Dados não encontrados"});
         }

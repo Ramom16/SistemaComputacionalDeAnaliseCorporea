@@ -11,6 +11,6 @@ const router = express.Router();
 
 router.use("/auth", authRoutes);
 router.use("/usuarios", usuariosRoutes);
-router.use("/dadosCorporais", dadosRoutes );
+router.use("/dados", dadosRoutes );
 
 export default router

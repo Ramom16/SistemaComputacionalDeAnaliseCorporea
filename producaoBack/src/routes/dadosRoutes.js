@@ -6,7 +6,7 @@ const dadosRoutes = express.Router();
 
 dadosRoutes.get('/', dadosCorporaisController.listar);
 dadosRoutes.get("/:idDados" , dadosCorporaisController.buscarPorId);
-dadosRoutes.get("/:idUsuario", dadosCorporaisController.buscarPorUsuario);
+dadosRoutes.get("/usuario/:id", dadosCorporaisController.buscarPorUsuario);
 
 dadosRoutes.post('/', dadosCorporaisController.criar);
 
