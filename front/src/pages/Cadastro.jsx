@@ -10,10 +10,10 @@ export default function Cadastro() {
   const [loading, setLoading] = useState(false);
   const [msg, setMsg] = useState({ text: '', type: '' });
 
-  const handleCadastro = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    setMsg({ text: '', type: '' });
+  const lidarCadastro = async (e) => {
+    e.preventDefault(); // O preventDefault() é usado para evitar que o formulário seja enviado de maneira tradicional, o que causaria um recarregamento da página. Em vez disso, queremos lidar com o envio do formulário usando JavaScript para fazer uma requisição assíncrona à API, permitindo uma experiência de usuário mais fluida e sem interrupções.
+    setLoading(true); // Ativa o estado de carregamento para desabilitar o botão e mostrar feedback visual
+    setMsg({ text: '', type: '' }); // Limpa mensagens anteriores
 
     try {
       const response = await fetch('http://localhost:3000/auth/register', {
@@ -32,7 +32,7 @@ export default function Cadastro() {
       }
 
       setMsg({ text: data.msg, type: 'sucesso' });
-      // Clear fields on success
+      // Limpar campos em caso de sucesso
       setNome('');
       setEmail('');
       setSenha('');
@@ -74,7 +74,7 @@ export default function Cadastro() {
               <div className="accent-line"></div>
             </div>
 
-            <form id="formCadastro" onSubmit={handleCadastro}>
+            <form id="formCadastro" onSubmit={lidarCadastro}>
               <div className="form-group">
                 <label htmlFor="nome">Nome</label>
                 <input 
@@ -129,7 +129,7 @@ export default function Cadastro() {
 
             <div className="link-login">
               <span>Já tem conta? </span>
-              <Link to="/login">Faça login</Link>
+              <Link to="/login">Faça login</Link> {/* Para não precisar do <a> que serve para ir de uma página para outra fazendo uma nova requisição no navegador e recarrega a página do zero. O Link vai fazer o navegador ser gerenciado pelo JavaScript (Single Page Application). Apenas a parte da interface que muda é renderizada, tornando a transição mais instantânea e fluida */}
             </div>
           </div>
         </div>

@@ -4,12 +4,12 @@ import '../styles/intro.css';
 
 export default function LandingPage() {
   useEffect(() => {
-    // Intersection Observer for scroll reveal animations
+    // Observador de Interseção para animações de revelação por rolagem
     const revealElements = document.querySelectorAll('.reveal');
 
     const observerOptions = {
       root: null,
-      threshold: 0.15,
+      threshold: 0.15,// O threshold vai servir para determinaro o quanto vai ser preciso do elemento estar visivel na tela do cliente para que a animação apareca. No caso, 15% do elemento precisar estar visivel para a animação ser ativada
       rootMargin: '0px 0px -50px 0px',
     };
 
@@ -29,13 +29,13 @@ export default function LandingPage() {
       revealObserver.observe(el);
     });
 
-    // Cleanup observer on unmount
+    // Observador de limpeza ao desmontar o componente
     return () => {
       revealObserver.disconnect();
     };
   }, []);
 
-  // Handlers for dynamic styles
+  // Manipuladores para estilos dinâmicos
   useEffect(() => {
     const styleSheet = document.createElement("style");
     styleSheet.innerText = `
@@ -59,7 +59,6 @@ export default function LandingPage() {
     if (desc) {
       desc.classList.toggle('active');
       
-      // Close others
       const allItems = document.querySelectorAll('.delivery-item');
       allItems.forEach(otherItem => {
         if (otherItem !== item) {
