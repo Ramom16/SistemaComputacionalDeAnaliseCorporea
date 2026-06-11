@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import '../styles/cadastro.css';
+import Navbar from '../components/Navbar';
+import Input from '../components/Input';
+import AlertMessage from '../components/AlertMessage';
 
 export default function Cadastro() {
   const [nome, setNome] = useState('');
@@ -47,23 +50,11 @@ export default function Cadastro() {
 
   return (
     <>
-      <header className="navbar">
-        <Link to="/" className="logo">
-          <div className="logo-icon">
-            <span className="logo-bar"></span>
-            <span className="logo-bar"></span>
-            <span className="logo-bar"></span>
-          </div>
-          <span className="logo-text">IRONFIT</span>
-        </Link>
-        <nav>
-          <ul className="nav-links">
-            <li><Link to="/">Início</Link></li>
-            <li><Link to="/login">Login</Link></li>
-            <li><Link to="/cadastro" style={{ color: 'var(--primary-yellow)' }}>Cadastrar</Link></li>
-          </ul>
-        </nav>
-      </header>
+      <Navbar>
+        <li><Link to="/">Início</Link></li>
+        <li><Link to="/login">Login</Link></li>
+        <li><Link to="/cadastro" style={{ color: 'var(--primary-yellow)' }}>Cadastrar</Link></li>
+      </Navbar>
 
       <section className="cadastro-hero">
         <div className="cadastro-wrapper">
@@ -75,57 +66,46 @@ export default function Cadastro() {
             </div>
 
             <form id="formCadastro" onSubmit={lidarCadastro}>
-              <div className="form-group">
-                <label htmlFor="nome">Nome</label>
-                <input 
-                  type="text" 
-                  id="nome" 
-                  placeholder="Seu nome completo" 
-                  required 
-                  value={nome}
-                  onChange={(e) => setNome(e.target.value)}
-                />
-              </div>
-              <div className="form-group">
-                <label htmlFor="email">E-mail</label>
-                <input 
-                  type="email" 
-                  id="email" 
-                  placeholder="seu@email.com" 
-                  required 
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                />
-              </div>
-              <div className="form-group">
-                <label htmlFor="senha">Senha</label>
-                <input 
-                  type="password" 
-                  id="senha" 
-                  placeholder="Mínimo 6 caracteres" 
-                  required 
-                  value={senha}
-                  onChange={(e) => setSenha(e.target.value)}
-                />
-              </div>
-              <div className="form-group">
-                <label htmlFor="data_nascimento">Data de Nascimento</label>
-                <input 
-                  type="date" 
-                  id="data_nascimento" 
-                  required 
-                  value={data_nascimento}
-                  onChange={(e) => setDataNascimento(e.target.value)}
-                />
-              </div>
+              <Input 
+                label="Nome" 
+                id="nome" 
+                type="text" 
+                placeholder="Seu nome completo" 
+                value={nome}
+                onChange={(e) => setNome(e.target.value)}
+              />
+              <Input 
+                label="E-mail" 
+                id="email" 
+                type="email" 
+                placeholder="seu@email.com" 
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
+
+              <Input 
+                label="Senha" 
+                id="senha" 
+                type="password" 
+                placeholder="Mínimo 6 caracteres" 
+                value={senha}
+                onChange={(e) => setSenha(e.target.value)}
+              />
+              
+
+              <Input 
+                label="Data de Nascimento" 
+                id="data_nascimento" 
+                type="date" 
+                value={data_nascimento}
+                onChange={(e) => setDataNascimento(e.target.value)}
+              />
               <button type="submit" id="btnCadastro" className="btn-cadastro" disabled={loading}>
                 {loading ? 'Cadastrando...' : 'Cadastrar'}
               </button>
             </form>
 
-            {msg.text && (
-              <p id="msg" className={msg.type}>{msg.text}</p>
-            )}
+            <AlertMessage msg={msg} />
 
             <div className="link-login">
               <span>Já tem conta? </span>

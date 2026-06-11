@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import '../styles/login.css';
+import Navbar from '../components/Navbar';
+import Input from '../components/Input';
+import AlertMessage from '../components/AlertMessage';
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -54,23 +57,11 @@ export default function Login() {
 
   return (
     <>
-      <header className="navbar">
-        <Link to="/" className="logo">
-          <div className="logo-icon">
-            <span className="logo-bar"></span>
-            <span className="logo-bar"></span>
-            <span className="logo-bar"></span>
-          </div>
-          <span className="logo-text">IRONFIT</span>
-        </Link>
-        <nav>
-          <ul className="nav-links">
-            <li><Link to="/">Início</Link></li>
-            <li><Link to="/login" style={{ color: 'var(--primary-yellow)' }}>Login</Link></li>
-            <li><Link to="/cadastro">Cadastrar</Link></li>
-          </ul>
-        </nav>
-      </header>
+      <Navbar>
+        <li><Link to="/">Início</Link></li>
+        <li><Link to="/login" style={{ color: 'var(--primary-yellow)' }}>Login</Link></li>
+        <li><Link to="/cadastro">Cadastrar</Link></li>
+      </Navbar>
 
       <section className="login-hero">
         <div className="login-wrapper">
@@ -82,36 +73,28 @@ export default function Login() {
             </div>
 
             <form id="formLogin" onSubmit={handleLogin}>
-              <div className="form-group">
-                <label htmlFor="email">E-mail</label>
-                <input 
-                  type="email" 
-                  id="email" 
-                  placeholder="seu@email.com" 
-                  required 
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                />
-              </div>
-              <div className="form-group">
-                <label htmlFor="senha">Senha</label>
-                <input 
-                  type="password" 
-                  id="senha" 
-                  placeholder="Sua senha" 
-                  required 
-                  value={senha}
-                  onChange={(e) => setSenha(e.target.value)}
-                />
-              </div>
+              <Input 
+                label="E-mail" 
+                id="email" 
+                type="email" 
+                placeholder="seu@email.com" 
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
+              <Input 
+                label="Senha" 
+                id="senha" 
+                type="password" 
+                placeholder="Sua senha" 
+                value={senha}
+                onChange={(e) => setSenha(e.target.value)}
+              />
               <button type="submit" id="btnLogin" className="btn-login" disabled={loading}>
                 {loading ? 'Entrando...' : 'Entrar'}
               </button>
             </form>
 
-            {msg.text && (
-              <p id="msg" className={msg.type}>{msg.text}</p>
-            )}
+            <AlertMessage msg={msg} />
 
             {loginData && (
               <div className="retorno" id="retorno" style={{ display: 'block' }}>
