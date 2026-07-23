@@ -1,24 +1,45 @@
 const EvolucaoService = {
-
     gerarGrafico(historico) {
 
-        return historico.map(item => ({
+        const separarDados = (campo) => {
+            return historico.map(item => ({
+                data: new Date(item.criado_em)
+                    .toLocaleDateString("pt-BR"),
+                valor: Number(item[campo])
+            }));
+        };
 
-            data: new Date(item.criado_em)
-                .toLocaleDateString("pt-BR"),
+        const calcularMedia = (campo) => {
+            const soma = historico.reduce(
+                (total, item) =>
+                    total + Number(item[campo]),
+                0
+            );
 
-            peso: Number(item.peso_kg),
-
-            imc: Number(item.imc),
-
-            tmb: Number(item.tmb),
-
-            ndc: Number(item.ndc)
-
-        }));
-
+            return Number(
+                (soma / historico.length)
+                    .toFixed(2)
+            );
+        };
+        return {
+            peso: {
+                dados: separarDados("peso_kg"),
+                media: calcularMedia("peso_kg")
+            },
+            imc: {
+                dados: separarDados("imc"),
+                media: calcularMedia("imc")
+            },
+            tmb: {
+                dados: separarDados("tmb"),
+                media: calcularMedia("tmb")
+            },
+            ndc: {
+                dados: separarDados("ndc"),
+                media: calcularMedia("ndc")
+            }
+        };
     }
-
 };
 
 export default EvolucaoService;
