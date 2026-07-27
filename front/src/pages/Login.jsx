@@ -45,7 +45,7 @@ export default function Login() {
       localStorage.setItem('usuario', JSON.stringify(data.usuario));
 
       setTimeout(() => {
-        window.location.href = '/dashboard';
+        window.location.href = '/dashboard'; // o window.location.href redireciona o usuário para a página de dashboard após o login ser bem-sucedido.
       }, 1500);
 
     } catch (error) {

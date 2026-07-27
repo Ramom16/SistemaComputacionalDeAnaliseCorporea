@@ -24,16 +24,22 @@ export default function Dashboard() {
   // Tenta buscar se o usuário já tem dados cadastrados ao carregar a página
   useEffect(() => {
     async function buscarDadosExistentes() {
+      if (!idUsuario) return;
       try {
         const response = await fetch(`http://localhost:3000/dadosCorporais/usuario/${idUsuario}`);
-        // Note: A rota atual no backend é GET /dadosCorporais/ passando id? Ou GET /dadosCorporais/:idDados?
-        // Em dadosRoutes.js a rota buscarPorUsuario está mapeada como GET "/" (conflita com listar).
-        // Por via das dúvidas, vamos apenas aguardar o envio do formulário, ou assumir vazio inicialmente.
+        
+        if (response.ok) {
+          const data = await response.json();
+          // Pega o cálculo mais recente (índice 0) e joga nos cards
+          if (data.calculos && data.calculos.length > 0) {
+            setResultados(data.calculos[0]);
+          }
+        }
       } catch (err) {
-        // ignora
+        console.error("Erro ao buscar cálculos salvos: ", err);
       }
     }
-    // buscarDadosExistentes();
+    buscarDadosExistentes();
   }, [idUsuario]);
 
   const handleCalcular = async (e) => {
