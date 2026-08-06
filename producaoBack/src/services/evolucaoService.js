@@ -2,27 +2,20 @@ const EvolucaoService = {
 
     gerarGrafico(historico) {
 
-        return {
-            peso: historico.map(item => ({
-                data: item.criado_em,
-                valor: Number(item.peso_kg)
-            })),
+        return historico.map(item => ({
 
-            imc: historico.map(item => ({
-                data: item.criado_em,
-                valor: Number(item.imc)
-            })),
+            data: new Date(item.criado_em)
+                .toLocaleDateString("pt-BR"),
 
-            tmb: historico.map(item => ({
-                data: item.criado_em,
-                valor: Number(item.tmb)
-            })),
+            peso: Number(item.peso_kg),
 
-            ndc: historico.map(item => ({
-                data: item.criado_em,
-                valor: Number(item.ndc)
-            }))
-        };
+            imc: Number(item.imc),
+
+            tmb: Number(item.tmb),
+
+            ndc: Number(item.ndc)
+
+        }));
 
     }
 
