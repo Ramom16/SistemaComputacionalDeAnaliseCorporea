@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import api from '../services/api'; // Importação do Axios (Ajuste o caminho se necessário)
 import '../styles/login.css';
 import Navbar from '../components/Navbar';
 import Input from '../components/Input';
@@ -19,20 +20,8 @@ export default function Login() {
     setLoginData(null);
 
     try {
-      const response = await fetch('http://localhost:3000/auth/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ email, senha })
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        setMsg({ text: data.erro || 'Erro no login', type: 'erro' });
-        return;
-      }
+      const response = await api.post('/auth/login', { email, senha });
+      const data = response.data;
 
       setMsg({ text: data.msg, type: 'sucesso' });
       setLoginData({
@@ -45,11 +34,12 @@ export default function Login() {
       localStorage.setItem('usuario', JSON.stringify(data.usuario));
 
       setTimeout(() => {
-        window.location.href = '/dashboard'; // o window.location.href redireciona o usuário para a página de dashboard após o login ser bem-sucedido.
+        window.location.href = '/dashboard';
       }, 1500);
 
     } catch (error) {
-      setMsg({ text: 'Erro: API não respondeu', type: 'erro' });
+      const mensagemErro = error.response?.data?.erro || 'Erro: API não respondeu';
+      setMsg({ text: mensagemErro, type: 'erro' });
     } finally {
       setLoading(false);
     }

@@ -5,6 +5,8 @@ import Cadastro from './pages/Cadastro';
 import RecuperarSenha from './pages/RecuperarSenha';
 import Verify from './pages/Verify';
 import Dashboard from './pages/Dashboard';
+import MeusTreinos from './pages/MeusTreinos';
+import DetalhesTreinos from './pages/DetalhesTreinos';
 
 
 function App() {
@@ -17,6 +19,8 @@ function App() {
         <Route path="/recuperar-senha" element={<RecuperarSenha />} />
         <Route path="/verificar-email" element={<Verify />} />
         <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/meus-treinos" element={<MeusTreinos />} />
+        <Route path="/treino/:id" element={<DetalhesTreinos />} />
       </Routes>
     </BrowserRouter>
   );

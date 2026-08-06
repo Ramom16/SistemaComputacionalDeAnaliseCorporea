@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
+import api from '../services/api'; // Importação da instância do Axios (Ajuste o caminho se necessário)
 
 export default function Verify() {
   const [searchParams] = useSearchParams();
@@ -16,27 +17,17 @@ export default function Verify() {
         setMsg('Token não encontrado na URL.');
         return;
       }
-      
+
       try {
-        const response = await fetch(`http://localhost:3000/auth/verificar-email?token=${encodeURIComponent(token)}`);
-        
-        let data = {};
-        const text = await response.text();
-        if (text) {
-          try { data = JSON.parse(text); } catch (e) { }
-        }
+        const response = await api.get('/auth/verificar-email', {
+          params: { token }
+        });
 
-        if (!response.ok) {
-          setMsg(data.erro || 'Erro ao verificar email.');
-          setShowReauth(true);
-          return;
-        }
-
-        setMsg(data.msg || 'Email verificado com sucesso!');
+        setMsg(response.data.msg || 'Email verificado com sucesso!');
         setShowReauth(false);
-
       } catch (error) {
-        setMsg('Erro: API não respondeu.');
+        const mensagemErro = error.response?.data?.erro || 'Erro ao verificar email.';
+        setMsg(mensagemErro);
         setShowReauth(true);
       }
     }
@@ -55,28 +46,13 @@ export default function Verify() {
     setMsg('Enviando...');
 
     try {
-      const response = await fetch('http://localhost:3000/auth/reenviar-email', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: emailTrimmed })
-      });
+      const response = await api.post('/auth/reenviar-email', { email: emailTrimmed });
 
-      let data = {};
-      const text = await response.text();
-      if (text) {
-        try { data = JSON.parse(text); } catch (e) { }
-      }
-
-      if (!response.ok) {
-        setMsg(data.erro || 'Erro ao reenviar email.');
-        return;
-      }
-
-      setMsg(data.msg || 'Novo link enviado para seu email.');
+      setMsg(response.data.msg || 'Novo link enviado para seu email.');
       setShowReauth(false);
-
     } catch (error) {
-      setMsg('Erro ao reenviar email.');
+      const mensagemErro = error.response?.data?.erro || 'Erro ao reenviar email.';
+      setMsg(mensagemErro);
     } finally {
       setLoading(false);
     }

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import api from '../services/api'; // Importação do Axios (Ajuste o caminho se seu arquivo api.js estiver em outro local)
 import '../styles/dashboard.css';
 
 export default function Dashboard() {
@@ -26,14 +27,12 @@ export default function Dashboard() {
     async function buscarDadosExistentes() {
       if (!idUsuario) return;
       try {
-        const response = await fetch(`http://localhost:3000/dadosCorporais/usuario/${idUsuario}`);
+        const response = await api.get(`/dadosCorporais/usuario/${idUsuario}`);
+        const data = response.data;
         
-        if (response.ok) {
-          const data = await response.json();
-          // Pega o cálculo mais recente (índice 0) e joga nos cards
-          if (data.calculos && data.calculos.length > 0) {
-            setResultados(data.calculos[0]);
-          }
+        // Pega o cálculo mais recente (índice 0) e joga nos cards
+        if (data.calculos && data.calculos.length > 0) {
+          setResultados(data.calculos[0]);
         }
       } catch (err) {
         console.error("Erro ao buscar cálculos salvos: ", err);
@@ -57,29 +56,21 @@ export default function Dashboard() {
     };
 
     try {
-      // 1. Primeiro tentamos criar (POST)
-      let response = await fetch('http://localhost:3000/dadosCorporais', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      });
+      let data;
 
-      let data = await response.json();
-
-      // 2. Se retornar erro informando que já existe, tentamos atualizar (PUT)
-      if (!response.ok && data.erro === 'Usuário já possui dados corporais') {
-        response = await fetch(`http://localhost:3000/dadosCorporais/${idUsuario}`, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
-        });
-        data = await response.json();
-      }
-
-      if (!response.ok) {
-        setMsg({ text: data.erro || 'Erro ao calcular', type: 'erro' });
-        setLoading(false);
-        return;
+      try {
+        // 1. Primeiro tentamos criar (POST)
+        const response = await api.post('/dadosCorporais', payload);
+        data = response.data;
+      } catch (postError) {
+        // 2. Se o backend informar que já existe, tentamos atualizar (PUT)
+        if (postError.response?.data?.erro === 'Usuário já possui dados corporais') {
+          const putResponse = await api.put(`/dadosCorporais/${idUsuario}`, payload);
+          data = putResponse.data;
+        } else {
+          // Se for qualquer outro erro, repassa para o catch principal
+          throw postError;
+        }
       }
 
       setMsg({ text: 'Cálculos realizados com sucesso!', type: 'sucesso' });
@@ -87,14 +78,15 @@ export default function Dashboard() {
 
     } catch (error) {
       console.error(error);
-      setMsg({ text: 'Erro ao conectar com a API', type: 'erro' });
+      const mensagemErro = error.response?.data?.erro || 'Erro ao conectar com a API';
+      setMsg({ text: mensagemErro, type: 'erro' });
     } finally {
       setLoading(false);
     }
   };
 
   const handleLogout = () => {
-    // Lógica de logout (limpar localStorage, etc)
+    localStorage.removeItem('usuario');
     navigate('/login');
   };
 
@@ -113,7 +105,7 @@ export default function Dashboard() {
 
         <nav className="sidebar-nav">
           <Link to="/dashboard" className="active">Análise Corporal</Link>
-          <Link to="#">Meus Treinos</Link>
+          <Link to="/meus-treinos">Meus Treinos</Link>
           <Link to="#">Evolução</Link>
           <Link to="#">Configurações</Link>
         </nav>
