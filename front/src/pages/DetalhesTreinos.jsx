@@ -201,7 +201,7 @@ export default function DetalhesTreino() {
           <nav className="sidebar-nav">
             <Link to="/dashboard">Análise Corporal</Link>
             <Link to="/meus-treinos" className="active">Meus Treinos</Link>
-            <Link to="#">Evolução</Link>
+            <Link to="/evolucao">Evolução</Link>
             <Link to="#">Configurações</Link>
           </nav>
           <button onClick={handleLogout} className="logout-btn">Sair da Conta</button>
@@ -232,7 +232,7 @@ export default function DetalhesTreino() {
         <nav className="sidebar-nav">
           <Link to="/dashboard">Análise Corporal</Link>
           <Link to="/meus-treinos" className="active">Meus Treinos</Link>
-          <Link to="#">Evolução</Link>
+          <Link to="/evolucao">Evolução</Link>
           <Link to="#">Configurações</Link>
         </nav>
         <button onClick={handleLogout} className="logout-btn">Sair da Conta</button>

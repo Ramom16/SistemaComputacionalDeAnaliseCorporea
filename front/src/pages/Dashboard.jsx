@@ -106,7 +106,7 @@ export default function Dashboard() {
         <nav className="sidebar-nav">
           <Link to="/dashboard" className="active">Análise Corporal</Link>
           <Link to="/meus-treinos">Meus Treinos</Link>
-          <Link to="#">Evolução</Link>
+          <Link to="/evolucao">Evolução</Link>
           <Link to="#">Configurações</Link>
         </nav>
 

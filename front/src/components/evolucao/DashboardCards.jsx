@@ -4,41 +4,35 @@ import {
     FaDumbbell,
     FaChartLine
 } from "react-icons/fa";
-
 import StatCard from "./StatCard";
 
 export default function DashboardCards({ cards }) {
-
     return (
-
         <section className="cards-grid">
-
             <StatCard
-                titulo="Treinos"
-                valor={cards.totalTreinos}
+                titulo="Treinos Realizados"
+                valor={cards?.totalTreinos || 0}
                 icone={<FaDumbbell />}
+                tendencia="+15% este mês"
             />
-
             <StatCard
-                titulo="Exercícios"
-                valor={cards.totalExercicios}
+                titulo="Séries Concluídas"
+                valor={cards?.totalExercicios || 0}
                 icone={<FaChartLine />}
+                tendencia="Frequência alta"
             />
-
             <StatCard
-                titulo="Tempo"
-                valor={`${cards.tempoTreinado} h`}
+                titulo="Tempo Treinado"
+                valor={`${cards?.tempoTreinado || 0} h`}
                 icone={<FaClock />}
+                tendencia="Meta semanal OK"
             />
-
             <StatCard
-                titulo="Calorias"
-                valor={`${cards.calorias} kcal`}
+                titulo="Gasto Calórico"
+                valor={`${(cards?.calorias || 0).toLocaleString('pt-BR')} kcal`}
                 icone={<FaFire />}
+                tendencia="Estimativa acumulada"
             />
-
         </section>
-
     );
-
-}
+}

@@ -228,7 +228,7 @@ export default function MeusTreinos() {
           <Link to="/meus-treinos" className="active">
             Meus Treinos
           </Link>
-          <Link to="#">Evolução</Link>
+          <Link to="/evolucao">Evolução</Link>
           <Link to="#">Configurações</Link>
         </nav>
 

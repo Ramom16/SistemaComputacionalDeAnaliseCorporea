@@ -1,22 +1,12 @@
 export default function Header() {
-
     return (
-
-        <section className="header-evolucao">
-
-            <h1>
-                Evolução Física
+        <section className="welcome-section">
+            <h1 className="welcome-title">
+                Sua <span>Evolução</span>
             </h1>
-
-            <p>
-
-                Veja sua evolução corporal, desempenho nos treinos
-                e estatísticas completas.
-
+            <p className="welcome-desc">
+                Acompanhe seu progresso físico, histórico de medições corporais, frequência nos treinos e recordes pessoais.
             </p>
-
         </section>
-
     );
-
-}
+}
