@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import api from '../services/api'; // Importação do Axios (Ajuste o caminho se necessário)
 
 export default function RecuperarSenha() {
   const [email, setEmail] = useState('');
@@ -17,28 +18,12 @@ export default function RecuperarSenha() {
     setMsg('Enviando...');
 
     try {
-      const response = await fetch('http://localhost:3000/auth/reenviar-email', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: emailTrimmed })
-      });
-
-      let data = null;
-      try {
-        data = await response.json();
-      } catch (e) {
-        data = null;
-      }
-
-      if (!response.ok) {
-        setMsg((data && data.erro) ? data.erro : 'Erro ao reenviar o e-mail.');
-        return;
-      }
-
-      setMsg((data && data.msg) ? data.msg : 'Enviamos um novo link de verificação. Verifique seu e-mail.');
-
+      const response = await api.post('/auth/reenviar-email', { email: emailTrimmed });
+      
+      setMsg(response.data?.msg || 'Enviamos um novo link de verificação. Verifique seu e-mail.');
     } catch (error) {
-      setMsg(error.message || 'Erro de comunicação com a API.');
+      const mensagemErro = error.response?.data?.erro || error.message || 'Erro ao reenviar o e-mail.';
+      setMsg(mensagemErro);
     } finally {
       setLoading(false);
     }
