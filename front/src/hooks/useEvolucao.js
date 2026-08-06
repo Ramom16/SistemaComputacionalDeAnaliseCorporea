@@ -61,24 +61,34 @@ export function useEvolucao() {
 
             if (idUsuario) {
                 try {
-                    const response = await api.get(`/dadosCorporais/usuario/${idUsuario}`, {
+                    const response = await api.get(`/historico/usuario/${idUsuario}`, {
                         headers: token ? { Authorization: `Bearer ${token}` } : {}
                     });
                     
-                    if (response.data && response.data.calculos && response.data.calculos.length > 0) {
-                        const calculosFormatados = response.data.calculos.map((item, index) => {
-                            const dataObj = new Date(item.created_at || Date.now());
-                            const diaMes = `${String(dataObj.getDate()).padStart(2, '0')}/${String(dataObj.getMonth() + 1).padStart(2, '0')}`;
+                    if (response.data && response.data.length > 0) {
+                        const getClassificacaoIMC = (imc) => {
+                            if (imc < 18.5) return "Abaixo do peso";
+                            if (imc < 25) return "Peso Normal";
+                            if (imc < 30) return "Sobrepeso";
+                            if (imc < 35) return "Obesidade Grau I";
+                            if (imc < 40) return "Obesidade Grau II";
+                            return "Obesidade Grau III";
+                        };
+
+                        const calculosFormatados = response.data.map((item, index) => {
+                            const dataParts = item.data ? item.data.split('/') : [];
+                            const diaMes = dataParts.length >= 2 ? `${dataParts[0].padStart(2, '0')}/${dataParts[1].padStart(2, '0')}` : item.data;
+                            
                             return {
-                                id: item.id || index + 1,
+                                id: index + 1,
                                 data: diaMes,
-                                peso: Number(item.peso_kg || 0),
+                                peso: Number(item.peso || 0),
                                 imc: Number(Number(item.imc || 0).toFixed(1)),
                                 tmb: Math.round(Number(item.tmb || 0)),
                                 ndc: Math.round(Number(item.ndc || 0)),
-                                classificacao: item.classificacao_imc || 'Medição'
+                                classificacao: getClassificacaoIMC(Number(item.imc || 0))
                             };
-                        }).reverse();
+                        });
 
                         if (calculosFormatados.length > 0) {
                             setHistorico(calculosFormatados);
