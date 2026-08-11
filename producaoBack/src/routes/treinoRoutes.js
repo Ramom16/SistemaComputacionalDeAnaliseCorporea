@@ -1,11 +1,14 @@
 import TreinoController from "../controllers/treinoControllers.js";
 import express from "express";
+import {autenticarToken as authMiddleware} from "../middlewares/autenticarToken.js";
 
 const router = express.Router();
 const treinoRoutes = router
 
-treinoRoutes.get("/", TreinoController.listar);
-treinoRoutes.post("/", TreinoController.criar);
-treinoRoutes.put("/", TreinoController.editar);
+router.post("/treinos",authMiddleware,treinoController.criar);
+
+router.get("/treinos", authMiddleware, treinoController.listar);
+
+router.get("/treinos/:idTreino", authMiddleware, treinoController.buscar);
 
 export default treinoRoutes;

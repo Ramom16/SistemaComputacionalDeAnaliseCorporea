@@ -1,52 +1,78 @@
-import { Treino } from "../models/Treino.js";
-import treinoRepository from "../repositories/treinoRepository.js";
+import treinoService from "../services/treinoService.js";
 
-const TreinoController = {
+const treinoController = {
 
-    criar: async (req, res) => {
+    async criar(req, res) {
+
         try {
-            const {
-                idTreino,
-                idCalculo,
-                objetivo,
-                nivel,
-                data_criacao
-            } = req.body;
 
+            const idUsuario = req.usuario.id;
+
+            const treino = await treinoService.criar(
+                idUsuario,
+                req.body
+            );
+
+            return res.status(201).json({
+                message: "Treino criado com sucesso.",
+                data: treino
+            });
 
         } catch (error) {
-            console.error("Erro ao criar treino:", error);
-            res.status(500).json({ message: "Erro interno do servidor" });
-        }
-    },
-    listar: async (req, res) => {
-        try {
-            const treinos = await treinoRepository.listar();
-            res.status(200).json(treinos);
-        } catch (error) {
-            console.error("Erro ao listar treinos:", error);
-            res.status(500).json({ message: "Erro interno do servidor" });
+
+            return res.status(400).json({
+                error: error.message
+            });
         }
     },
 
-    editar: async (req, res) => {
-        try {
-            const {
-                idTreino,
-                idCalculo,
-                objetivo,
-                nivel,
-                data_criacao
-            } = req.body;
-        } catch (error) {
-            console.error("Erro ao editar treino:", error);
-            res.status(500).json({ message: "Erro interno do servidor" });
-        }
+    async listar(req, res) {
 
+        try {
+
+            const idUsuario = req.usuario.id;
+
+            const treinos =
+                await treinoService.listarPorUsuario(
+                    idUsuario
+                );
+
+            return res.status(200).json({
+                data: treinos
+            });
+
+        } catch (error) {
+
+            return res.status(400).json({
+                error: error.message
+            });
+        }
+    },
+
+    async buscar(req, res) {
+
+        try {
+
+            const idUsuario = req.usuario.id;
+            const idTreino = Number(req.params.idTreino);
+
+            const treino =
+                await treinoService.buscarPorId(
+                    idUsuario,
+                    idTreino
+                );
+
+            return res.status(200).json({
+                data: treino
+            });
+
+        } catch (error) {
+
+            return res.status(404).json({
+                error: error.message
+            });
+        }
     }
+};
 
-}
-
-
-
-export default TreinoController;
+export default treinoController;

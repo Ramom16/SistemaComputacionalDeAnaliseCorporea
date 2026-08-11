@@ -1,56 +1,80 @@
-import prisma from "../database/prismaClient.js";
-import DadosCorporaisRepository from "./dadosCorporaisRepository.js";
+import prisma from "../config/prisma.js";
 
 const treinoRepository = {
 
-  criar: async (idTreino, idCalculo, objetivo, nivel, data_criacao) => {
-    try {
-        if (!idTreino || !idCalculo || !objetivo || !nivel || !data_criacao) {
-            throw new Error("Todos os campos são obrigatórios");
-        }
-        const idCalculoExists = await DadosCorporaisRepository.findById(idCalculo);
-        if (!idCalculoExists) {
-            throw new Error("O ID do cálculo fornecido não existe");
-        }
+    async criar({ idCalculo, objetivo, nivel }) {
+        return await prisma.treino.create({
+            data: {
+                idCalculo,
+                objetivo,
+                nivel
+            }
+        });
+    },
 
-    } catch (error) {
-      console.error("Erro ao criar treino:", error);
-      throw new Error("Erro ao criar treino");
+    async buscarPorId(idTreino) {
+        return await prisma.treino.findUnique({
+            where: {
+                idTreino
+            },
+            include: {
+                calculo: {
+                    include: {
+                        dados: {
+                            include: {
+                                usuario: true
+                            }
+                        }
+                    }
+                },
+                treinoExercicios: {
+                    include: {
+                        exercicio: true
+                    }
+                }
+            }
+        });
+    },
+
+    async listarPorUsuario(idUsuario) {
+        return await prisma.treino.findMany({
+            where: {
+                calculo: {
+                    dados: {
+                        idUsuario
+                    }
+                }
+            },
+            include: {
+                treinoExercicios: {
+                    include: {
+                        exercicio: true
+                    }
+                },
+                calculo: true
+            },
+            orderBy: {
+                data_criacao: "desc"
+            }
+        });
+    },
+
+    async atualizar(idTreino, dados) {
+        return await prisma.treino.update({
+            where: {
+                idTreino
+            },
+            data: dados
+        });
+    },
+
+    async deletar(idTreino) {
+        return await prisma.treino.delete({
+            where: {
+                idTreino
+            }
+        });
     }
-    
-    return await prisma.treino.create({
-      data: {
-        idTreino,
-        idCalculo,
-        objetivo,
-        nivel,
-        data_criacao
-      }
-    });
-  },
-
-  listar: async () => {
-    return await prisma.treino.findMany({
-      orderBy: {
-        idTreino: "desc"
-      }
-    });
-  },
-
-  editar: async(idTreino, idCalculo, objetivo, nivel, data_criacao) => {
-    return await prisma.treino.update({
-      where: {
-        idTreino: idTreino
-      },
-      data: {
-        idCalculo,
-        objetivo,
-        nivel,
-        data_criacao
-      }
-    });
-  }
-
 };
 
 export default treinoRepository;
