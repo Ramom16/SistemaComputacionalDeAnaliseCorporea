@@ -5,10 +5,10 @@ import {autenticarToken as authMiddleware} from "../middlewares/autenticarToken.
 const router = express.Router();
 const treinoRoutes = router
 
-router.post("/treinos",authMiddleware,treinoController.criar);
+router.post("/treinos",authMiddleware,TreinoController.criar);
 
-router.get("/treinos", authMiddleware, treinoController.listar);
+router.get("/treinos", authMiddleware, TreinoController.listar);
 
-router.get("/treinos/:idTreino", authMiddleware, treinoController.buscar);
+router.get("/treinos/:idTreino", authMiddleware, TreinoController.buscar);
 
 export default treinoRoutes;

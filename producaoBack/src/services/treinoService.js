@@ -1,5 +1,5 @@
 //Aqui tem um detalhe: como usei prisma diretamente para validar o cálculo, o arquivo precisa importar:
-import prisma from "../config/prisma.js";
+import prisma from "../database/prismaClient.js";
 import treinoRepository from "../repositories/treinoRepository.js";
 
 const treinoService = {

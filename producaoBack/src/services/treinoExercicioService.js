@@ -1,4 +1,4 @@
-import prisma from "../config/prisma.js";
+import prisma from "../database/prismaClient.js";
 import treinoExercicioRepository
     from "../repositories/treinoExercicioRepository.js";
 
