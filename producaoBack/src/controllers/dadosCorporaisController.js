@@ -70,10 +70,10 @@ const DadosCorporaisController = {
     // BUSCAR POR ID
     buscarPorId: async (req, res) => {
         try {
-            const { idDados } = req.params;
+            const { id } = req.params;
             const dados =
                 await DadosCorporaisRepository.findById(
-                    Number(idDados)
+                    Number(id)
                 );
             if (!dados) {
                 return res.status(404).json({
@@ -89,26 +89,24 @@ const DadosCorporaisController = {
     },
     // BUSCAR POR USUÁRIO
     buscarPorUsuario: async (req, res) => {
-    try {
-        const idUsuario = Number(req.params.id);
-
-        console.log("ID recebido:", idUsuario);
-
-        if (!idUsuario || isNaN(idUsuario)) {
-            return res.status(400).json({erro: "ID do usuário inválido"});
+        try {
+            const { id } = req.params;
+            const dados =
+                await DadosCorporaisRepository.findByUsuario(
+                    Number(id)
+                );
+            if (!dados) {
+                return res.status(404).json({
+                    erro: "Dados não encontrados"
+                });
+            }
+            return res.status(200).json(dados);
+        } catch (error) {
+            return res.status(500).json({
+                erro: error.message
+            });
         }
-        const dados = await DadosCorporaisRepository.findByUsuario(idUsuario);
-         console.log("Dados encontrados:", dados);
-        if (!dados) {return res.status(404).json(
-            {erro: "Dados não encontrados"});
-        }
-        return res.status(200).json(dados);
-    } catch (error) {
-        return res.status(500).json({
-            erro: error.message
-        });
-    }
-},
+    },
 
     // UPDATE
     atualizar: async (req, res) => {
