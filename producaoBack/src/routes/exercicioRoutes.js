@@ -4,10 +4,10 @@ import { autenticarToken as authMiddleware } from "../middlewares/autenticarToke
 
 const router = express.Router();
 
-router.post("/exercicios", authMiddleware, exerciciosController.criar);
-router.get("/exercicios", authMiddleware, exerciciosController.listar);
-router.get("/exercicios/:idExercicio", authMiddleware, exerciciosController.buscar);
-router.put("/exercicios/:idExercicio", authMiddleware, exerciciosController.atualizar);
-router.delete("/exercicios/:idExercicio", authMiddleware, exerciciosController.deletar);
+router.post("/", authMiddleware, exerciciosController.criar);
+router.get("/", authMiddleware, exerciciosController.listar);
+router.get("/:idExercicio", authMiddleware, exerciciosController.buscar);
+router.put("/:idExercicio", authMiddleware, exerciciosController.atualizar);
+router.delete("/:idExercicio", authMiddleware, exerciciosController.deletar);
 
 export default router;

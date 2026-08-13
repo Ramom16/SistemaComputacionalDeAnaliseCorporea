@@ -15,7 +15,7 @@ router.use("/auth", authRoutes);
 router.use("/usuarios", usuariosRoutes);
 router.use("/dadosCorporais", dadosRoutes );
 router.use("/treinos", treinoRoutes);
-router.use(treinoExercicioRoute);
-router.use(exercicioRoutes);
+router.use( "/treinoExercicio", treinoExercicioRoute);
+router.use("/exercicios",exercicioRoutes);
 
 export default router
