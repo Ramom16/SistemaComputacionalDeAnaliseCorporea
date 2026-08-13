@@ -53,6 +53,17 @@ const treinoService = {
             );
         }
         return treino;
+    },
+    async atualizar(idUsuario, idTreino, dados) {
+        await this.buscarPorId(idUsuario, idTreino);
+        return await treinoRepository.atualizar(
+            idTreino,
+            dados
+        );
+    },
+    async deletar(idUsuario, idTreino) {
+        await this.buscarPorId(idUsuario, idTreino);
+        return await treinoRepository.deletar(idTreino);
     }
 };
 

@@ -1,117 +1,113 @@
 export class Exercicio {
 
-    #id;
-    #nome_exercicio;
-    #descricao_exercicio;
+    #idExercicio;
+    #nome;
+    #descricao;
     #caminho_video;
 
-    constructor(id, nome_exercicio, descricao_exercicio, caminho_video){
-        this.#id = id;
-        this.#nome_exercicio = nome_exercicio;
-        this.#descricao_exercicio = descricao_exercicio;
+    constructor(idExercicio, nome, descricao, caminho_video) {
+        this.#idExercicio = idExercicio;
+        this.#nome = nome;
+        this.#descricao = descricao;
         this.#caminho_video = caminho_video;
     }
-    
-    get Id(){
-        return this.#id;
-    };
 
-    get nome_exercicio(){
-        return this.#nome_exercicio;
+    get idExercicio() {
+        return this.#idExercicio;
     }
 
-    get descricao_exercicio(){
-        return this.#descricao_exercicio;
+    get nome() {
+        return this.#nome;
     }
 
-    get caminho_video(){
+    get descricao() {
+        return this.#descricao;
+    }
+
+    get caminho_video() {
         return this.#caminho_video;
     }
 
-    //SETTERS
+    // SETTERS
 
-    set id(value) {
+    set idExercicio(value) {
         this.#validarId(value);
-        this.#id = value;
+        this.#idExercicio = value;
     }
 
-    set nome(value){
-        this.#validarNome_exercicio(value)
-        this.#nome_exercicio = value
+    set nome(value) {
+        this.#validarNome(value);
+        this.#nome = value;
     }
 
-    set descricao(value){
+    set descricao(value) {
         this.#validarDescricao(value);
-        this.#descricao_exercicio = value
+        this.#descricao = value;
     }
 
-    set caminho_video(value){
+    set caminho_video(value) {
         this.#validarCaminho(value);
         this.#caminho_video = value;
     }
 
-    //VALIDAÇÃO
+    // VALIDAÇÕES
+
     #validarId(value) {
-        if (value === undefined || typeof value !== "number" || !value) {
-            throw new Error("ID do usuário inválido");
+        if (value !== null && value !== undefined && (typeof value !== "number" || value <= 0)) {
+            throw new Error("ID do exercício inválido.");
         }
     }
 
-    #validarNome_exercicio(value) {
-        if (value === undefined || typeof value !== "string" || value.trim().length < 5 || value.trim() > 100) {
-            throw new Error("Nome do exercício inválido");
+    #validarNome(value) {
+        if (!value || typeof value !== "string" || value.trim().length < 2 || value.trim().length > 150) {
+            throw new Error("Nome do exercício inválido. Deve ter entre 2 e 150 caracteres.");
         }
     }
 
-    #validarDescricao(value){
-        if (!value || typeof value !== "string" ||value.trim().length < 5 || value.trim().length > 100)
-            throw new Error("Descrição do exercício inválido");
+    #validarDescricao(value) {
+        if (value && (typeof value !== "string" || value.trim().length > 255)) {
+            throw new Error("Descrição do exercício inválida. Deve ter no máximo 255 caracteres.");
+        }
     }
 
-    #validarCaminho(value){
-        if (!value || typeof value !== "string" )
-            throw new Error("Caminho de vídeo do exercício inválido");
+    #validarCaminho(value) {
+        if (value && (typeof value !== "string" || value.trim().length > 255)) {
+            throw new Error("Caminho de vídeo do exercício inválido.");
+        }
     }
 
-    // FACTORY
+    // FACTORY METHODS
 
-static criar({
-    nome_exercicio,
-    descricao_exercicio,
-    caminho_video,
-}) {
-    if (
-        nome_exercicio === undefined ||
-        descricao_exercicio === undefined ||
-        caminho_video === undefined
-    ) {
-        throw new Error("Dados obrigatórios faltando");
+    static criar({ nome, nome_exercicio, descricao, descricao_exercicio, caminho_video }) {
+        const nomeFinal = nome || nome_exercicio;
+        const descricaoFinal = descricao !== undefined ? descricao : descricao_exercicio;
+
+        if (!nomeFinal) {
+            throw new Error("Nome do exercício é obrigatório.");
+        }
+
+        return new Exercicio(
+            null,
+            nomeFinal,
+            descricaoFinal || null,
+            caminho_video || null
+        );
     }
 
-    return new Exercicio(
-        id,
-        nome_exercicio,
-        descricao_exercicio,
-        caminho_video
-    );
-}
+    static editar({ idExercicio, id, nome, nome_exercicio, descricao, descricao_exercicio, caminho_video }) {
+        const idFinal = idExercicio || id;
+        const nomeFinal = nome || nome_exercicio;
+        const descricaoFinal = descricao !== undefined ? descricao : descricao_exercicio;
 
-static editar({
-    id,
-    nome_exercicio,
-    descricao_exercicio,
-    caminho_video,
-}) {
+        if (!idFinal) {
+            throw new Error("ID do exercício é obrigatório.");
+        }
 
-    if (id === undefined) {
-        throw new Error("ID obrigatório");
+        return new Exercicio(
+            idFinal,
+            nomeFinal,
+            descricaoFinal || null,
+            caminho_video || null
+        );
     }
-
-    return new Exercicio(
-        id,
-        nome_exercicio,
-        descricao_exercicio,
-        caminho_video
-    );
-}
 }

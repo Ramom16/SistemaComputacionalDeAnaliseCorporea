@@ -80,6 +80,36 @@ const treinoExercicioController = {
                 error: error.message
             });
         }
+    },
+
+    async atualizar(req, res) {
+
+        try {
+
+            const idUsuario = req.usuario.id;
+            const idTreino = Number(req.params.idTreino);
+            const idExercicio =
+                Number(req.params.idExercicio);
+
+            const resultado =
+                await treinoExercicioService.atualizar(
+                    idUsuario,
+                    idTreino,
+                    idExercicio,
+                    req.body
+                );
+
+            return res.status(200).json({
+                message: "Exercício atualizado no treino.",
+                data: resultado
+            });
+
+        } catch (error) {
+
+            return res.status(400).json({
+                error: error.message
+            });
+        }
     }
 };
 

@@ -100,6 +100,38 @@ const treinoExercicioService = {
             idTreino,
             idExercicio
         );
+    },
+    async atualizar(idUsuario, idTreino, idExercicio, dados) {
+        const treino = await prisma.treino.findFirst({
+            where: {
+                idTreino,
+                calculo: {
+                    dados: {
+                        idUsuario
+                    }
+                }
+            }
+        });
+        if (!treino) {
+            throw new Error(
+                "Treino não encontrado ou não pertence ao usuário."
+            );
+        }
+        const existente =
+            await treinoExercicioRepository.buscar(
+                idTreino,
+                idExercicio
+            );
+        if (!existente) {
+            throw new Error(
+                "Exercício não encontrado neste treino."
+            );
+        }
+        return await treinoExercicioRepository.atualizar(
+            idTreino,
+            idExercicio,
+            dados
+        );
     }
 };
 
