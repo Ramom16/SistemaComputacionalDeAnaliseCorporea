@@ -1,0 +1,44 @@
+# Refatoração com Componentes React
+
+Aqui está o resumo de todas as alterações feitas para limpar e organizar o seu frontend utilizando componentes reutilizáveis. Seu código agora está seguindo as melhores práticas do React!
+
+## Componentes Criados
+
+Os seguintes arquivos foram criados na pasta `src/components/`:
+
+### [Navbar.jsx](file:///c:/Users/49197597899/Desktop/TCC/SistemaComputacionalDeAnaliseCorporea/front/src/components/Navbar.jsx)
+Criamos o componente de cabeçalho. Ele recebe a propriedade especial `children`, que permite que você passe links dinâmicos para ele. Isso resolveu o problema de repetir a logo e o layout da barra de navegação superior nas 3 páginas.
+
+### [Input.jsx](file:///c:/Users/49197597899/Desktop/TCC/SistemaComputacionalDeAnaliseCorporea/front/src/components/Input.jsx)
+Criamos o componente de entrada de texto para os formulários. Ele engloba a estrutura de `<div className="form-group">`, o `<label>` e o `<input>`, reduzindo em até 5 linhas de código cada campo dos seus formulários de Login e Cadastro.
+
+### [AlertMessage.jsx](file:///c:/Users/49197597899/Desktop/TCC/SistemaComputacionalDeAnaliseCorporea/front/src/components/AlertMessage.jsx)
+Um pequeno componente responsável por exibir as mensagens de erro ou sucesso na tela, encapsulando a condicional `{msg.text && ...}` e a formatação do parágrafo.
+
+### [FeatureCard.jsx](file:///c:/Users/49197597899/Desktop/TCC/SistemaComputacionalDeAnaliseCorporea/front/src/components/FeatureCard.jsx)
+Criado especificamente para a Landing Page. Ele encapsula o HTML daquele card interativo que possui título e parágrafos descritivos.
+
+> [!NOTE]
+> O arquivo `Card.jsx` antigo foi removido, pois suas funcionalidades foram divididas corretamente nos novos arquivos acima.
+
+---
+
+## Páginas Atualizadas
+
+Após criarmos os componentes, aplicamos as substituições nas seguintes páginas:
+
+### [Cadastro.jsx](file:///c:/Users/49197597899/Desktop/TCC/SistemaComputacionalDeAnaliseCorporea/front/src/pages/Cadastro.jsx)
+- Importamos os três novos componentes (`Navbar`, `Input`, `AlertMessage`).
+- O bloco de código do `<header>` gigante foi substituído pelo uso do `<Navbar>`.
+- Cada `<div className="form-group">` foi transformado em uma única tag `<Input />` passando os valores de `label` e estado como propriedades.
+- A mensagem condicional de erro da API foi substituída por `<AlertMessage msg={msg} />`.
+
+### [Login.jsx](file:///c:/Users/49197597899/Desktop/TCC/SistemaComputacionalDeAnaliseCorporea/front/src/pages/Login.jsx)
+- Passou pelo mesmo tratamento que a tela de Cadastro, ficando com o código extremamente enxuto e focando agora na lógica do Login e não na marcação repetitiva.
+
+### [LandingPage.jsx](file:///c:/Users/49197597899/Desktop/TCC/SistemaComputacionalDeAnaliseCorporea/front/src/pages/LandingPage.jsx)
+- A barra de navegação adotou o componente `<Navbar>`.
+- Os três blocos massivos de HTML dos cards ("TREINOS PERSONALIZADOS", "ANÁLISE METABÓLICA" e "ACOMPANHAMENTO CORPORAL") foram convertidos para a sintaxe limpa de `<FeatureCard />`, recebendo o título e os textos como propriedades (arrays de strings).
+
+## Conclusão
+Com essas alterações, seu código agora está muito mais **limpo, escalável e fácil de dar manutenção**. Se você precisar mudar uma classe CSS no input ou um detalhe visual do menu no futuro, não precisará abrir as três páginas; basta editar o componente e tudo será atualizado instantaneamente em todos os lugares!

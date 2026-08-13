@@ -3,7 +3,7 @@ generator client {
 }
 
 datasource db {
-  provider = "mysql"
+  provider = "mysql"  ' Q
   url      = env("DATABASE_URL")
 }
 
@@ -56,6 +56,7 @@ model DadosCorporais {
   nivel_atividade NivelAtividade
   data_registro_Inicial DateTime @default(now()) @db.Timestamp(0)
   data_atualizacao_dados DateTime @updatedAt
+  historicos HistoricoCorporal[]
 
 
   usuario Usuario @relation(fields: [idUsuario], references: [id])
@@ -129,6 +130,30 @@ model EmailVerificationToken {
   usuario Usuario @relation(fields: [usuarioId], references: [id])
 
   @@map("email_verification_tokens")
+}
+
+model HistoricoCorporal {
+  idHistorico Int @id @default(autoincrement())
+  idDados Int
+
+  peso_kg Decimal @db.Decimal(10,2)
+  altura_cm Decimal @db.Decimal(5,2)
+  genero Genero
+  idade Int
+
+  nivel_atividade NivelAtividade
+
+  imc Decimal @db.Decimal(10,2)
+  tmb Decimal @db.Decimal(10,2)
+  ndc Decimal @db.Decimal(10,2)
+
+  criado_em DateTime @default(now()) @db.Timestamp(0)
+  dados DadosCorporais @relation(fields:[idDados], references:[idDados])
+
+  @@index([idDados])
+  @@index([criado_em])
+
+  @@map("historico_corporal")
 }
 
 //
