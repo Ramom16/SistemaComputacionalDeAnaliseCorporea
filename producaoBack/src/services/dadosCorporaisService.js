@@ -59,7 +59,7 @@ const DadosCorporaisService = {
                 );
             // recalcula tudo
             const calculos =
-                CalculosService.gerarCalculos(
+                await CalculosService.criarCalculo(
                     dadosAtualizados
                 );
             return {
