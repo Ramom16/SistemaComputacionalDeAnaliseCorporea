@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Logs
 logs
 *.log
@@ -28,3 +29,9 @@ dist-ssr
 # Environment variables
 .env
 >>>>>>> producaoBack
+=======
+node_modules/
+package-lock.json
+.env
+/src/generated/prisma
+>>>>>>> devTestesLogin

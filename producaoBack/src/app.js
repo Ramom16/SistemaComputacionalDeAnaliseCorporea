@@ -2,9 +2,8 @@ import dotenv from "dotenv";
 import express from "express";
 import cors from "cors";
 import { autenticarToken } from "./middlewares/autenticarToken.js";
+import router from "./routes/router.js";
 
-import authRoutes from "./routes/authRoutes.js";
-import usuariosRoutes from "./routes/usuariosRoutes.js";
 
 dotenv.config();
 
@@ -24,8 +23,7 @@ app.use(cors(corsOptions));
 app.use(express.json());
 
 // ROTAS PÚBLICAS
-app.use("/auth", authRoutes);
-app.use("/usuarios", usuariosRoutes);
+app.use('/', router)
 
 // ROTA PROTEGIDA DE TESTE
 app.get("/perfil", autenticarToken, (req, res) => {
