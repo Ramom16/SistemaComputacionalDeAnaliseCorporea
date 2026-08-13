@@ -5,6 +5,10 @@ import usuariosRoutes from "./usuariosRoutes.js"
 import dadosRoutes from "./dadosRoutes.js";
 import historyRoutes from "./historyRoutes.js"
 import evolucaoRoutes from "./evolucaoRoutes.js";
+import treinoRoutes from "./treinoRoutes.js";
+import treinoExercicioRoute from "./treinoExercicioRoute.js";
+import exercicioRoutes from "./exercicioRoutes.js";
+
 
 const router = express.Router();
 
@@ -13,5 +17,8 @@ router.use("/usuarios", usuariosRoutes);
 router.use("/dadosCorporais", dadosRoutes );
 router.use("/historico", historyRoutes);
 router.use("/evolucao", evolucaoRoutes)
+router.use("/treinos", treinoRoutes);
+router.use( "/treinoExercicio", treinoExercicioRoute);
+router.use("/exercicios",exercicioRoutes);
 
 export default router
