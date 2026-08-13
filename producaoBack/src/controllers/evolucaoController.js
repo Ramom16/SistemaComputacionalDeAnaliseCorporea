@@ -7,7 +7,7 @@ const EvolucaoController = {
         try{
 
             const idUsuario =
-                Number(req.params.idUsuario);
+                Number(req.params.id);
 
             const historico =
                 await HistoricoCorporalRepository

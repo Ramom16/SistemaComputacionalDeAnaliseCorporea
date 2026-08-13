@@ -3,7 +3,7 @@ import EvolucaoController from "../controllers/evolucaoController.js";
 const historyRoutes = express.Router();
 
 
-historyRoutes.get("/usuario/:idUsuario",EvolucaoController.buscar);
+historyRoutes.get("/usuario/:id",EvolucaoController.buscar);
 
 
 export default historyRoutes

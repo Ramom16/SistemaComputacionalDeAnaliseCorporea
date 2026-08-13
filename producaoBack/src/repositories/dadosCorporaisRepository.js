@@ -156,17 +156,14 @@ const DadosCorporaisRepository = {
         });
     },
     // READ BY USER
-    findByUsuario: async (
-        idUsuario,
-        transaction = prisma
-    ) => {
-        return await transaction.dadosCorporais.findUnique({
-            where: {
-                idUsuario: Number(idUsuario)
-            },
-            include: includesPadrao
-        });
-    },
+    findByUsuario: async (idUsuario) => {
+    return await prisma.dadosCorporais.findFirst({
+        where: {
+            idUsuario: Number(idUsuario)
+        },
+        include: includesPadrao
+    });
+},
     // UPDATE
 atualizarDados: async (idUsuario,dados,transaction = prisma) => {
 
