@@ -72,6 +72,57 @@ const treinoController = {
                 error: error.message
             });
         }
+    },
+
+    async atualizar(req, res) {
+
+        try {
+
+            const idUsuario = req.usuario.id;
+            const idTreino = Number(req.params.idTreino);
+
+            const treino =
+                await treinoService.atualizar(
+                    idUsuario,
+                    idTreino,
+                    req.body
+                );
+
+            return res.status(200).json({
+                message: "Treino atualizado com sucesso.",
+                data: treino
+            });
+
+        } catch (error) {
+
+            return res.status(400).json({
+                error: error.message
+            });
+        }
+    },
+
+    async deletar(req, res) {
+
+        try {
+
+            const idUsuario = req.usuario.id;
+            const idTreino = Number(req.params.idTreino);
+
+            await treinoService.deletar(
+                idUsuario,
+                idTreino
+            );
+
+            return res.status(200).json({
+                message: "Treino removido com sucesso."
+            });
+
+        } catch (error) {
+
+            return res.status(400).json({
+                error: error.message
+            });
+        }
     }
 };
 
