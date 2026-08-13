@@ -1,89 +1,94 @@
-import {
-    calcularIMC,
-    calcularTMB,
-    calcularNDC
-}
-from "../utils/calculosFisicos.js";
-
 const CalculosService = {
 
     gerarCalculos: (dados) => {
+
+        const peso = Number(dados.peso_kg);
+        const altura = Number(dados.altura_cm);
+        const idade = Number(dados.idade);
+
         const imc = calcularIMC(
-            Number(dados.peso_kg),
-            Number(dados.altura_cm)
+            peso,
+            altura
         );
+
         const tmb = calcularTMB(
-            Number(dados.peso_kg),
-            Number(dados.altura_cm),
-            Number(dados.idade),
+            peso,
+            altura,
+            idade,
             dados.genero
         );
+
         const ndc = calcularNDC(
             tmb,
             dados.nivel_atividade
         );
+
         return {
             imc,
             tmb,
             ndc,
+
             classificacao_imc:
                 CalculosService.classificarIMC(imc),
+
             agua_diaria_litros:
-                CalculosService.calcularAguaDiaria(
-                    Number(dados.peso_kg)
-                ),
+                CalculosService.calcularAguaDiaria(peso),
+
             macros:
                 CalculosService.calcularMacros(ndc)
         };
     },
-    // CLASSIFICAÇÃO IMC
+
     classificarIMC: (imc) => {
-        if (imc < 18.5) {
+
+        if (imc < 18.5)
             return "Abaixo do peso";
-        }
-        if (imc < 25) {
+
+        if (imc < 25)
             return "Peso normal";
-        }
-        if (imc < 30) {
+
+        if (imc < 30)
             return "Sobrepeso";
-        }
-        if (imc < 35) {
+
+        if (imc < 35)
             return "Obesidade grau 1";
-        }
-        if (imc < 40) {
+
+        if (imc < 40)
             return "Obesidade grau 2";
-        }
+
         return "Obesidade grau 3";
     },
-    // ÁGUA DIÁRIA
+
     calcularAguaDiaria: (peso) => {
+
         return Number(
             ((peso * 35) / 1000).toFixed(2)
         );
     },
-    // MACROS
+
     calcularMacros: (ndc) => {
-        const proteina =
-            Number(
-                ((ndc * 0.30) / 4)
-                .toFixed(2)
-            );
-        const carboidrato =
-            Number(
-                ((ndc * 0.40) / 4)
-                .toFixed(2)
-            );
-        const gordura =
-            Number(
-                ((ndc * 0.30) / 9)
-                .toFixed(2)
-            );
+
         return {
-            proteina_g: proteina,
-            carboidrato_g: carboidrato,
-            gordura_g: gordura
+
+            proteina_g:
+                Number(
+                    ((ndc * 0.30) / 4)
+                        .toFixed(2)
+                ),
+
+            carboidrato_g:
+                Number(
+                    ((ndc * 0.40) / 4)
+                        .toFixed(2)
+                ),
+
+            gordura_g:
+                Number(
+                    ((ndc * 0.30) / 9)
+                        .toFixed(2)
+                )
         };
     }
 };
-export default CalculosService;
 
+export default CalculosService;

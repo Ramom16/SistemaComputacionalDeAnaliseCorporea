@@ -1,12 +1,13 @@
 export class Calculo {
-    #idCalculo
-    #idDados
-    #imc
-    #tmb
-    #ndc
-    #dataCalculo
-    #dataAtualizacaoCalculo
-    #treinos
+
+    #idCalculo;
+    #idDados;
+    #imc;
+    #tmb;
+    #ndc;
+    #treinos;
+    #dataCalculo;
+    #dataAtualizacaoCalculo;
 
     constructor(
         idDados,
@@ -18,18 +19,22 @@ export class Calculo {
         dataCalculo = null,
         dataAtualizacaoCalculo = null
     ) {
+
+        this.idCalculo = idCalculo;
         this.idDados = idDados;
         this.imc = imc;
         this.tmb = tmb;
         this.ndc = ndc;
         this.treinos = treinos;
 
-        this.#idCalculo = idCalculo;
-        this.#dataCalculo = dataCalculo;
-        this.#dataAtualizacaoCalculo = dataAtualizacaoCalculo;
+        this.dataCalculo = dataCalculo;
+        this.dataAtualizacaoCalculo =
+            dataAtualizacaoCalculo;
     }
 
+    // =========================
     // GETTERS
+    // =========================
 
     get idCalculo() {
         return this.#idCalculo;
@@ -63,77 +68,135 @@ export class Calculo {
         return this.#dataAtualizacaoCalculo;
     }
 
+    // =========================
     // SETTERS
+    // =========================
+
+    set idCalculo(value) {
+
+        if (
+            value !== null &&
+            value !== undefined &&
+            (!Number.isInteger(Number(value)) ||
+             Number(value) <= 0)
+        ) {
+            throw new Error(
+                "ID do cálculo inválido"
+            );
+        }
+
+        this.#idCalculo =
+            value === null || value === undefined
+                ? null
+                : Number(value);
+    }
+
     set idDados(value) {
-        this.#validarIdDados(value);
-        this.#idDados = value;
+
+        if (
+            !Number.isInteger(Number(value)) ||
+            Number(value) <= 0
+        ) {
+            throw new Error(
+                "ID dos dados corporais inválido"
+            );
+        }
+
+        this.#idDados = Number(value);
     }
 
     set imc(value) {
-        this.#validarImc(value);
-        this.#imc = value;
-    }
 
-    set tmb(value) {
-        this.#validarTmb(value);
-        this.#tmb = value;
-    }
+        const imc = Number(value);
 
-    set ndc(value) {
-        this.#validarNdc(value);
-        this.#ndc = value;
-    }
-
-    set treinos(value) {
-        this.#validarTreinos(value);
-        this.#treinos = value;
-    }
-    // VALIDAÇÕES
-    #validarIdDados(value) {
-        if (!value || typeof value !== "number") {
-            throw new Error("ID dos dados corporais é obrigatório");
-        }
-    }
-
-    #validarImc(value) {
         if (
-            value === null ||
-            value === undefined ||
-            typeof value !== "number" ||
-            value <= 0
+            !Number.isFinite(imc) ||
+            imc <= 0
         ) {
             throw new Error("IMC inválido");
         }
+
+        this.#imc = imc;
     }
 
-    #validarTmb(value) {
+    set tmb(value) {
+
+        const tmb = Number(value);
+
         if (
-            value === null ||
-            value === undefined ||
-            typeof value !== "number" ||
-            value <= 0
+            !Number.isFinite(tmb) ||
+            tmb <= 0
         ) {
-            throw new Error("TMB inválido");
+            throw new Error("TMB inválida");
         }
+
+        this.#tmb = tmb;
     }
 
-    #validarNdc(value) {
+    set ndc(value) {
+
+        const ndc = Number(value);
+
         if (
-            value === null ||
-            value === undefined ||
-            typeof value !== "number" ||
-            value <= 0
+            !Number.isFinite(ndc) ||
+            ndc <= 0
         ) {
-            throw new Error("NDC inválido");
+            throw new Error("NDC inválida");
         }
+
+        this.#ndc = ndc;
     }
 
-    #validarTreinos(value) {
+    set treinos(value) {
+
         if (!Array.isArray(value)) {
-            throw new Error("Treinos devem ser um array");
+            throw new Error(
+                "Treinos devem ser um array"
+            );
         }
+
+        this.#treinos = value;
     }
-    // FACTORY METHODS
+
+    set dataCalculo(value) {
+
+        if (value === null || value === undefined) {
+            this.#dataCalculo = null;
+            return;
+        }
+
+        const data = new Date(value);
+
+        if (isNaN(data.getTime())) {
+            throw new Error(
+                "Data do cálculo inválida"
+            );
+        }
+
+        this.#dataCalculo = data;
+    }
+
+    set dataAtualizacaoCalculo(value) {
+
+        if (value === null || value === undefined) {
+            this.#dataAtualizacaoCalculo = null;
+            return;
+        }
+
+        const data = new Date(value);
+
+        if (isNaN(data.getTime())) {
+            throw new Error(
+                "Data de atualização inválida"
+            );
+        }
+
+        this.#dataAtualizacaoCalculo = data;
+    }
+
+    // =========================
+    // FACTORY
+    // =========================
 
     static criar({
         idDados,
@@ -142,24 +205,20 @@ export class Calculo {
         ndc,
         treinos = []
     }) {
+
         if (
             idDados === undefined ||
             imc === undefined ||
             tmb === undefined ||
             ndc === undefined
         ) {
-            console.log({
-                idDados,
-                imc,
-                tmb,
-                ndc
-            });
-
-            throw new Error("Dados obrigatórios faltando");
+            throw new Error(
+                "Dados obrigatórios faltando"
+            );
         }
 
         return new Calculo(
-            idDados,
+            Number(idDados),
             Number(imc),
             Number(tmb),
             Number(ndc),
@@ -177,11 +236,14 @@ export class Calculo {
         dataCalculo,
         dataAtualizacaoCalculo
     }) {
+
         if (!idCalculo) {
-            throw new Error("ID do cálculo é obrigatório");
+            throw new Error(
+                "ID do cálculo é obrigatório"
+            );
         }
 
-        const calculo = new Calculo(
+        return new Calculo(
             Number(idDados),
             Number(imc),
             Number(tmb),
@@ -191,9 +253,5 @@ export class Calculo {
             dataCalculo,
             dataAtualizacaoCalculo
         );
-
-        return calculo;
     }
-
-    
 }
