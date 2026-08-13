@@ -10,17 +10,34 @@ const treinoExercicioController = {
             const idUsuario = req.usuario.id;
             const idTreino = Number(req.params.idTreino);
 
-            const resultado =
-                await treinoExercicioService.adicionar(
-                    idUsuario,
-                    idTreino,
-                    req.body
-                );
+            if (Array.isArray(req.body)) {
+                const resultados = [];
+                for (const item of req.body) {
+                    const resultado = await treinoExercicioService.adicionar(
+                        idUsuario,
+                        idTreino,
+                        item
+                    );
+                    resultados.push(resultado);
+                }
 
-            return res.status(201).json({
-                message: "Exercício adicionado ao treino.",
-                data: resultado
-            });
+                return res.status(201).json({
+                    message: "Exercícios adicionados ao treino.",
+                    data: resultados
+                });
+            } else {
+                const resultado =
+                    await treinoExercicioService.adicionar(
+                        idUsuario,
+                        idTreino,
+                        req.body
+                    );
+
+                return res.status(201).json({
+                    message: "Exercício adicionado ao treino.",
+                    data: resultado
+                });
+            }
 
         } catch (error) {
 
