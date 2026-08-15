@@ -156,14 +156,26 @@ const authController = {
       }
 
       const tokenHash = gerarHashSHA256(tokenBruto);
-      const tokenEncontrado = await emailTokenRepository.buscarPorTokenHash(tokenHash);
+      let tokenEncontrado = await emailTokenRepository.buscarPorTokenHash(tokenHash);
+
+      // Fallback para tokens gravados antes do hashing
+      if (!tokenEncontrado) {
+        tokenEncontrado = await emailTokenRepository.buscarPorTokenHash(tokenBruto);
+      }
 
       if (!tokenEncontrado) {
-        return res.status(400).json({ erro: "Token inválido ou já utilizado" });
+        return res.status(400).json({ erro: "Token inválido ou não encontrado." });
+      }
+
+      // Se a conta do usuário já tiver sido ativada, confirma com sucesso
+      const usuario = await usuariosRepository.buscarPorId(tokenEncontrado.usuarioId);
+      if (usuario && usuario.email_verificado) {
+        return res.status(200).json({ msg: "E-mail verificado com sucesso! Você já pode fazer login." });
       }
 
       if (tokenEncontrado.usado_em) {
-        return res.status(400).json({ erro: "Este token de verificação já foi utilizado" });
+        await usuariosRepository.verificarEmail(tokenEncontrado.usuarioId);
+        return res.status(200).json({ msg: "E-mail verificado com sucesso! Você já pode fazer login." });
       }
 
       if (new Date(tokenEncontrado.expira_em) < new Date()) {

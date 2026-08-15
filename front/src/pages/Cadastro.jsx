@@ -4,6 +4,7 @@ import "../styles/cadastro.css";
 import Navbar from "../components/Navbar";
 import Input from "../components/Input";
 import AlertMessage from "../components/AlertMessage";
+import api from "../services/api";
 
 export default function Cadastro() {
   const [nome, setNome] = useState("");
@@ -14,27 +15,25 @@ export default function Cadastro() {
   const [msg, setMsg] = useState({ text: "", type: "" });
 
   const lidarCadastro = async (e) => {
-    e.preventDefault(); // O preventDefault() é usado para evitar que o formulário seja enviado de maneira tradicional, o que causaria um recarregamento da página. Em vez disso, queremos lidar com o envio do formulário usando JavaScript para fazer uma requisição assíncrona à API, permitindo uma experiência de usuário mais fluida e sem interrupções.
-    setLoading(true); // Ativa o estado de carregamento para desabilitar o botão e mostrar feedback visual
-    setMsg({ text: "", type: "" }); // Limpa mensagens anteriores
+    e.preventDefault();
+    setLoading(true);
+    setMsg({ text: "", type: "" });
 
     try {
-      try {
-        const response = await api.post("/auth/register", formData);
-        setMsg({ text: response.data.mensagem, type: "success" });
-      } catch (error) {
-        const mensagemErro = error.response?.data?.erro || "Erro ao cadastrar";
-        setMsg({ text: mensagemErro, type: "error" });
-      }
-
-      setMsg({ text: data.msg, type: "sucesso" });
-      // Limpar campos em caso de sucesso
+      const response = await api.post("/auth/register", {
+        nome,
+        email,
+        senha,
+        data_nascimento
+      });
+      setMsg({ text: response.data?.msg || "Usuário cadastrado com sucesso!", type: "sucesso" });
       setNome("");
       setEmail("");
       setSenha("");
       setDataNascimento("");
     } catch (error) {
-      setMsg({ text: "Erro: API não respondeu", type: "erro" });
+      const mensagemErro = error.response?.data?.erro || error.message || "Erro ao cadastrar";
+      setMsg({ text: mensagemErro, type: "erro" });
     } finally {
       setLoading(false);
     }
