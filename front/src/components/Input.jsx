@@ -17,7 +17,7 @@ export default function Input({ label, id, type, placeholder, value, onChange, r
         required={required} 
         value={value}
         onChange={onChange}
-        style={{ paddingRight: isPassword ? '40px' : '15px' }}
+        style={{ paddingRight: isPassword ? '40px' : '15px' }} // Espaço para o ícone
       />
       {isPassword && (
         <div 
@@ -25,7 +25,7 @@ export default function Input({ label, id, type, placeholder, value, onChange, r
           style={{
             position: 'absolute',
             right: '12px',
-            bottom: '12px',
+            bottom: '12px', // Tentar alinhar pelo bottom do input
             cursor: 'pointer',
             color: '#999',
             display: 'flex',
