@@ -1,0 +1,279 @@
+import React, { useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import api from '../services/api'; // Importação do Axios (Ajuste o caminho se seu arquivo api.js estiver em outro local)
+import '../styles/dashboard.css';
+
+export default function Dashboard() {
+  const navigate = useNavigate();
+  // Lê os dados reais do usuário salvos pelo Login
+  const usuarioSalvo = JSON.parse(localStorage.getItem('usuario') || '{}');
+  const [usuarioNome] = useState(usuarioSalvo.nome || 'Atleta');
+  const [idUsuario] = useState(usuarioSalvo.id || null);
+
+  // Estados para os inputs
+  const [peso, setPeso] = useState('');
+  const [altura, setAltura] = useState('');
+  const [idade, setIdade] = useState('');
+  const [sexo, setSexo] = useState('Masculino');
+  const [nivelAtividade, setNivelAtividade] = useState('Sedentario');
+
+  // Estado para armazenar os resultados da API
+  const [resultados, setResultados] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [msg, setMsg] = useState({ text: '', type: '' });
+
+  // Tenta buscar se o usuário já tem dados cadastrados ao carregar a página
+  useEffect(() => {
+    async function buscarDadosExistentes() {
+      if (!idUsuario) return;
+      try {
+        const response = await api.get(`/dadosCorporais/usuario/${idUsuario}`);
+        const data = response.data;
+        
+        // Pega o cálculo mais recente (índice 0) e joga nos cards
+        if (data.calculos && data.calculos.length > 0) {
+          setResultados(data.calculos[0]);
+        }
+      } catch (err) {
+        console.error("Erro ao buscar cálculos salvos: ", err);
+      }
+    }
+    buscarDadosExistentes();
+  }, [idUsuario]);
+
+  const handleCalcular = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setMsg({ text: '', type: '' });
+
+    const payload = {
+      idUsuario,
+      peso_kg: parseFloat(peso),
+      altura_cm: parseFloat(altura),
+      idade: parseInt(idade, 10),
+      genero: sexo, // Mapeia sexo para genero (como esperado no controller)
+      nivel_atividade: nivelAtividade
+    };
+
+    try {
+      let data;
+
+      try {
+        // 1. Primeiro tentamos criar (POST)
+        const response = await api.post('/dadosCorporais', payload);
+        data = response.data;
+      } catch (postError) {
+        // 2. Se o backend informar que já existe, tentamos atualizar (PUT)
+        if (postError.response?.data?.erro === 'Usuário já possui dados corporais') {
+          const putResponse = await api.put(`/dadosCorporais/${idUsuario}`, payload);
+          data = putResponse.data;
+        } else {
+          // Se for qualquer outro erro, repassa para o catch principal
+          throw postError;
+        }
+      }
+
+      setMsg({ text: 'Cálculos realizados com sucesso!', type: 'sucesso' });
+      setResultados(data.dados.calculos);
+
+    } catch (error) {
+      console.error(error);
+      const mensagemErro = error.response?.data?.erro || 'Erro ao conectar com a API';
+      setMsg({ text: mensagemErro, type: 'erro' });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('usuario');
+    navigate('/login');
+  };
+
+  return (
+    <div className="dashboard-layout">
+      {/* Sidebar de Navegação */}
+      <aside className="dashboard-sidebar">
+        <Link to="/" className="sidebar-logo">
+          <div className="logo-icon">
+            <span className="logo-bar"></span>
+            <span className="logo-bar"></span>
+            <span className="logo-bar"></span>
+          </div>
+          <span className="logo-text">IRONFIT</span>
+        </Link>
+
+        <nav className="sidebar-nav">
+          <Link to="/dashboard" className="active">Análise Corporal</Link>
+          <Link to="/meus-treinos">Meus Treinos</Link>
+          <Link to="/evolucao">Evolução</Link>
+          <Link to="#">Configurações</Link>
+        </nav>
+
+        <button onClick={handleLogout} className="logout-btn">
+          Sair da Conta
+        </button>
+      </aside>
+
+      {/* Conteúdo Principal */}
+      <main className="dashboard-content">
+        <section className="welcome-section">
+          <h1 className="welcome-title">Olá, <span>{usuarioNome}</span></h1>
+          <p className="welcome-desc">
+            Bem-vindo ao sistema! Aqui você vai poder calcular seu TMB, IMC e NDC, trabalhar com seus exercícios e acompanhar sua evolução física de perto.
+          </p>
+        </section>
+
+        <section className="calculator-section">
+          {/* Card do Formulário */}
+          <div className="calc-card">
+            <h3>Calculadora Metabólica</h3>
+            <form className="form-grid" onSubmit={handleCalcular}>
+              
+              <div className="input-group">
+                <label htmlFor="peso">Peso (kg)</label>
+                <input 
+                  type="number" 
+                  id="peso" 
+                  step="0.1"
+                  placeholder="Ex: 75.5" 
+                  value={peso}
+                  onChange={(e) => setPeso(e.target.value)}
+                  required 
+                />
+              </div>
+
+              <div className="input-group">
+                <label htmlFor="altura">Altura (cm)</label>
+                <input 
+                  type="number" 
+                  id="altura" 
+                  placeholder="Ex: 178" 
+                  value={altura}
+                  onChange={(e) => setAltura(e.target.value)}
+                  required 
+                />
+              </div>
+
+              <div className="input-group">
+                <label htmlFor="idade">Idade</label>
+                <input 
+                  type="number" 
+                  id="idade" 
+                  placeholder="Ex: 25" 
+                  value={idade}
+                  onChange={(e) => setIdade(e.target.value)}
+                  required 
+                />
+              </div>
+
+              <div className="input-group">
+                <label htmlFor="sexo">Sexo Biológico</label>
+                <select 
+                  id="sexo"
+                  value={sexo}
+                  onChange={(e) => setSexo(e.target.value)}
+                  required
+                >
+                  <option value="Masculino">Masculino</option>
+                  <option value="Feminino">Feminino</option>
+                  <option value="Outro">Outro</option>
+                </select>
+              </div>
+
+              <div className="input-group">
+                <label htmlFor="atividade">Nível de Atividade Física</label>
+                <select 
+                  id="atividade"
+                  value={nivelAtividade}
+                  onChange={(e) => setNivelAtividade(e.target.value)}
+                  required
+                >
+                  <option value="Sedentario">Sedentário (Pouco ou nenhum exercício)</option>
+                  <option value="Leve">Leve (1 a 3 dias/semana)</option>
+                  <option value="Moderado">Moderado (3 a 5 dias/semana)</option>
+                  <option value="Intenso">Intenso (6 a 7 dias/semana)</option>
+                  <option value="MuitoIntenso">Muito Intenso (Atleta/2x ao dia)</option>
+                </select>
+              </div>
+
+              <button type="submit" className="btn-calc" disabled={loading}>
+                {loading ? 'Calculando...' : 'Calcular'}
+              </button>
+            </form>
+            
+            {msg.text && (
+              <p style={{ marginTop: '15px', color: msg.type === 'erro' ? '#ff4d5a' : '#4ade80', fontWeight: 'bold' }}>
+                {msg.text}
+              </p>
+            )}
+          </div>
+
+          {/* Seção de Resultados (3 Tabelas/Cards) */}
+          <div className="results-section">
+            
+            {/* Resultado TMB */}
+            <div className="result-table-card">
+              <div className="table-header">
+                <h4>Taxa Metabólica Basal</h4>
+                <span className="table-badge">TMB</span>
+              </div>
+              <div className="table-content">
+                <div>
+                  <span className="result-value">
+                    {resultados ? Math.round(resultados.tmb) : '---'}
+                  </span>
+                  <span className="result-unit">kcal</span>
+                </div>
+                <div className="result-desc">
+                  Quantidade mínima de energia que seu corpo precisa apenas para manter as funções vitais em repouso.
+                </div>
+              </div>
+            </div>
+
+            {/* Resultado IMC */}
+            <div className="result-table-card">
+              <div className="table-header">
+                <h4>Índice de Massa Corporal</h4>
+                <span className="table-badge">IMC</span>
+              </div>
+              <div className="table-content">
+                <div>
+                  <span className="result-value">
+                    {resultados ? (Math.round(resultados.imc * 10) / 10) : '---'}
+                  </span>
+                  <span className="result-unit"></span>
+                </div>
+                <div className="result-desc">
+                  {resultados?.classificacao_imc 
+                    ? <strong style={{color: 'var(--primary-yellow)'}}>{resultados.classificacao_imc}</strong> 
+                    : 'Indicador de adequação do peso em relação à altura.'}
+                </div>
+              </div>
+            </div>
+
+            {/* Resultado NDC */}
+            <div className="result-table-card">
+              <div className="table-header">
+                <h4>Necessidade Diária de Calorias</h4>
+                <span className="table-badge">NDC</span>
+              </div>
+              <div className="table-content">
+                <div>
+                  <span className="result-value">
+                    {resultados ? Math.round(resultados.ndc) : '---'}
+                  </span>
+                  <span className="result-unit">kcal</span>
+                </div>
+                <div className="result-desc">
+                  Total de calorias gastas no dia. (Recomendação de Água: {resultados ? resultados.agua_diaria_litros : '--'} Litros)
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </section>
+      </main>
+    </div>
+  );
+}
