@@ -36,9 +36,6 @@ model Usuario {
   emailTokens EmailVerificationToken[]
   resetTokens PasswordResetToken[]
 
-  sessoes Sessao[]
-
-  logsAutenticacao LogAutenticacao[]
 
   @@map("usuarios")
 }
@@ -93,7 +90,7 @@ model DadosCorporais {
   nivel_atividade NivelAtividade
 
   data_registro_Inicial DateTime @default(now()) @db.Timestamp(0)
-  data_atualizacao_dados DateTime @updatedAt
+  data_atualizacao_dados DateTime @updatedAt @db.DateTime(3)
 
   usuario Usuario @relation(fields: [idUsuario], references: [id], onDelete: Cascade)
 
@@ -118,7 +115,7 @@ model Calculo {
   ndc Decimal @db.Decimal(10, 2)
 
   data_calculo DateTime @default(now()) @db.Timestamp(0)
-  data_atualizacao_calculo DateTime @updatedAt
+  data_atualizacao_calculo DateTime @updatedAt @db.DateTime(3)
 
   dados DadosCorporais @relation(fields: [idDados], references: [idDados], onDelete: Cascade)
 
@@ -257,72 +254,6 @@ model PasswordResetToken {
 
 
 // ============================================================
-// SESSÕES / JWT
-// ============================================================
-
-model Sessao {
-  id Int @id @default(autoincrement())
-
-  usuarioId Int
-
-  // JWT ID
-  jti String @unique @db.VarChar(255)
-
-  criado_em DateTime @default(now()) @db.Timestamp(0)
-
-  expira_em DateTime @db.Timestamp(0)
-
-  // NULL = sessão ativa
-  // preenchido = sessão revogada
-  revogado_em DateTime? @db.Timestamp(0)
-
-  // IPv4 / IPv6
-  ip String? @db.VarChar(45)
-
-  user_agent String? @db.VarChar(500)
-
-  usuario Usuario @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
-
-  @@index([usuarioId])
-  @@index([expira_em])
-  @@index([revogado_em])
-
-  @@map("sessoes")
-}
-
-
-// ============================================================
-// LOG DE AUTENTICAÇÃO
-// ============================================================
-
-model LogAutenticacao {
-  id Int @id @default(autoincrement())
-
-  // Pode ser NULL caso o usuário não seja identificado
-  usuarioId Int?
-
-  evento EventoAutenticacao
-
-  sucesso Boolean @default(false)
-
-  ip String? @db.VarChar(45)
-
-  user_agent String? @db.VarChar(500)
-
-  criado_em DateTime @default(now()) @db.Timestamp(0)
-
-  usuario Usuario? @relation(fields: [usuarioId], references: [id], onDelete: SetNull)
-
-  @@index([usuarioId])
-  @@index([evento])
-  @@index([criado_em])
-  @@index([ip])
-
-  @@map("logs_autenticacao")
-}
-
-
-// ============================================================
 // HISTÓRICO CORPORAL
 // ============================================================
 
@@ -396,26 +327,3 @@ enum TipoExercicio {
 }
 
 
-// ============================================================
-// EVENTOS DE AUTENTICAÇÃO
-// ============================================================
-
-enum EventoAutenticacao {
-  LOGIN_SUCESSO
-  LOGIN_FALHA
-
-  LOGOUT
-  SESSAO_REVOGADA
-
-  EMAIL_VERIFICADO
-  EMAIL_VERIFICACAO_SOLICITADA
-  EMAIL_VERIFICACAO_EXPIRADA
-
-  SENHA_ALTERADA
-
-  RECUPERACAO_SOLICITADA
-  RECUPERACAO_CONCLUIDA
-
-  CONTA_BLOQUEADA
-  CONTA_DESBLOQUEADA
-}

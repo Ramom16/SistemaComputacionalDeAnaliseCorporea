@@ -5,15 +5,12 @@ export class Usuario {
     #email;
     #senha_hash;
     #data_nascimento;
-
     #ativo;
     #email_verificado;
-
     #ultimo_login;
     #criado_em;
-
-    #tentativas_login;
     #bloqueado_ate;
+    #tentativas_login;
 
 
     constructor(
@@ -21,18 +18,16 @@ export class Usuario {
         email,
         senha_hash,
         data_nascimento,
-
         ativo = true,
         email_verificado = false,
-
         ultimo_login = null,
         criado_em = null,
-
-        tentativas_login = 0,
         bloqueado_ate = null,
-
+        tentativas_login = 0,
         id = null
     ) {
+
+        this.id = id;
 
         this.nome = nome;
         this.email = email;
@@ -45,16 +40,14 @@ export class Usuario {
         this.ultimo_login = ultimo_login;
         this.criado_em = criado_em;
 
-        this.tentativas_login = tentativas_login;
         this.bloqueado_ate = bloqueado_ate;
-
-        this.id = id;
+        this.tentativas_login = tentativas_login;
     }
 
 
-    // ============================================================
+    // =========================
     // GETTERS
-    // ============================================================
+    // =========================
 
     get id() {
         return this.#id;
@@ -92,22 +85,55 @@ export class Usuario {
         return this.#criado_em;
     }
 
-    get tentativas_login() {
-        return this.#tentativas_login;
-    }
-
     get bloqueado_ate() {
         return this.#bloqueado_ate;
     }
 
+    get tentativas_login() {
+        return this.#tentativas_login;
+    }
 
-    // ============================================================
+
+    // =========================
     // SETTERS
-    // ============================================================
+    // =========================
+
+    set id(value) {
+
+        if (
+            value !== null &&
+            value !== undefined
+        ) {
+
+            if (
+                !Number.isInteger(Number(value)) ||
+                Number(value) <= 0
+            ) {
+                throw new Error(
+                    "ID do usuário inválido"
+                );
+            }
+
+            this.#id = Number(value);
+
+        } else {
+
+            this.#id = null;
+        }
+    }
+
 
     set nome(value) {
 
-        this.#validarNome(value);
+        if (
+            typeof value !== "string" ||
+            value.trim().length < 3 ||
+            value.trim().length > 250
+        ) {
+            throw new Error(
+                "Nome deve ter entre 3 e 250 caracteres"
+            );
+        }
 
         this.#nome = value.trim();
     }
@@ -115,15 +141,44 @@ export class Usuario {
 
     set email(value) {
 
-        this.#validarEmail(value);
+        if (
+            typeof value !== "string" ||
+            value.trim().length < 5 ||
+            value.trim().length > 255
+        ) {
+            throw new Error(
+                "Email inválido"
+            );
+        }
 
-        this.#email = value.trim().toLowerCase();
+        const email =
+            value.trim().toLowerCase();
+
+        const regex =
+            /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+        if (!regex.test(email)) {
+
+            throw new Error(
+                "Email inválido"
+            );
+        }
+
+        this.#email = email;
     }
 
 
     set senha_hash(value) {
 
-        this.#validarSenhaHash(value);
+        if (
+            typeof value !== "string" ||
+            value.length < 40 ||
+            value.length > 255
+        ) {
+            throw new Error(
+                "Hash da senha inválido"
+            );
+        }
 
         this.#senha_hash = value;
     }
@@ -131,15 +186,40 @@ export class Usuario {
 
     set data_nascimento(value) {
 
-        this.#validarDataNascimento(value);
+        if (!value) {
 
-        this.#data_nascimento = new Date(value);
+            this.#data_nascimento = null;
+            return;
+        }
+
+        const data = new Date(value);
+
+        if (isNaN(data.getTime())) {
+
+            throw new Error(
+                "Data de nascimento inválida"
+            );
+        }
+
+        if (data > new Date()) {
+
+            throw new Error(
+                "Data de nascimento não pode ser futura"
+            );
+        }
+
+        this.#data_nascimento = data;
     }
 
 
     set ativo(value) {
 
-        this.#validarAtivo(value);
+        if (typeof value !== "boolean") {
+
+            throw new Error(
+                "Ativo deve ser boolean"
+            );
+        }
 
         this.#ativo = value;
     }
@@ -147,7 +227,12 @@ export class Usuario {
 
     set email_verificado(value) {
 
-        this.#validarEmailVerificado(value);
+        if (typeof value !== "boolean") {
+
+            throw new Error(
+                "Email_verificado deve ser boolean"
+            );
+        }
 
         this.#email_verificado = value;
     }
@@ -155,10 +240,9 @@ export class Usuario {
 
     set ultimo_login(value) {
 
-        if (value === null || value === undefined) {
+        if (value === null) {
 
             this.#ultimo_login = null;
-
             return;
         }
 
@@ -177,10 +261,9 @@ export class Usuario {
 
     set criado_em(value) {
 
-        if (value === null || value === undefined) {
+        if (value === null) {
 
             this.#criado_em = null;
-
             return;
         }
 
@@ -197,20 +280,11 @@ export class Usuario {
     }
 
 
-    set tentativas_login(value) {
-
-        this.#validarTentativasLogin(value);
-
-        this.#tentativas_login = Number(value);
-    }
-
-
     set bloqueado_ate(value) {
 
-        if (value === null || value === undefined) {
+        if (value === null) {
 
             this.#bloqueado_ate = null;
-
             return;
         }
 
@@ -227,190 +301,25 @@ export class Usuario {
     }
 
 
-    set id(value) {
-
-        if (value !== null && value !== undefined) {
-
-            this.#validarId(value);
-
-            this.#id = Number(value);
-
-        } else {
-
-            this.#id = null;
-        }
-    }
-
-
-    // ============================================================
-    // VALIDAÇÕES
-    // ============================================================
-
-    #validarNome(value) {
-
-        if (
-            !value ||
-            typeof value !== "string" ||
-            value.trim().length < 3 ||
-            value.trim().length > 60
-        ) {
-
-            throw new Error(
-                "Nome deve ter entre 3 e 60 caracteres"
-            );
-        }
-    }
-
-
-    #validarEmail(value) {
-
-        if (
-            !value ||
-            typeof value !== "string" ||
-            value.trim().length < 5 ||
-            value.trim().length > 120
-        ) {
-
-            throw new Error(
-                "Email deve ter entre 5 e 120 caracteres"
-            );
-        }
-
-
-        const emailRegex =
-            /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-
-        if (!emailRegex.test(value.trim())) {
-
-            throw new Error(
-                "Email inválido"
-            );
-        }
-    }
-
-
-    #validarSenhaHash(value) {
-
-        if (
-            !value ||
-            typeof value !== "string"
-        ) {
-
-            throw new Error(
-                "Senha hash inválida"
-            );
-        }
-
-
-        /*
-         * O projeto utiliza bcrypt.
-         *
-         * Hashes bcrypt normalmente possuem
-         * 60 caracteres.
-         *
-         * Mantemos uma faixa para permitir
-         * outros algoritmos compatíveis.
-         */
-
-        if (
-            value.length < 40 ||
-            value.length > 255
-        ) {
-
-            throw new Error(
-                "Senha hash deve ter entre 40 e 255 caracteres"
-            );
-        }
-    }
-
-
-    #validarDataNascimento(value) {
-
-        if (!value) {
-
-            throw new Error(
-                "Data de nascimento é obrigatória"
-            );
-        }
-
-
-        const data = new Date(value);
-
-
-        if (isNaN(data.getTime())) {
-
-            throw new Error(
-                "Data de nascimento inválida"
-            );
-        }
-
-
-        const hoje = new Date();
-
-
-        if (data > hoje) {
-
-            throw new Error(
-                "Data de nascimento não pode ser futura"
-            );
-        }
-    }
-
-
-    #validarAtivo(value) {
-
-        if (typeof value !== "boolean") {
-
-            throw new Error(
-                "Ativo deve ser true ou false"
-            );
-        }
-    }
-
-
-    #validarEmailVerificado(value) {
-
-        if (typeof value !== "boolean") {
-
-            throw new Error(
-                "Email_verificado deve ser true ou false"
-            );
-        }
-    }
-
-
-    #validarTentativasLogin(value) {
+    set tentativas_login(value) {
 
         if (
             !Number.isInteger(Number(value)) ||
             Number(value) < 0
         ) {
-
             throw new Error(
-                "Número de tentativas de login inválido"
+                "Número de tentativas inválido"
             );
         }
+
+        this.#tentativas_login =
+            Number(value);
     }
 
 
-    #validarId(value) {
-
-        if (
-            isNaN(value) ||
-            Number(value) <= 0
-        ) {
-
-            throw new Error(
-                "ID inválido"
-            );
-        }
-    }
-
-
-    // ============================================================
-    // FACTORY - CRIAÇÃO
-    // ============================================================
+    // =========================
+    // FACTORY
+    // =========================
 
     static criar({
         nome,
@@ -419,43 +328,21 @@ export class Usuario {
         data_nascimento
     }) {
 
-        if (
-            !nome ||
-            !email ||
-            !senha_hash ||
-            !data_nascimento
-        ) {
-
-            throw new Error(
-                "Dados obrigatórios faltando"
-            );
-        }
-
-
         return new Usuario(
-
             nome,
             email,
             senha_hash,
             data_nascimento,
-
             true,
             false,
-
             null,
             null,
-
+            null,
             0,
-            null,
-
             null
         );
     }
 
-
-    // ============================================================
-    // FACTORY - EDIÇÃO
-    // ============================================================
 
     static editar({
         nome,
@@ -465,34 +352,9 @@ export class Usuario {
         ativo,
         email_verificado,
         ultimo_login,
-        criado_em,
-        tentativas_login,
-        bloqueado_ate
+        bloqueado_ate,
+        tentativas_login
     }, id) {
-
-
-        if (
-            !id ||
-            isNaN(id)
-        ) {
-
-            throw new Error(
-                "ID é obrigatório para edição"
-            );
-        }
-
-
-        if (
-            !nome ||
-            !email ||
-            !data_nascimento
-        ) {
-
-            throw new Error(
-                "Dados obrigatórios faltando para edição"
-            );
-        }
-
 
         return new Usuario(
 
@@ -502,13 +364,16 @@ export class Usuario {
             data_nascimento,
 
             ativo ?? true,
+
             email_verificado ?? false,
 
             ultimo_login ?? null,
-            criado_em ?? null,
+
+            null,
+
+            bloqueado_ate ?? null,
 
             tentativas_login ?? 0,
-            bloqueado_ate ?? null,
 
             id
         );

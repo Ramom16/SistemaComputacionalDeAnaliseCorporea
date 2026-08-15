@@ -1,20 +1,28 @@
 import prisma from "../database/prismaClient.js";
 
 const emailTokenRepository = {
-
-  criar: async (usuarioId, token, expira_em) => {
+  criar: async (usuarioId, token_hash, expira_em) => {
     return await prisma.emailVerificationToken.create({
       data: {
         usuarioId,
-        token,
+        token_hash,
         expira_em
       }
     });
   },
 
-  buscarPorToken: async (token) => {
+  buscarPorTokenHash: async (token_hash) => {
     return await prisma.emailVerificationToken.findUnique({
-      where: { token }
+      where: { token_hash }
+    });
+  },
+
+  marcarComoUsado: async (id) => {
+    return await prisma.emailVerificationToken.update({
+      where: { id },
+      data: {
+        usado_em: new Date()
+      }
     });
   },
 
@@ -31,4 +39,4 @@ const emailTokenRepository = {
   }
 };
 
-export default emailTokenRepository;
+export default emailTokenRepository;
