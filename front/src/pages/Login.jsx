@@ -79,6 +79,11 @@ export default function Login() {
                 value={senha}
                 onChange={(e) => setSenha(e.target.value)}
               />
+              <div className="forgot-password-wrapper">
+                <Link to="/recuperar-senha" className="forgot-password-link">
+                  Esqueceu a senha?
+                </Link>
+              </div>
               <button type="submit" id="btnLogin" className="btn-login" disabled={loading}>
                 {loading ? 'Entrando...' : 'Entrar'}
               </button>
@@ -103,6 +108,12 @@ export default function Login() {
             <div className="link-cadastro">
               <span>Não tem conta? </span>
               <Link to="/cadastro">Cadastre-se</Link>
+            </div>
+
+            <div style={{ textAlign: 'center', marginTop: '14px' }}>
+              <Link to="/verificar-email" style={{ color: 'var(--text-gray)', fontSize: '0.85rem', textDecoration: 'none', transition: 'color 0.2s' }} onMouseOver={(e) => e.target.style.color = '#fff'} onMouseOut={(e) => e.target.style.color = 'var(--text-gray)'}>
+                Precisa reenviar o e-mail de verificação?
+              </Link>
             </div>
           </div>
         </div>
