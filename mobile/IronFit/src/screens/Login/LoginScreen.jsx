@@ -27,6 +27,17 @@ export default function LoginScreen({ navigation }) {
       return;
     }
 
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      setErro('Digite um e-mail válido.');
+      return;
+    }
+
+    if (senha.length < 8) {
+      setErro('A senha deve ter no mínimo 8 caracteres.');
+      return;
+    }
+
     setErro('');
     const res = await login(email.trim(), senha);
 
