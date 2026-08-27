@@ -19,8 +19,10 @@ export const autenticarToken = (req, res, next) => {
 
 // Middleware para validar se o usuário é Administrador/Professor
 export const eAdmin = (req, res, next) => {
-  if (req.usuario && req.usuario.role === "ADMIN") {
+  console.log(req)
+  if ( req.usuario.role === "ADMIN") {
     return next();
   }
+
   return res.status(403).json({ erro: "Acesso negado. Apenas professores têm essa permissão." });
 };

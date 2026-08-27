@@ -8,7 +8,7 @@ import evolucaoRoutes from "./evolucaoRoutes.js";
 import treinoRoutes from "./treinoRoutes.js";
 import treinoExercicioRoute from "./treinoExercicioRoute.js";
 import exercicioRoutes from "./exercicioRoutes.js";
-
+import testeRoutes from "./testeRoutes.js";
 
 const router = express.Router();
 
@@ -20,5 +20,6 @@ router.use("/evolucao", evolucaoRoutes)
 router.use("/treinos", treinoRoutes);
 router.use( "/treinoExercicio", treinoExercicioRoute);
 router.use("/exercicios",exercicioRoutes);
+router.use("/testes", testeRoutes)
 
 export default router
