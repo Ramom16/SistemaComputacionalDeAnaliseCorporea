@@ -1,12 +1,16 @@
-import React, { useState, useEffect } from 'react';
-import { useSearchParams } from 'react-router-dom';
-import api from '../services/api'; // Importação da instância do Axios (Ajuste o caminho se necessário)
+import React, { useState, useEffect, useRef } from 'react';
+import { useSearchParams, Link } from 'react-router-dom';
+import api from '../services/api';
+import Navbar from '../components/Navbar';
+import Input from '../components/Input';
+import AlertMessage from '../components/AlertMessage';
+import '../styles/login.css';
 
 export default function Verify() {
   const [searchParams] = useSearchParams();
   const token = searchParams.get('token');
 
-  const [msg, setMsg] = useState('Verificando...');
+  const [msg, setMsg] = useState({ text: 'Verificando seu e-mail...', type: '' });
   const [showReauth, setShowReauth] = useState(false);
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
@@ -14,7 +18,8 @@ export default function Verify() {
   useEffect(() => {
     async function verificarEmail() {
       if (!token) {
-        setMsg('Token não encontrado na URL.');
+        setMsg({ text: 'Token não fornecido. Digite seu e-mail abaixo para receber um link de verificação.', type: '' });
+        setShowReauth(true);
         return;
       }
 
@@ -23,11 +28,12 @@ export default function Verify() {
           params: { token }
         });
 
-        setMsg(response.data.msg || 'Email verificado com sucesso!');
+        setMsg({ text: response.data?.msg || 'E-mail verificado com sucesso!', type: 'sucesso' });
+        setSucesso(true);
         setShowReauth(false);
       } catch (error) {
-        const mensagemErro = error.response?.data?.erro || 'Erro ao verificar email.';
-        setMsg(mensagemErro);
+        const mensagemErro = error.response?.data?.erro || 'Erro ao verificar e-mail. O link pode ter expirado.';
+        setMsg({ text: mensagemErro, type: 'erro' });
         setShowReauth(true);
       }
     }
@@ -38,88 +44,80 @@ export default function Verify() {
   const handleReenviar = async () => {
     const emailTrimmed = email.trim();
     if (!emailTrimmed) {
-      setMsg('Digite seu e-mail.');
+      setMsg({ text: 'Digite o seu e-mail para receber um novo link.', type: 'erro' });
       return;
     }
 
     setLoading(true);
-    setMsg('Enviando...');
+    setMsg({ text: '', type: '' });
 
     try {
       const response = await api.post('/auth/reenviar-email', { email: emailTrimmed });
-
-      setMsg(response.data.msg || 'Novo link enviado para seu email.');
+      setMsg({ text: response.data?.msg || 'Novo link enviado com sucesso! Verifique sua caixa de entrada.', type: 'sucesso' });
       setShowReauth(false);
     } catch (error) {
-      const mensagemErro = error.response?.data?.erro || 'Erro ao reenviar email.';
-      setMsg(mensagemErro);
+      const mensagemErro = error.response?.data?.erro || 'Erro ao reenviar e-mail de verificação.';
+      setMsg({ text: mensagemErro, type: 'erro' });
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div style={{
-      fontFamily: 'Arial, sans-serif',
-      textAlign: 'center',
-      paddingTop: '80px',
-      backgroundColor: '#f4f4f4',
-      minHeight: '100vh',
-      color: '#333'
-    }}>
-      <div style={{
-        background: 'white',
-        width: '400px',
-        maxWidth: '90%',
-        margin: 'auto',
-        padding: '30px',
-        borderRadius: '10px',
-        boxShadow: '0px 0px 10px rgba(0,0,0,0.1)'
-      }}>
-        <h2>Verificação de Email</h2>
+    <>
+      <Navbar>
+        <li><Link to="/">Início</Link></li>
+        <li><Link to="/login">Login</Link></li>
+        <li><Link to="/cadastro">Cadastrar</Link></li>
+      </Navbar>
 
-        <p id="msg" style={{ fontWeight: 'bold', marginTop: '20px' }}>{msg}</p>
+      <section className="login-hero">
+        <div className="login-wrapper">
+          <div className="login-container">
+            <div className="login-header">
+              <h2>Verificação<br />de E-mail</h2>
+              <p>Confirme seu acesso à plataforma</p>
+              <div className="accent-line"></div>
+            </div>
 
-        {showReauth && (
-          <>
-            <p id="reauth" style={{ color: 'red', marginTop: '15px' }}>
-              Token expirado ou inválido. Se não recebeu o e-mail, solicite outro link.
-            </p>
+            <AlertMessage msg={msg} />
 
-            <input 
-              type="email" 
-              placeholder="Digite seu email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              style={{
-                padding: '10px',
-                width: '80%',
-                marginTop: '10px',
-                border: '1px solid #ccc',
-                borderRadius: '4px'
-              }}
-            />
+            {sucesso && (
+              <div style={{ marginTop: '20px', textAlign: 'center' }}>
+                <Link to="/login" className="btn-login" style={{ display: 'inline-block', textDecoration: 'none' }}>
+                  Ir para o Login
+                </Link>
+              </div>
+            )}
 
-            <br />
+            {showReauth && (
+              <form onSubmit={handleReenviar} style={{ marginTop: '20px' }}>
+                <p style={{ color: 'var(--text-gray)', fontSize: '0.85rem', marginBottom: '16px', textAlign: 'center' }}>
+                  Se o seu link expirou ou você não o recebeu, informe seu e-mail abaixo para solicitar um novo envio.
+                </p>
 
-            <button 
-              onClick={handleReenviar} 
-              disabled={loading}
-              style={{
-                padding: '10px 20px',
-                marginTop: '15px',
-                cursor: loading ? 'not-allowed' : 'pointer',
-                border: 'none',
-                background: loading ? 'gray' : '#007bff',
-                color: 'white',
-                borderRadius: '5px'
-              }}
-            >
-              {loading ? 'Enviando...' : 'Reenviar e-mail'}
-            </button>
-          </>
-        )}
-      </div>
-    </div>
+                <Input 
+                  label="E-mail" 
+                  id="emailReenviar" 
+                  type="email" 
+                  placeholder="seu@email.com" 
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  disabled={loading}
+                />
+
+                <button type="submit" className="btn-login" disabled={loading}>
+                  {loading ? 'Enviando...' : 'Reenviar E-mail'}
+                </button>
+              </form>
+            )}
+
+            <div className="link-cadastro">
+              <Link to="/login">← Voltar para o Login</Link>
+            </div>
+          </div>
+        </div>
+      </section>
+    </>
   );
 }

@@ -1,86 +1,144 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-import api from '../services/api'; // Importação do Axios (Ajuste o caminho se necessário)
+import React, { useState, useEffect } from 'react';
+import { Link, useSearchParams } from 'react-router-dom';
+import api from '../services/api';
+import Navbar from '../components/Navbar';
+import Input from '../components/Input';
+import AlertMessage from '../components/AlertMessage';
+import '../styles/login.css';
 
 export default function RecuperarSenha() {
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
-  const [msg, setMsg] = useState('Informe seu e-mail para receber um novo link.');
+  const [msg, setMsg] = useState({ text: '', type: '' });
+  const [sucesso, setSucesso] = useState(false);
 
-  const handleReenviar = async () => {
+  useEffect(() => {
+    if (token) {
+      setMsg({ text: 'Informe sua nova senha abaixo para redefinir o acesso.', type: '' });
+    } else {
+      setMsg({ text: 'Informe seu e-mail para receber o link de recuperação.', type: '' });
+    }
+  }, [token]);
+
+  const handleSolicitarRecuperacao = async (e) => {
+    e.preventDefault();
     const emailTrimmed = email.trim();
     if (!emailTrimmed) {
-      setMsg('Informe um e-mail válido.');
+      setMsg({ text: 'Informe um e-mail válido.', type: 'erro' });
       return;
     }
 
     setLoading(true);
-    setMsg('Enviando...');
+    setMsg({ text: '', type: '' });
 
     try {
-      const response = await api.post('/auth/reenviar-email', { email: emailTrimmed });
-      
-      setMsg(response.data?.msg || 'Enviamos um novo link de verificação. Verifique seu e-mail.');
+      const response = await api.post('/auth/solicitar-recuperacao', { email: emailTrimmed });
+      setMsg({ text: response.data?.msg || 'Se o e-mail estiver cadastrado, você receberá o link em breve.', type: 'sucesso' });
+      setSucesso(true);
     } catch (error) {
-      const mensagemErro = error.response?.data?.erro || error.message || 'Erro ao reenviar o e-mail.';
-      setMsg(mensagemErro);
+      const mensagemErro = error.response?.data?.erro || error.message || 'Erro ao solicitar recuperação.';
+      setMsg({ text: mensagemErro, type: 'erro' });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleRedefinirSenha = async (e) => {
+    e.preventDefault();
+    if (!novaSenha || novaSenha.length < 6) {
+      setMsg({ text: 'A nova senha deve ter no mínimo 6 caracteres.', type: 'erro' });
+      return;
+    }
+
+    if (novaSenha !== confirmarSenha) {
+      setMsg({ text: 'As senhas não coincidem.', type: 'erro' });
+      return;
+    }
+
+    setLoading(true);
+    setMsg({ text: '', type: '' });
+
+    try {
+      const response = await api.post('/auth/redefinir-senha', { token, novaSenha });
+      setMsg({ text: response.data?.msg || 'Senha redefinida com sucesso! Você já pode fazer login.', type: 'sucesso' });
+      setSucesso(true);
+    } catch (error) {
+      const mensagemErro = error.response?.data?.erro || error.message || 'Erro ao redefinir a senha.';
+      setMsg({ text: mensagemErro, type: 'erro' });
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div style={{
-      fontFamily: 'Arial, sans-serif',
-      textAlign: 'center',
-      paddingTop: '80px',
-      backgroundColor: '#f4f4f4',
-      minHeight: '100vh',
-      color: '#333'
-    }}>
-      <div style={{
-        background: 'white',
-        width: '400px',
-        maxWidth: '90%',
-        margin: 'auto',
-        padding: '30px',
-        borderRadius: '10px',
-        boxShadow: '0px 0px 10px rgba(0,0,0,0.1)'
-      }}>
-        <h2>Reenviar link de verificação</h2>
-        <p style={{ marginBottom: '20px', fontWeight: 'bold' }}>{msg}</p>
-        
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
-          <input 
-            type="email" 
-            placeholder="seu-email@dominio.com" 
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            style={{ padding: '10px', borderRadius: '4px', border: '1px solid #ccc' }} 
-          />
-          
-          <button 
-            onClick={handleReenviar} 
-            disabled={loading}
-            style={{
-              padding: '10px',
-              backgroundColor: loading ? 'gray' : '#007bff',
-              color: '#fff',
-              border: 'none',
-              borderRadius: '4px',
-              cursor: loading ? 'not-allowed' : 'pointer'
-            }}
-          >
-            {loading ? 'Enviando...' : 'Enviar novo link'}
-          </button>
+    <>
+      <Navbar>
+        <li><Link to="/">Início</Link></li>
+        <li><Link to="/login">Login</Link></li>
+        <li><Link to="/cadastro">Cadastrar</Link></li>
+      </Navbar>
+
+      <section className="login-hero">
+        <div className="login-wrapper">
+          <div className="login-container">
+            <div className="login-header">
+              <h2>{token ? 'Redefinir\nsenha' : 'Recuperar\nsenha'}</h2>
+              <p>{token ? 'Crie uma nova senha de acesso' : 'Receba as instruções no seu e-mail'}</p>
+              <div className="accent-line"></div>
+            </div>
+
+            {!token ? (
+              <form onSubmit={handleSolicitarRecuperacao}>
+                <Input 
+                  label="E-mail" 
+                  id="emailRecuperacao" 
+                  type="email" 
+                  placeholder="seu@email.com" 
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  disabled={loading || sucesso}
+                />
+                
+                <button type="submit" className="btn-login" disabled={loading || sucesso}>
+                  {loading ? 'Enviando...' : 'Enviar Link'}
+                </button>
+              </form>
+            ) : (
+              <form onSubmit={handleRedefinirSenha}>
+                <Input 
+                  label="Nova Senha" 
+                  id="novaSenha" 
+                  type="password" 
+                  placeholder="Mínimo 6 caracteres" 
+                  value={novaSenha}
+                  onChange={(e) => setNovaSenha(e.target.value)}
+                  disabled={loading || sucesso}
+                />
+
+                <Input 
+                  label="Confirmar Senha" 
+                  id="confirmarSenha" 
+                  type="password" 
+                  placeholder="Repita a nova senha" 
+                  value={confirmarSenha}
+                  onChange={(e) => setConfirmarSenha(e.target.value)}
+                  disabled={loading || sucesso}
+                />
+                
+                <button type="submit" className="btn-login" disabled={loading || sucesso}>
+                  {loading ? 'Redefinindo...' : 'Salvar Nova Senha'}
+                </button>
+              </form>
+            )}
+
+            <AlertMessage msg={msg} />
+
+            <div className="link-cadastro">
+              <Link to="/login">← Voltar para o Login</Link>
+            </div>
+          </div>
         </div>
-        
-        <div style={{ marginTop: '20px' }}>
-          <Link to="/login" style={{ color: '#007bff', textDecoration: 'none' }}>
-            Voltar para o Login
-          </Link>
-        </div>
-      </div>
-    </div>
+      </section>
+    </>
   );
 }
