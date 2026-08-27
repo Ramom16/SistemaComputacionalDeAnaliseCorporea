@@ -7,103 +7,107 @@ import {
   Pressable,
 } from 'react-native';
 import { useAuth } from '../../context/AuthContext';
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function HomeScreen({ navigation }) {
   const { user, ultimaAvaliacao } = useAuth();
 
   return (
+
     <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
-      {/* Header com Boas-Vindas */}
-      <View style={styles.header}>
-        <View>
-          <Text style={styles.welcomeText}>BEM-VINDO,</Text>
-          <Text style={styles.userName}>{user?.nome || 'Atleta'}</Text>
-        </View>
-        <View style={styles.badge}>
-          <Text style={styles.badgeText}>ATIVO</Text>
-        </View>
-      </View>
-
-      {/* Card de Destaque Metabólico */}
-      <View style={styles.heroCard}>
-        <View style={styles.heroCardHeader}>
-          <Text style={styles.heroTag}>ÚLTIMA AVALIAÇÃO CORPORAL</Text>
-          <Text style={styles.heroDate}>
-            {ultimaAvaliacao ? new Date(ultimaAvaliacao.data_registro).toLocaleDateString('pt-BR') : 'Hoje'}
-          </Text>
-        </View>
-
-        <View style={styles.metricsRow}>
-          <View style={styles.metricItem}>
-            <Text style={styles.metricLabel}>IMC</Text>
-            <Text style={styles.metricValue}>{ultimaAvaliacao?.imc || '--'}</Text>
-            <Text style={styles.metricSub}>{ultimaAvaliacao?.classificacaoImc || 'Não registrado'}</Text>
+      <SafeAreaView>
+        {/* Header com Boas-Vindas */}
+        <View style={styles.header}>
+          <View>
+            <Text style={styles.welcomeText}>BEM-VINDO,</Text>
+            <Text style={styles.userName}>{user?.nome || 'Atleta'}</Text>
           </View>
-
-          <View style={styles.divider} />
-
-          <View style={styles.metricItem}>
-            <Text style={styles.metricLabel}>TMB</Text>
-            <Text style={styles.metricValue}>{ultimaAvaliacao?.tmb || '--'}</Text>
-            <Text style={styles.metricSub}>kcal/dia (Basal)</Text>
-          </View>
-
-          <View style={styles.divider} />
-
-          <View style={styles.metricItem}>
-            <Text style={styles.metricLabel}>NDC</Text>
-            <Text style={styles.metricValue}>{ultimaAvaliacao?.ndc || '--'}</Text>
-            <Text style={styles.metricSub}>kcal/dia (Meta)</Text>
+          <View style={styles.badge}>
+            <Text style={styles.badgeText}>ATIVO</Text>
           </View>
         </View>
-      </View>
 
-      {/* Seção de Treino Atual */}
-      <View style={styles.sectionHeader}>
-        <Text style={styles.sectionTitle}>FICHA DE TREINO RECOMENDADA</Text>
-      </View>
+        {/* Card de Destaque Metabólico */}
+        <View style={styles.heroCard}>
+          <View style={styles.heroCardHeader}>
+            <Text style={styles.heroTag}>ÚLTIMA AVALIAÇÃO CORPORAL</Text>
+            <Text style={styles.heroDate}>
+              {ultimaAvaliacao ? new Date(ultimaAvaliacao.data_registro).toLocaleDateString('pt-BR') : 'Hoje'}
+            </Text>
+          </View>
 
-      <View style={styles.workoutCard}>
-        <View style={styles.workoutTop}>
-          <Text style={styles.workoutBadge}>TREINO A</Text>
-          <Text style={styles.workoutGoal}>Foco: Hipertrofia</Text>
+          <View style={styles.metricsRow}>
+            <View style={styles.metricItem}>
+              <Text style={styles.metricLabel}>IMC</Text>
+              <Text style={styles.metricValue}>{ultimaAvaliacao?.imc || '--'}</Text>
+              <Text style={styles.metricSub}>{ultimaAvaliacao?.classificacaoImc || 'Não registrado'}</Text>
+            </View>
+
+            <View style={styles.divider} />
+
+            <View style={styles.metricItem}>
+              <Text style={styles.metricLabel}>TMB</Text>
+              <Text style={styles.metricValue}>{ultimaAvaliacao?.tmb || '--'}</Text>
+              <Text style={styles.metricSub}>kcal/dia (Basal)</Text>
+            </View>
+
+            <View style={styles.divider} />
+
+            <View style={styles.metricItem}>
+              <Text style={styles.metricLabel}>NDC</Text>
+              <Text style={styles.metricValue}>{ultimaAvaliacao?.ndc || '--'}</Text>
+              <Text style={styles.metricSub}>kcal/dia (Meta)</Text>
+            </View>
+          </View>
         </View>
 
-        <Text style={styles.workoutTitle}>Peito & Tríceps</Text>
-        <Text style={styles.workoutDesc}>5 exercícios • Duração estimada: 50 min</Text>
+        {/* Seção de Treino Atual */}
+        <View style={styles.sectionHeader}>
+          <Text style={styles.sectionTitle}>FICHA DE TREINO RECOMENDADA</Text>
+        </View>
 
-        <Pressable
-          style={styles.workoutButton}
-          onPress={() => navigation.navigate('TreinosTab')}
-        >
-          <Text style={styles.workoutButtonText}>ABRIR TREINO COMPLETO →</Text>
-        </Pressable>
-      </View>
+        <View style={styles.workoutCard}>
+          <View style={styles.workoutTop}>
+            <Text style={styles.workoutBadge}>TREINO A</Text>
+            <Text style={styles.workoutGoal}>Foco: Hipertrofia</Text>
+          </View>
 
-      {/* Ações Rápidas */}
-      <View style={styles.sectionHeader}>
-        <Text style={styles.sectionTitle}>AÇÕES RÁPIDAS</Text>
-      </View>
+          <Text style={styles.workoutTitle}>Peito & Tríceps</Text>
+          <Text style={styles.workoutDesc}>5 exercícios • Duração estimada: 50 min</Text>
 
-      <View style={styles.quickGrid}>
-        <Pressable
-          style={styles.quickCard}
-          onPress={() => navigation.navigate('AvaliacaoTab')}
-        >
-          <Text style={styles.quickIcon}>🧮</Text>
-          <Text style={styles.quickTitle}>Nova Avaliação</Text>
-          <Text style={styles.quickSub}>Calcule seu IMC/TMB</Text>
-        </Pressable>
+          <Pressable
+            style={styles.workoutButton}
+            onPress={() => navigation.navigate('TreinosTab')}
+          >
+            <Text style={styles.workoutButtonText}>ABRIR TREINO COMPLETO →</Text>
+          </Pressable>
+        </View>
 
-        <Pressable
-          style={styles.quickCard}
-          onPress={() => navigation.navigate('EvolucaoTab')}
-        >
-          <Text style={styles.quickIcon}>📈</Text>
-          <Text style={styles.quickTitle}>Ver Evolução</Text>
-          <Text style={styles.quickSub}>Histórico e métricas</Text>
-        </Pressable>
-      </View>
+        {/* Ações Rápidas */}
+        <View style={styles.sectionHeader}>
+          <Text style={styles.sectionTitle}>AÇÕES RÁPIDAS</Text>
+        </View>
+
+        <View style={styles.quickGrid}>
+          <Pressable
+            style={styles.quickCard}
+            onPress={() => navigation.navigate('AvaliacaoTab')}
+          >
+            <Text style={styles.quickIcon}>🧮</Text>
+            <Text style={styles.quickTitle}>Nova Avaliação</Text>
+            <Text style={styles.quickSub}>Calcule seu IMC/TMB</Text>
+          </Pressable>
+
+          <Pressable
+            style={styles.quickCard}
+            onPress={() => navigation.navigate('EvolucaoTab')}
+          >
+            <Text style={styles.quickIcon}>📈</Text>
+            <Text style={styles.quickTitle}>Ver Evolução</Text>
+            <Text style={styles.quickSub}>Histórico e métricas</Text>
+          </Pressable>
+        </View>
+      </SafeAreaView>
     </ScrollView>
   );
 }
@@ -289,5 +293,9 @@ const styles = StyleSheet.create({
   quickSub: {
     color: '#888888',
     fontSize: 12,
+  },
+  safeArea: {
+    flex: 1,
+    backgroundColor: "#F6F7F8",
   },
 });
