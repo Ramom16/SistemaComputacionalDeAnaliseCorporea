@@ -2,12 +2,13 @@ import prisma from "../database/prismaClient.js";
 
 const exerciciosRepository = {
 
-    async criar({ nome, descricao, caminho_video }) {
+    async criar({ nome, descricao, caminho_video, grupo_muscular }) {
         return await prisma.exercicio.create({
             data: {
                 nome,
                 descricao,
-                caminho_video
+                caminho_video,
+                grupo_muscular: grupo_muscular || null
             }
         });
     },

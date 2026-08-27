@@ -2,12 +2,15 @@ import prisma from "../database/prismaClient.js";
 
 const treinoRepository = {
 
-    async criar({ idCalculo, objetivo, nivel }) {
+    async criar({ idUsuario, idCalculo, titulo, objetivo, nivel, is_oficial }) {
         return await prisma.treino.create({
             data: {
-                idCalculo,
+                idUsuario: idUsuario ? Number(idUsuario) : null,
+                idCalculo: idCalculo ? Number(idCalculo) : null,
+                titulo,
                 objetivo,
-                nivel
+                nivel,
+                is_oficial: Boolean(is_oficial)
             }
         });
     },
@@ -15,7 +18,7 @@ const treinoRepository = {
     async buscarPorId(idTreino) {
         return await prisma.treino.findUnique({
             where: {
-                idTreino
+                idTreino: Number(idTreino)
             },
             include: {
                 calculo: {
@@ -39,11 +42,17 @@ const treinoRepository = {
     async listarPorUsuario(idUsuario) {
         return await prisma.treino.findMany({
             where: {
-                calculo: {
-                    dados: {
-                        idUsuario
+                OR: [
+                    { idUsuario: Number(idUsuario) },
+                    { is_oficial: true },
+                    {
+                        calculo: {
+                            dados: {
+                                idUsuario: Number(idUsuario)
+                            }
+                        }
                     }
-                }
+                ]
             },
             include: {
                 treinoExercicios: {
@@ -62,7 +71,7 @@ const treinoRepository = {
     async atualizar(idTreino, dados) {
         return await prisma.treino.update({
             where: {
-                idTreino
+                idTreino: Number(idTreino)
             },
             data: dados
         });
@@ -71,7 +80,7 @@ const treinoRepository = {
     async deletar(idTreino) {
         return await prisma.treino.delete({
             where: {
-                idTreino
+                idTreino: Number(idTreino)
             }
         });
     }
