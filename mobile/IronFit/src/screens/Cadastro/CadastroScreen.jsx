@@ -10,7 +10,35 @@ import {
   Platform,
   ScrollView,
 } from 'react-native';
+import { z } from 'zod';
 import { useAuth } from '../../context/AuthContext';
+
+// Schema de validação para a CadastroScreen
+const cadastroSchema = z
+  .object({
+    nome: z
+      .string()
+      .trim()
+      .min(1, 'Preencha todos os campos obrigatórios.'),
+    email: z
+      .string()
+      .trim()
+      .min(1, 'Preencha todos os campos obrigatórios.')
+      .pipe(z.email('Digite um e-mail válido.')),
+    senha: z
+      .string()
+      .min(1, 'Preencha todos os campos obrigatórios.')
+      .min(6, 'A senha deve conter no mínimo 6 caracteres.'),
+    confirmarSenha: z
+      .string()
+      .min(1, 'Preencha todos os campos obrigatórios.'),
+    dataNascimento: z.string().optional(),
+    genero: z.string().optional(),
+  })
+  .refine((data) => data.senha === data.confirmarSenha, {
+    message: 'As senhas digitadas não coincidem.',
+    path: ['confirmarSenha'],
+  });
 
 export default function CadastroScreen({ navigation }) {
   const { register, loading } = useAuth();
@@ -24,18 +52,19 @@ export default function CadastroScreen({ navigation }) {
   const [erro, setErro] = useState('');
 
   async function handleCadastro() {
-    if (!nome.trim() || !email.trim() || !senha.trim() || !confirmarSenha.trim()) {
-      setErro('Preencha todos os campos obrigatórios.');
-      return;
-    }
+    // Validação com Zod
+    const result = cadastroSchema.safeParse({
+      nome,
+      email,
+      senha,
+      confirmarSenha,
+      dataNascimento,
+      genero,
+    });
 
-    if (senha !== confirmarSenha) {
-      setErro('As senhas digitadas não coincidem.');
-      return;
-    }
-
-    if (senha.length < 6) {
-      setErro('A senha deve conter no mínimo 6 caracteres.');
+    if (!result.success) {
+      const primeiraMensagem = result.error.issues[0].message;
+      setErro(primeiraMensagem);
       return;
     }
 
