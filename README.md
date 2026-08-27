@@ -116,9 +116,9 @@ Melhora o acompanhamento físico
 **Scrum Master:** Ramom Vinycius Ferreira  
 **Back-End:** Davi Custódio da Silva  
 **Front-End:** Enthony / Ramom  
-**Mobile:** Tiago Esdras da Silva Pereira  
+**Mobile:** Tiago Esdras da Silva Pereira  / Davi Custódio da Silva
 **Database:** Davi Custódio da Silva  
-**QA:** André Fernandes  
+**QA:** André Fernandes  / Ramon Vinícius
 
 
 ## Metodologia
