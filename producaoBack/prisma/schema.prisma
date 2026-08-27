@@ -30,7 +30,6 @@ model Usuario {
   tentativas_login Int       @default(0)
   bloqueado_ate    DateTime? @db.Timestamp(0)
 
-  // Relações
   dadosCorporais DadosCorporais?
   usuariosPerfil UsuariosPerfil[]
 
@@ -65,19 +64,8 @@ model UsuariosPerfil {
   idUsuario Int
   idPerfil  Int
 
-  usuario Usuario @relation(
-    fields: [idUsuario],
-    references: [id],
-    onDelete: Cascade,
-    onUpdate: Cascade
-  )
-
-  perfil Perfil @relation(
-    fields: [idPerfil],
-    references: [idPerfil],
-    onDelete: Cascade,
-    onUpdate: Cascade
-  )
+  usuario Usuario @relation(fields: [idUsuario], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  perfil  Perfil  @relation(fields: [idPerfil], references: [idPerfil], onDelete: Cascade, onUpdate: Cascade)
 
   @@id([idUsuario, idPerfil])
   @@index([idPerfil])
@@ -102,15 +90,9 @@ model DadosCorporais {
   nivel_atividade NivelAtividade
 
   data_registro_Inicial  DateTime @default(now()) @db.Timestamp(0)
-  data_atualizacao_dados DateTime @updatedAt @db.DateTime(3)
+  data_atualizacao_dados DateTime @updatedAt
 
-  // Relações
-  usuario Usuario @relation(
-    fields: [idUsuario],
-    references: [id],
-    onDelete: Cascade,
-    onUpdate: Cascade
-  )
+  usuario Usuario @relation(fields: [idUsuario], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
   historicos HistoricoCorporal[]
   calculos   Calculo[]
@@ -133,15 +115,9 @@ model Calculo {
   ndc Decimal @db.Decimal(10, 2)
 
   data_calculo             DateTime @default(now()) @db.Timestamp(0)
-  data_atualizacao_calculo DateTime @updatedAt @db.DateTime(3)
+  data_atualizacao_calculo DateTime @updatedAt
 
-  // Relações
-  dados DadosCorporais @relation(
-    fields: [idDados],
-    references: [idDados],
-    onDelete: Cascade,
-    onUpdate: Cascade
-  )
+  dados DadosCorporais @relation(fields: [idDados], references: [idDados], onDelete: Cascade, onUpdate: Cascade)
 
   treinos Treino[]
 
@@ -159,7 +135,6 @@ model Treino {
 
   titulo String @default("Novo Treino") @db.VarChar(150)
 
-  // Pode existir treino sem cálculo ou usuário associado
   idCalculo Int?
   idUsuario Int?
 
@@ -170,20 +145,8 @@ model Treino {
 
   data_criacao DateTime @default(now()) @db.Timestamp(0)
 
-  // Relações
-  calculo Calculo? @relation(
-    fields: [idCalculo],
-    references: [idCalculo],
-    onDelete: Cascade,
-    onUpdate: Cascade
-  )
-
-  usuario Usuario? @relation(
-    fields: [idUsuario],
-    references: [id],
-    onDelete: Cascade,
-    onUpdate: Cascade
-  )
+  calculo Calculo? @relation(fields: [idCalculo], references: [idCalculo], onDelete: Cascade, onUpdate: Cascade)
+  usuario Usuario? @relation(fields: [idUsuario], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
   treinoExercicios TreinoExercicio[]
 
@@ -203,12 +166,9 @@ model Exercicio {
   nome String @db.VarChar(150)
 
   grupo_muscular String? @db.VarChar(100)
-
   descricao String? @db.VarChar(255)
-
   caminho_video String? @db.VarChar(255)
 
-  // Relação
   treinoExercicios TreinoExercicio[]
 
   @@map("exercicios")
@@ -231,20 +191,8 @@ model TreinoExercicio {
 
   tipo TipoExercicio
 
-  // Relações
-  treino Treino @relation(
-    fields: [idTreino],
-    references: [idTreino],
-    onDelete: Cascade,
-    onUpdate: Cascade
-  )
-
-  exercicio Exercicio @relation(
-    fields: [idExercicio],
-    references: [idExercicio],
-    onDelete: Cascade,
-    onUpdate: Cascade
-  )
+  treino    Treino    @relation(fields: [idTreino], references: [idTreino], onDelete: Cascade, onUpdate: Cascade)
+  exercicio Exercicio @relation(fields: [idExercicio], references: [idExercicio], onDelete: Cascade, onUpdate: Cascade)
 
   @@id([idTreino, idExercicio])
   @@index([idExercicio])
@@ -268,13 +216,7 @@ model EmailVerificationToken {
 
   criado_em DateTime @default(now()) @db.Timestamp(0)
 
-  // Relação
-  usuario Usuario @relation(
-    fields: [usuarioId],
-    references: [id],
-    onDelete: Cascade,
-    onUpdate: Cascade
-  )
+  usuario Usuario @relation(fields: [usuarioId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
   @@index([usuarioId])
   @@index([expira_em])
@@ -298,13 +240,7 @@ model PasswordResetToken {
 
   criado_em DateTime @default(now()) @db.Timestamp(0)
 
-  // Relação
-  usuario Usuario @relation(
-    fields: [usuarioId],
-    references: [id],
-    onDelete: Cascade,
-    onUpdate: Cascade
-  )
+  usuario Usuario @relation(fields: [usuarioId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
   @@index([usuarioId])
   @@index([expira_em])
@@ -334,13 +270,7 @@ model HistoricoCorporal {
 
   criado_em DateTime @default(now()) @db.Timestamp(0)
 
-  // Relação
-  dados DadosCorporais @relation(
-    fields: [idDados],
-    references: [idDados],
-    onDelete: Cascade,
-    onUpdate: Cascade
-  )
+  dados DadosCorporais @relation(fields: [idDados], references: [idDados], onDelete: Cascade, onUpdate: Cascade)
 
   @@index([idDados])
   @@index([criado_em])
@@ -349,7 +279,7 @@ model HistoricoCorporal {
 
 
 // ============================================================
-// ENUM - PAPEL DO USUÁRIO
+// ENUMS
 // ============================================================
 
 enum Role {
@@ -357,21 +287,11 @@ enum Role {
   USER
 }
 
-
-// ============================================================
-// ENUM - GÊNERO
-// ============================================================
-
 enum Genero {
   Masculino
   Feminino
   Outro
 }
-
-
-// ============================================================
-// ENUM - NÍVEL DE ATIVIDADE
-// ============================================================
 
 enum NivelAtividade {
   Sedentario
@@ -381,11 +301,6 @@ enum NivelAtividade {
   MuitoIntenso
 }
 
-
-// ============================================================
-// ENUM - OBJETIVO DO TREINO
-// ============================================================
-
 enum ObjetivoTreino {
   Hipertrofia
   Emagrecimento
@@ -393,21 +308,11 @@ enum ObjetivoTreino {
   Condicionamento
 }
 
-
-// ============================================================
-// ENUM - NÍVEL DO TREINO
-// ============================================================
-
 enum NivelTreino {
   Iniciante
   Intermediario
   Avancado
 }
-
-
-// ============================================================
-// ENUM - TIPO DE EXERCÍCIO
-// ============================================================
 
 enum TipoExercicio {
   Forca
