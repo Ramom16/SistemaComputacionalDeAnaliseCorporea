@@ -27,7 +27,6 @@ export default function LoginScreen({ navigation }) {
       return;
     }
 
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
       setErro('Digite um e-mail válido.');
       return;
