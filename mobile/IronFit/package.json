@@ -7,6 +7,7 @@
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web",
+    "apk_config_install" : "npm install -g eas-cli && eas login",
     "apk": "eas build --platform android --profile preview"
   },
   "dependencies": {
