@@ -1,0 +1,12 @@
+DB_PORT=3306
+DB_USER=root
+DB_PASS=1234
+DB_NAME=sistemaTmbNdcImc
+DATABASE_URL=mysql://root:1234@localhost:3306/sistemaTmbNdcImc
+JWT_SECRET=chave_super_secreta
+FRONT_URL=http://localhost:5173
+NODE_ENV='dev'
+
+EMAIL_USER=sistema.verificacao.login@gmail.com
+EMAIL_PASS=bwlhgrydqvpyvzdo
+EMAIL_TOKEN_EXPIRATION_MINUTES=5
