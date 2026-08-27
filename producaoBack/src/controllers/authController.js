@@ -135,7 +135,8 @@ const authController = {
         usuario: {
           id: usuario.id,
           nome: usuario.nome,
-          email: usuario.email
+          email: usuario.email,
+          role: usuario.role
         }
       });
     } catch (error) {
