@@ -1,143 +1,84 @@
-# Sistema de Análise Corporal e Metabólica
+# IRONFIT — Sistema de Análise Corporal e Gestão de Treinos
 
-Bem-vindo ao **Sistema de Análise Corporal e Metabólica**.  
-Este repositório contém a documentação e implementação de um sistema voltado para academias, com foco em análise física e recomendações de treino.
+Bem-vindo ao **IRONFIT**.  
+Este repositório contém a documentação e implementação de uma plataforma voltada para academias, personal trainers e alunos, com foco em análise física, métricas metabólicas e gestão inteligente de treinos.
 
-## Objetivo
+---
 
-Projeto acadêmico com o objetivo de desenvolver um sistema capaz de realizar:
+## 🎯 Objetivo
 
-Cálculo de IMC (Índice de Massa Corporal)
-Cálculo de TMB (Taxa Metabólica Basal)
-Estimativa de NDC (Necessidade Diária de Calorias)
-Geração de recomendações iniciais de treino
-Acompanhamento da evolução física
+Desenvolver uma solução web e mobile completa capaz de realizar:
 
-Além disso, o projeto busca aplicar conceitos como:
+* **Cálculos metabólicos automáticos:** IMC (Índice de Massa Corporal), TMB (Taxa Metabólica Basal) e NDC (Necessidade Diária de Calorias).
+* **Gestão multi-perfil de treinos (RBAC):** Permissões diferenciadas para Alunos (`USER`) e Professores/Instrutores (`ADMIN`).
+* **Fichas Oficiais e Personalizadas:** Suporte a treinos padrão montados pela academia e rotinas personalizadas criadas pelos próprios alunos.
+* **Catálogo de Exercícios Enriquecido:** Mapeamento de exercícios com categorização por grupo muscular e links em vídeo.
+* **Acompanhamento de Evolução:** Histórico completo de métricas corporais.
 
-Arquitetura de sistemas
-Modelagem de banco de dados
-Desenvolvimento Web e Mobile
-APIs REST
-Metodologias ágeis (Scrum)
+---
 
-
-## Tecnologias Utilizadas
-
-### Front-end (Web)
-
-HTML5  
-CSS3  
-JavaScript  
-
-### Mobile
-
-React Native  
+## 🛠️ Tecnologias Utilizadas
 
 ### Back-end
-
-Node.js  
-Express  
+* **Runtime:** Node.js
+* **Framework:** Express.js
+* **ORM:** Prisma ORM
+* **Autenticação:** JWT (JSON Web Tokens) com controle de acesso por Roles (`ADMIN` | `USER`)
 
 ### Banco de Dados
+* **SGBD:** MySQL
 
-MySQL / PostgreSQL  
+### Front-end (Web) & Mobile
+* **Web:** HTML5, CSS3, JavaScript
+* **Mobile:** React Native
 
-### Cloud
+### Cloud & Deploy
+* **Hospedagem:** Vercel / Render / AWS
 
-Vercel  
-AWS / Render  
+---
 
+## 🔐 Controle de Acesso e Permissões (RBAC)
 
-## Documentação
+O sistema conta com dois perfis de acesso integrados:
 
-A documentação do projeto está organizada por tipo de usuário:
+| Perfil | Descrição | Permissões Principais |
+| :--- | :--- | :--- |
+| **`ADMIN`** | Professores e Gestores | Cadastrar/editar exercícios, criar treinos oficiais da academia, gerenciar todos os treinos do sistema. |
+| **`USER`** | Alunos | Registrar dados corporais, visualizar treinos oficiais, criar e gerenciar os próprios treinos pessoais. |
 
+---
 
-### Para Programadores
+## 📄 Documentação Técnica
 
-Informações técnicas para desenvolvimento do sistema:
+Para detalhes de arquitetura, diagrama de classes e rotas:
 
-- [Especificação Técnica e Arquitetura](./DOCS/Documentação/Especificacao_Tecnica.md): Contém o Diagrama Entidade-Relacionamento (DER), Diagrama de Classes, Funcionalidades vs Lógica e o Design System simplificado.
-- API (Endpoints e regras de negócio)  
-- Estrutura do sistema  
-- Modelagem do banco de dados  
-- Integração Front-End / Back-End  
+* **[Especificação Técnica e Arquitetura](./DOCS/Documentação/Especificacao_Tecnica.md):** Contém o Diagrama Entidade-Relacionamento (DER), Schema Prisma e padrões da API.
+* **Matriz de Permissões (API):** Proteção das rotas com retornos `403 Forbidden` para tentativas de ações não autorizadas por usuários de nível `USER`.
 
+---
 
-### Para Usuários
+## 🚀 Funcionalidades
 
-Visão funcional do sistema:
+- [x] Autenticação segura via JWT com suporte a `role` (`ADMIN` / `USER`).
+- [x] Cálculo automático de IMC, TMB e NDC integrado ao perfil do aluno.
+- [x] Catálogo de exercícios categorizados por `grupo_muscular`.
+- [x] Montagem de treinos oficiais (Academia) e treinos pessoais (Aluno).
+- [x] Vinculação de séries, repetições, carga e tempo de descanso por exercício.
+- [x] Histórico e acompanhamento de evolução corporal ao longo do tempo.
 
-Cálculo de IMC, TMB e NDC  
-Recomendações de treino  
-Exercícios com vídeos  
-Acompanhamento de evolução  
+---
 
+## 👥 Equipe
 
-### Para Administradores
+* **Scrum Master:** Ramom Vinycius Ferreira  
+* **Back-End:** Davi Custódio da Silva  
+* **Front-End:** Enthony / Ramom  
+* **Mobile:** Tiago Esdras da Silva Pereira  
+* **Database:** Davi Custódio da Silva  
+* **QA:** André Fernandes  
 
-Gerenciamento do sistema:
+---
 
-Controle de usuários  
-Monitoramento de dados  
-Manutenção do sistema  
+## 📌 Status do Projeto
 
-
-##  Funcionalidades
-
-Cadastro e login de usuários  
-Cálculo automático de indicadores corporais  
-Geração de treinos iniciais  
-Exibição de exercícios  
-Histórico de evolução  
-
-
-## Problema
-
-Falta de padronização em academias  
-Avaliações manuais e desorganizadas  
-Treinos genéricos  
-Dificuldade de acompanhamento  
-
-
-## Solução
-
-Sistema que:
-
-Automatiza cálculos  
-Organiza dados  
-Auxilia na tomada de decisão  
-Melhora o acompanhamento físico  
-
-
-## Equipe
-
-**Scrum Master:** Ramom Vinycius Ferreira  
-**Back-End:** Davi Custódio da Silva  
-**Front-End:** Enthony / Ramom  
-**Mobile:** Tiago Esdras da Silva Pereira  
-**Database:** Davi Custódio da Silva  
-**QA:** André Fernandes  
-
-
-## Metodologia
-
-Scrum  
-Sprints semanais  
-Kanban (Trello / ClickUp)  
-Reuniões de planejamento, review e retrospectiva  
-
-
-## Observações
-
-Projeto com fins acadêmicos  
-Não substitui profissionais da saúde  
-Utiliza ferramentas gratuitas  
-Sem fins lucrativos  
-
-
-## Status do Projeto
-
-Em desenvolvimento (2026)
-
+Em desenvolvimento ativo (2026).
