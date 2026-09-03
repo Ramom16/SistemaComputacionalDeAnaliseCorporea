@@ -21,13 +21,20 @@ export default function Dashboard() {
   const [resultados, setResultados] = useState(null);
   const [loading, setLoading] = useState(false);
   const [msg, setMsg] = useState({ text: '', type: '' });
+  
+  // Estados para treinos recomendados - RF-007
+  const [treinosRecomendados, setTreinosRecomendados] = useState([]);
+  const [loadingTreinos, setLoadingTreinos] = useState(false);
 
   // Tenta buscar se o usuário já tem dados cadastrados ao carregar a página
   useEffect(() => {
     async function buscarDadosExistentes() {
       if (!idUsuario) return;
       try {
-        const response = await api.get(`/dadosCorporais/usuario/${idUsuario}`);
+        const token = localStorage.getItem('token');
+        const response = await api.get(`/dadosCorporais/usuario/${idUsuario}`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
         const data = response.data;
         
         // Pega o cálculo mais recente (índice 0) e joga nos cards
@@ -40,6 +47,27 @@ export default function Dashboard() {
     }
     buscarDadosExistentes();
   }, [idUsuario]);
+
+  // Busca treinos recomendados baseados no perfil - RF-007
+  const buscarTreinosRecomendados = async () => {
+    const token = localStorage.getItem('token');
+    if (!token || !resultados) return;
+
+    try {
+      setLoadingTreinos(true);
+      const response = await api.get('/treinos', {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+
+      // Limita a 3 treinos recomendados
+      const treinos = (response.data.data || response.data || []).slice(0, 3);
+      setTreinosRecomendados(treinos);
+    } catch (err) {
+      console.error("Erro ao buscar treinos recomendados:", err);
+    } finally {
+      setLoadingTreinos(false);
+    }
+  };
 
   const handleCalcular = async (e) => {
     e.preventDefault();
@@ -75,6 +103,11 @@ export default function Dashboard() {
 
       setMsg({ text: 'Cálculos realizados com sucesso!', type: 'sucesso' });
       setResultados(data.dados.calculos);
+      
+      // Busca treinos recomendados após calcular
+      setTimeout(() => {
+        buscarTreinosRecomendados();
+      }, 500);
 
     } catch (error) {
       console.error(error);
@@ -273,6 +306,67 @@ export default function Dashboard() {
 
           </div>
         </section>
+
+        {/* Seção de Treinos Recomendados - RF-007 */}
+        {resultados && (
+          <section className="treinos-recomendados-section" style={{ marginTop: '3rem' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+              <h2 style={{ fontSize: '1.8rem', color: '#fff' }}>💪 Treinos Recomendados para Você</h2>
+              <Link to="/meus-treinos" style={{ color: 'var(--primary-yellow)', textDecoration: 'none', fontWeight: 'bold' }}>
+                Ver todos →
+              </Link>
+            </div>
+
+            {loadingTreinos ? (
+              <p style={{ textAlign: 'center', color: '#aaa' }}>Carregando treinos personalizados...</p>
+            ) : treinosRecomendados.length > 0 ? (
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1.5rem' }}>
+                {treinosRecomendados.map((treino) => (
+                  <div 
+                    key={treino.idTreino || treino.id}
+                    style={{
+                      background: 'linear-gradient(135deg, #1e1e2e 0%, #2d2d3d 100%)',
+                      border: '1px solid var(--primary-yellow)',
+                      borderRadius: '8px',
+                      padding: '1.5rem',
+                      cursor: 'pointer',
+                      transition: 'transform 0.2s ease, box-shadow 0.2s ease',
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.transform = 'translateY(-5px)';
+                      e.currentTarget.style.boxShadow = '0 5px 15px rgba(245, 195, 0, 0.2)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.transform = 'translateY(0)';
+                      e.currentTarget.style.boxShadow = 'none';
+                    }}
+                    onClick={() => navigate(`/treino/${treino.idTreino || treino.id}`)}
+                  >
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', marginBottom: '1rem' }}>
+                      <h3 style={{ fontSize: '1.2rem', color: '#fff', margin: 0 }}>
+                        {treino.titulo || `Treino ${treino.objetivo}`}
+                      </h3>
+                      <span style={{ background: 'var(--primary-yellow)', color: '#000', padding: '0.25rem 0.75rem', borderRadius: '20px', fontSize: '0.8rem', fontWeight: 'bold' }}>
+                        {treino.objetivo || 'Geral'}
+                      </span>
+                    </div>
+                    <p style={{ color: '#aaa', margin: '0.5rem 0', fontSize: '0.9rem' }}>
+                      {treino.descricao || 'Treino personalizado para seu perfil'}
+                    </p>
+                    <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem', color: '#888', fontSize: '0.85rem' }}>
+                      <span>🎯 {treino.nivel || 'Iniciante'}</span>
+                      {treino.treinoExercicios && <span>💪 {treino.treinoExercicios.length} exercícios</span>}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p style={{ textAlign: 'center', color: '#aaa' }}>
+                Nenhum treino disponível no momento. <Link to="/meus-treinos" style={{ color: 'var(--primary-yellow)' }}>Confira todos os treinos</Link>
+              </p>
+            )}
+          </section>
+        )}
       </main>
     </div>
   );

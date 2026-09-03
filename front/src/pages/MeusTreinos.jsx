@@ -10,6 +10,7 @@ export default function MeusTreinos() {
   const [filtroObjetivo, setFiltroObjetivo] = useState("Todos");
   const [loading, setLoading] = useState(true);
   const [erro, setErro] = useState("");
+  const [usuarioData, setUsuarioData] = useState(null);
 
   useEffect(() => {
     async function buscarTreinosAPI() {
@@ -21,15 +22,21 @@ export default function MeusTreinos() {
 
       try {
         setLoading(true);
+        
+        // Busca os dados do usuário para personalização
+        const usuarioSalvo = JSON.parse(localStorage.getItem("usuario") || "{}");
+        setUsuarioData(usuarioSalvo);
+
         // Busca os treinos cadastrados no seu banco de dados
         const response = await api.get("/treinos", {
           headers: { Authorization: `Bearer ${token}` },
         });
 
-        setTreinos(response.data);
+        console.log("Treinos recebidos da API:", response.data);
+        setTreinos(response.data.data || response.data || []);
       } catch (err) {
         console.error("Erro ao carregar treinos da API:", err);
-        setErro("Não foi possível carregar os treinos no momento.");
+        setErro("Não foi possível carregar os treinos no momento. Tente novamente mais tarde.");
       } finally {
         setLoading(false);
       }
@@ -48,8 +55,8 @@ export default function MeusTreinos() {
     "Todos",
     "Hipertrofia",
     "Emagrecimento",
-    "Manutenção",
-    "Força",
+    "Resistencia",
+    "Condicionamento",
   ];
 
   // Filtra os treinos recebidos da API
@@ -89,7 +96,7 @@ export default function MeusTreinos() {
             Meus <span>Treinos</span>
           </h1>
           <p className="welcome-desc">
-            Explore os planos de treino disponíveis no sistema para o seu perfil.
+            {usuarioData?.nome ? `Explore os planos de treino personalizados para você, ${usuarioData.nome}.` : "Explore os planos de treino disponíveis no sistema para o seu perfil."}
           </p>
         </section>
 
@@ -107,21 +114,23 @@ export default function MeusTreinos() {
         </div>
 
         {/* Estado de Carregamento e Mensagens */}
-        {loading && <p className="loading-txt">Carregando treinos da API...</p>}
+        {loading && <p className="loading-txt">Carregando treinos personalizados da API...</p>}
         {erro && <p className="erro-txt">{erro}</p>}
 
         {!loading && !erro && treinosFiltrados.length === 0 && (
-          <p className="vazio-txt">Nenhum treino encontrado no banco de dados.</p>
+          <p className="vazio-txt">
+            Nenhum treino encontrado para o filtro "{filtroObjetivo}". Tente selecionar outro objetivo!
+          </p>
         )}
 
-        {/* Grid de Treinos vindo do Banco */}
+        {/* Grid de Treinos vindo do Banco - RF-007: Treinos Personalizados */}
         {!loading && !erro && treinosFiltrados.length > 0 && (
           <div className="treinos-grid">
             {treinosFiltrados.map((treino) => (
               <TreinoCard
-                key={treino.id}
+                key={treino.idTreino || treino.id}
                 treino={treino}
-                onClick={() => navigate(`/treino/${treino.id}`)}
+                onClick={() => navigate(`/treino/${treino.idTreino || treino.id}`)}
               />
             ))}
           </div>
@@ -132,27 +141,44 @@ export default function MeusTreinos() {
 }
 
 function TreinoCard({ treino, onClick }) {
+  // Mapeia cores por objetivo para melhor visualização
+  const coresPorObjetivo = {
+    "Hipertrofia": "#FF6B6B",
+    "Emagrecimento": "#4ECDC4",
+    "Resistencia": "#FFD93D",
+    "Condicionamento": "#6BCB77",
+  };
+
   return (
     <div
       className="treino-card"
       onClick={onClick}
-      style={{ "--card-cor": treino.cor || "#f5c300" }}
+      style={{ 
+        "--card-cor": coresPorObjetivo[treino.objetivo] || "#f5c300",
+        cursor: "pointer",
+        transition: "transform 0.2s ease"
+      }}
     >
       <div className="treino-card-topo">
         <span className="treino-objetivo">{treino.objetivo || "Geral"}</span>
+        <span className="treino-nivel">Nível: {treino.nivel || "Iniciante"}</span>
       </div>
 
-      <h3 className="treino-titulo">{treino.titulo}</h3>
-      <p className="treino-desc">{treino.descricao}</p>
+      <h3 className="treino-titulo">{treino.titulo || `Treino ${treino.objetivo}`}</h3>
+      <p className="treino-desc">{treino.descricao || "Treino personalizado para seu perfil"}</p>
 
       <div className="treino-info">
-        {treino.dias && <span>📅 {treino.dias}</span>}
-        {treino.experiencia && <span>👤 {treino.experiencia}</span>}
-        {treino.faixaEtaria && <span>🎯 {treino.faixaEtaria}</span>}
+        {treino.treinoExercicios && (
+          <span>💪 {treino.treinoExercicios.length} exercícios</span>
+        )}
+        {treino.data_criacao && (
+          <span>📅 {new Date(treino.data_criacao).toLocaleDateString("pt-BR")}</span>
+        )}
+        <span>👤 {treino.nivel || "Iniciante"}</span>
       </div>
 
       <div className="treino-card-footer">
-        <span className="ver-treino">Ver treino →</span>
+        <span className="ver-treino">Ver treino e exercícios →</span>
       </div>
     </div>
   );

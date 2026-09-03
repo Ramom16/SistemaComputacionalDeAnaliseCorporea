@@ -119,16 +119,16 @@ export default function DetalhesTreino() {
 
         {/* Header do treino */}
         <div className="detalhe-header">
-          <span className="detalhe-objetivo">{treino.objetivo || 'Treino'}</span>
+          <span className="detalhe-objetivo">{treino.objetivo || 'Treino'} - Nível: {treino.nivel || 'Não especificado'}</span>
           <h1 className="welcome-title" style={{ marginBottom: '0.5rem' }}>
-            {treino.titulo}
+            {treino.titulo || `Treino ${treino.objetivo}`}
           </h1>
-          <p className="welcome-desc">{treino.descricao}</p>
+          <p className="welcome-desc">{treino.descricao || 'Treino personalizado baseado em seu perfil'}</p>
 
           <div className="detalhe-meta">
-            {treino.dias && <span>📅 {treino.dias}</span>}
-            {treino.experiencia && <span>👤 {treino.experiencia}</span>}
-            {treino.faixaEtaria && <span>🎯 {treino.faixaEtaria}</span>}
+            <span> Objetivo: {treino.objetivo}</span>
+            {treino.data_criacao && <span> Criado em: {new Date(treino.data_criacao).toLocaleDateString('pt-BR')}</span>}
+            <span> Total de Exercícios: {listaExercicios.length}</span>
           </div>
         </div>
 
@@ -152,15 +152,19 @@ export default function DetalhesTreino() {
           /* Renderização Lista Direta de Exercícios da API */
           <div className="detalhe-card">
             <h3 className="detalhe-card-titulo">Exercícios do Treino</h3>
-            <div className="exercicios-lista">
-              {listaExercicios.map((ex, exIdx) => (
-                <ExercicioItem 
-                  key={ex.id || exIdx} 
-                  exercicio={ex} 
-                  numero={exIdx + 1} 
-                />
-              ))}
-            </div>
+            {listaExercicios.length > 0 ? (
+              <div className="exercicios-lista">
+                {listaExercicios.map((ex, exIdx) => (
+                  <ExercicioItem 
+                    key={ex.id || exIdx} 
+                    exercicio={ex} 
+                    numero={exIdx + 1} 
+                  />
+                ))}
+              </div>
+            ) : (
+              <p className="texto-vazio">Nenhum exercício cadastrado para este treino.</p>
+            )}
           </div>
         )}
 
