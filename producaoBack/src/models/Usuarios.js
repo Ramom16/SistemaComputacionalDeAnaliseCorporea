@@ -1,5 +1,3 @@
-import { validarUUID } from "../utils/cryptoUtils.js";
-
 export class Usuario {
 
     #id;
@@ -107,13 +105,16 @@ export class Usuario {
             value !== undefined
         ) {
 
-            if (typeof value !== "string" || !validarUUID(value)) {
+            if (
+                !Number.isInteger(Number(value)) ||
+                Number(value) <= 0
+            ) {
                 throw new Error(
-                    "ID do usuário deve ser um UUID válido"
+                    "ID do usuário inválido"
                 );
             }
 
-            this.#id = value.trim();
+            this.#id = Number(value);
 
         } else {
 

@@ -13,7 +13,7 @@ datasource db {
 // ============================================================
 
 model Usuario {
-  id               String    @id @default(uuid()) @db.VarChar(36)
+  id               Int       @id @default(autoincrement())
   nome             String    @db.VarChar(250)
   email            String    @unique @db.VarChar(255)
   senha_hash       String    @db.VarChar(255)
@@ -36,6 +36,8 @@ model Usuario {
   emailTokens EmailVerificationToken[]
   resetTokens PasswordResetToken[]
 
+  treinos Treino[]
+
   @@map("usuarios")
 }
 
@@ -45,7 +47,7 @@ model Usuario {
 // ============================================================
 
 model Perfil {
-  idPerfil String @id @default(uuid()) @db.VarChar(36)
+  idPerfil Int    @id @default(autoincrement())
   nome     String @db.VarChar(100)
 
   usuariosPerfil UsuariosPerfil[]
@@ -59,8 +61,8 @@ model Perfil {
 // ============================================================
 
 model UsuariosPerfil {
-  idUsuario String @db.VarChar(36)
-  idPerfil  String @db.VarChar(36)
+  idUsuario Int
+  idPerfil  Int
 
   usuario Usuario @relation(fields: [idUsuario], references: [id], onDelete: Cascade, onUpdate: Cascade)
   perfil  Perfil  @relation(fields: [idPerfil], references: [idPerfil], onDelete: Cascade, onUpdate: Cascade)
@@ -76,9 +78,9 @@ model UsuariosPerfil {
 // ============================================================
 
 model DadosCorporais {
-  idDados String @id @default(uuid()) @db.VarChar(36)
+  idDados Int @id @default(autoincrement())
 
-  idUsuario String @unique @db.VarChar(36)
+  idUsuario Int @unique
 
   peso_kg   Decimal @db.Decimal(10, 2)
   altura_cm Decimal @db.Decimal(5, 2)
@@ -104,9 +106,9 @@ model DadosCorporais {
 // ============================================================
 
 model Calculo {
-  idCalculo String @id @default(uuid()) @db.VarChar(36)
+  idCalculo Int @id @default(autoincrement())
 
-  idDados String @db.VarChar(36)
+  idDados Int
 
   imc Decimal @db.Decimal(10, 2)
   tmb Decimal @db.Decimal(10, 2)
@@ -129,9 +131,12 @@ model Calculo {
 // ============================================================
 
 model Treino {
-  idTreino String @id @default(uuid()) @db.VarChar(36)
+  idTreino Int @id @default(autoincrement())
 
-  idCalculo String @db.VarChar(36)
+  titulo String @default("Novo Treino") @db.VarChar(150)
+
+  idCalculo Int?
+  idUsuario Int?
 
   objetivo ObjetivoTreino
   nivel    NivelTreino
@@ -156,7 +161,7 @@ model Treino {
 // ============================================================
 
 model Exercicio {
-  idExercicio String @id @default(uuid()) @db.VarChar(36)
+  idExercicio Int @id @default(autoincrement())
 
   nome String @db.VarChar(150)
 
@@ -175,8 +180,8 @@ model Exercicio {
 // ============================================================
 
 model TreinoExercicio {
-  idTreino String @db.VarChar(36)
-  idExercicio String @db.VarChar(36)
+  idTreino    Int
+  idExercicio Int
 
   series            Int
   descanso_segundos Int
@@ -200,11 +205,11 @@ model TreinoExercicio {
 // ============================================================
 
 model EmailVerificationToken {
-  id String @id @default(uuid()) @db.VarChar(36)
+  id Int @id @default(autoincrement())
 
   token_hash String @unique @db.VarChar(64)
 
-  usuarioId String @db.VarChar(36)
+  usuarioId Int
 
   expira_em DateTime  @db.Timestamp(0)
   usado_em  DateTime? @db.Timestamp(0)
@@ -224,11 +229,11 @@ model EmailVerificationToken {
 // ============================================================
 
 model PasswordResetToken {
-  id String @id @default(uuid()) @db.VarChar(36)
+  id Int @id @default(autoincrement())
 
   token_hash String @unique @db.VarChar(64)
 
-  usuarioId String @db.VarChar(36)
+  usuarioId Int
 
   expira_em DateTime  @db.Timestamp(0)
   usado_em  DateTime? @db.Timestamp(0)
@@ -248,9 +253,9 @@ model PasswordResetToken {
 // ============================================================
 
 model HistoricoCorporal {
-  idHistorico String @id @default(uuid()) @db.VarChar(36)
+  idHistorico Int @id @default(autoincrement())
 
-  idDados String @db.VarChar(36)
+  idDados Int
 
   peso_kg   Decimal @db.Decimal(10, 2)
   altura_cm Decimal @db.Decimal(5, 2)

@@ -102,7 +102,7 @@ const DadosCorporaisRepository = {
         //inicia um registro novo para os dados corporais
         const registro = await tx.dadosCorporais.create({
             data: {
-                idUsuario: String(dados.idUsuario),
+                idUsuario: Number(dados.idUsuario),
                 peso_kg: Number(dados.peso_kg),
                 altura_cm: Number(dados.altura_cm),
                 genero,
@@ -150,7 +150,7 @@ const DadosCorporaisRepository = {
     findById: async (idDados) => {
         return await prisma.dadosCorporais.findUnique({
             where: {
-                idDados: String(idDados)
+                idDados: Number(idDados)
             },
             include: includesPadrao
         });
@@ -159,7 +159,7 @@ const DadosCorporaisRepository = {
     findByUsuario: async (idUsuario) => {
     return await prisma.dadosCorporais.findFirst({
         where: {
-            idUsuario: String(idUsuario)
+            idUsuario: Number(idUsuario)
         },
         include: includesPadrao
     });
@@ -179,7 +179,7 @@ atualizarDados: async (idUsuario,dados,transaction = prisma) => {
     return await prisma.$transaction(async (tx) => {
             // Atualiza os dados atuais do usuário
             const registroAtualizado =await tx.dadosCorporais.update({
-                    where: {idUsuario: String(idUsuario)},
+                    where: {idUsuario: Number(idUsuario)},
                     data: {
                         peso_kg: Number(dados.peso_kg),
                         altura_cm: Number(dados.altura_cm),
@@ -223,7 +223,7 @@ atualizarDados: async (idUsuario,dados,transaction = prisma) => {
         const dados =
             await transaction.dadosCorporais.findUnique({
                 where: {
-                    idUsuario: String(idUsuario)
+                    idUsuario: Number(idUsuario)
                 }
             });
         if (!dados) {
@@ -240,7 +240,7 @@ atualizarDados: async (idUsuario,dados,transaction = prisma) => {
         });
         return await transaction.dadosCorporais.delete({
             where: {
-                idUsuario: String(idUsuario)
+                idUsuario: Number(idUsuario)
             }
         });
     }

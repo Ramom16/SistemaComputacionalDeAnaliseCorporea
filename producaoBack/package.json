@@ -5,10 +5,7 @@
   "main": "server.js",
   "scripts": {
     "dev": "nodemon server.js",
-    "start": "node server.js",
-    "test": "vitest run",
-    "test:watch": "vitest",
-    "test:coverage": "vitest run --coverage"
+    "start": "node server.js"
   },
   "keywords": [],
   "author": "",
@@ -27,9 +24,5 @@
     "nodemailer": "^8.0.7",
     "prisma": "^6.19.3",
     "recharts": "^3.10.1"
-  },
-  "devDependencies": {
-    "@vitest/coverage-v8": "^4.1.11",
-    "vitest": "^4.1.11"
   }
 }

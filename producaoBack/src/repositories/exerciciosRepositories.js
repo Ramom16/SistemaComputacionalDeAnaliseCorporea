@@ -16,7 +16,7 @@ const exerciciosRepository = {
     async buscarPorId(idExercicio) {
         return await prisma.exercicio.findUnique({
             where: {
-                idExercicio: String(idExercicio)
+                idExercicio: Number(idExercicio)
             }
         });
     },
@@ -32,7 +32,7 @@ const exerciciosRepository = {
     async atualizar(idExercicio, dados) {
         return await prisma.exercicio.update({
             where: {
-                idExercicio: String(idExercicio)
+                idExercicio: Number(idExercicio)
             },
             data: dados
         });
@@ -41,7 +41,7 @@ const exerciciosRepository = {
     async deletar(idExercicio) {
         return await prisma.exercicio.delete({
             where: {
-                idExercicio: String(idExercicio)
+                idExercicio: Number(idExercicio)
             }
         });
     },

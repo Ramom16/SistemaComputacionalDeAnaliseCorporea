@@ -17,7 +17,7 @@ const DadosCorporaisService = {
                 const existe =
                     await DadosCorporaisRepository
                         .findByUsuario(
-                            String(dados.idUsuario),
+                            dados.idUsuario,
                             transaction
                         );
 
@@ -45,7 +45,7 @@ const DadosCorporaisService = {
                         data: {
 
                             idDados:
-                                String(dadosCriados.idDados),
+                                dadosCriados.idDados,
 
                             imc:
                                 calculos.imc,
@@ -83,7 +83,7 @@ const DadosCorporaisService = {
                 const existe =
                     await DadosCorporaisRepository
                         .findByUsuario(
-                            String(idUsuario),
+                            idUsuario,
                             transaction
                         );
 
@@ -97,7 +97,7 @@ const DadosCorporaisService = {
                 const dadosAtualizados =
                     await DadosCorporaisRepository
                         .atualizarDados(
-                            String(idUsuario),
+                            idUsuario,
                             dados,
                             transaction
                         );
@@ -110,7 +110,7 @@ const DadosCorporaisService = {
                         data: {
 
                             idDados:
-                                String(dadosAtualizados.idDados),
+                                dadosAtualizados.idDados,
 
                             imc:
                                 calculos.imc,
@@ -137,5 +137,6 @@ const DadosCorporaisService = {
         );
     }
 };
+
 
 export default DadosCorporaisService;

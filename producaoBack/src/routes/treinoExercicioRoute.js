@@ -1,16 +1,13 @@
-import express from "express";
 import treinoExercicioController from "../controllers/treinoExercicioController.js";
-import { autenticarToken as authMiddleware } from "../middlewares/autenticarToken.js";
-import { tratarIdsCriptografados } from "../middlewares/tratarIdsCriptografados.js";
+import express from "express";
+import {autenticarToken as authMiddleware} from "../middlewares/autenticarToken.js";
 
 const router = express.Router();
+const treinoRoutes = router
 
-router.use(authMiddleware);
-router.use(tratarIdsCriptografados(["idTreino", "idExercicio"]));
+router.post("/:idTreino/exercicios",authMiddleware,treinoExercicioController.adicionar);
+router.get("/:idTreino/exercicios",authMiddleware,treinoExercicioController.listar);
+router.put("/:idTreino/exercicios/:idExercicio",authMiddleware,treinoExercicioController.atualizar);
+router.delete("/:idTreino/exercicios/:idExercicio",authMiddleware,treinoExercicioController.remover);
 
-router.post("/:idTreino/exercicios", treinoExercicioController.adicionar);
-router.get("/:idTreino/exercicios", treinoExercicioController.listar);
-router.put("/:idTreino/exercicios/:idExercicio", treinoExercicioController.atualizar);
-router.delete("/:idTreino/exercicios/:idExercicio", treinoExercicioController.remover);
-
-export default router;
+export default treinoRoutes;

@@ -1,5 +1,5 @@
-import treinoExercicioService from "../services/treinoExercicioService.js";
-import { anexarIdsCriptografados } from "../middlewares/tratarIdsCriptografados.js";
+import treinoExercicioService
+    from "../services/treinoExercicioService.js";
 
 const treinoExercicioController = {
 
@@ -8,13 +8,13 @@ const treinoExercicioController = {
         try {
 
             const idUsuario = req.usuario.id;
-            const idTreino = String(req.params.idTreino);
+            const idTreino = Number(req.params.idTreino);
 
             if (Array.isArray(req.body)) {
                 const resultados = [];
                 for (const item of req.body) {
                     const resultado = await treinoExercicioService.adicionar(
-                        String(idUsuario),
+                        idUsuario,
                         idTreino,
                         item
                     );
@@ -22,20 +22,20 @@ const treinoExercicioController = {
                 }
 
                 return res.status(201).json({
-                    message: "Exercícios adicionados ao treino com sucesso.",
-                    data: anexarIdsCriptografados(resultados)
+                    message: "Exercícios adicionados ao treino.",
+                    data: resultados
                 });
             } else {
                 const resultado =
                     await treinoExercicioService.adicionar(
-                        String(idUsuario),
+                        idUsuario,
                         idTreino,
                         req.body
                     );
 
                 return res.status(201).json({
-                    message: "Exercício adicionado ao treino com sucesso.",
-                    data: anexarIdsCriptografados(resultado)
+                    message: "Exercício adicionado ao treino.",
+                    data: resultado
                 });
             }
 
@@ -52,16 +52,16 @@ const treinoExercicioController = {
         try {
 
             const idUsuario = req.usuario.id;
-            const idTreino = String(req.params.idTreino);
+            const idTreino = Number(req.params.idTreino);
 
             const exercicios =
                 await treinoExercicioService.listar(
-                    String(idUsuario),
+                    idUsuario,
                     idTreino
                 );
 
             return res.status(200).json({
-                data: anexarIdsCriptografados(exercicios)
+                data: exercicios
             });
 
         } catch (error) {
@@ -77,17 +77,18 @@ const treinoExercicioController = {
         try {
 
             const idUsuario = req.usuario.id;
-            const idTreino = String(req.params.idTreino);
-            const idExercicio = String(req.params.idExercicio);
+            const idTreino = Number(req.params.idTreino);
+            const idExercicio =
+                Number(req.params.idExercicio);
 
             await treinoExercicioService.remover(
-                String(idUsuario),
+                idUsuario,
                 idTreino,
                 idExercicio
             );
 
             return res.status(200).json({
-                message: "Exercício removido do treino com sucesso."
+                message: "Exercício removido do treino."
             });
 
         } catch (error) {
@@ -103,20 +104,21 @@ const treinoExercicioController = {
         try {
 
             const idUsuario = req.usuario.id;
-            const idTreino = String(req.params.idTreino);
-            const idExercicio = String(req.params.idExercicio);
+            const idTreino = Number(req.params.idTreino);
+            const idExercicio =
+                Number(req.params.idExercicio);
 
-            const atualizado =
+            const resultado =
                 await treinoExercicioService.atualizar(
-                    String(idUsuario),
+                    idUsuario,
                     idTreino,
                     idExercicio,
                     req.body
                 );
 
             return res.status(200).json({
-                message: "Exercício do treino atualizado com sucesso.",
-                data: anexarIdsCriptografados(atualizado)
+                message: "Exercício atualizado no treino.",
+                data: resultado
             });
 
         } catch (error) {

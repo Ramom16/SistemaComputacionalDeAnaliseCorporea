@@ -1,5 +1,3 @@
-import { validarUUID } from "../utils/cryptoUtils.js";
-
 export class Exercicio {
 
     #idExercicio;
@@ -48,15 +46,19 @@ export class Exercicio {
 
         if (
             value !== null &&
-            value !== undefined
+            value !== undefined &&
+            (!Number.isInteger(Number(value)) ||
+             Number(value) <= 0)
         ) {
-            if (typeof value !== "string" || !validarUUID(value)) {
-                throw new Error("ID do exercício deve ser um UUID válido");
-            }
-            this.#idExercicio = value.trim();
-        } else {
-            this.#idExercicio = null;
+            throw new Error(
+                "ID do exercício inválido"
+            );
         }
+
+        this.#idExercicio =
+            value === null || value === undefined
+                ? null
+                : Number(value);
     }
 
     set nome(value) {
@@ -150,7 +152,7 @@ export class Exercicio {
             nome,
             descricao,
             caminho_video,
-            String(idExercicio)
+            Number(idExercicio)
         );
     }
 }

@@ -21,7 +21,7 @@ const exerciciosService = {
     async buscarPorId(idExercicio) {
         const exercicio =
             await exerciciosRepository.buscarPorId(
-                String(idExercicio)
+                Number(idExercicio)
             );
 
         if (!exercicio) {
@@ -35,7 +35,7 @@ const exerciciosService = {
         await this.buscarPorId(idExercicio);
 
         const exercicio = Exercicio.editar({
-            idExercicio: String(idExercicio),
+            idExercicio: Number(idExercicio),
             nome: dados.nome,
             descricao: dados.descricao,
             caminho_video: dados.caminho_video
@@ -55,7 +55,7 @@ const exerciciosService = {
     async deletar(idExercicio) {
         await this.buscarPorId(idExercicio);
         return await exerciciosRepository.deletar(
-            String(idExercicio)
+            Number(idExercicio)
         );
     }
 };

@@ -9,28 +9,24 @@ const treinoService = {
             throw new Error("Objetivo e nível são obrigatórios.");
         }
 
-        // Verifica se o cálculo pertence ao usuário autenticado (proteção contra IDOR)
-        const calculo = await prisma.calculo.findFirst({
-            where: {
-                idCalculo: String(idCalculo),
-                dados: {
-                    idUsuario: String(idUsuario)
+        // Se informou cálculo, valida se pertence ao usuário
+        if (idCalculo) {
+            const calculo = await prisma.calculo.findFirst({
+                where: {
+                    idCalculo: Number(idCalculo),
+                    dados: { idUsuario }
                 }
+            });
+
+            if (!calculo) {
+                throw new Error("O cálculo informado não pertence ao usuário.");
             }
-        });
-
-        if (!calculo) {
-            throw new Error("O cálculo informado não pertence ao usuário.");
-        }
-
-        if (!calculo) {
-            throw new Error(
-                "O cálculo informado não foi encontrado ou não pertence ao usuário."
-            );
         }
 
         return await treinoRepository.criar({
-            idCalculo: String(idCalculo),
+            idUsuario,
+            idCalculo: idCalculo ? Number(idCalculo) : null,
+            titulo: titulo || "Novo Treino",
             objetivo,
             nivel,
             is_oficial: Boolean(is_oficial)
@@ -38,26 +34,21 @@ const treinoService = {
     },
 
     async listarPorUsuario(idUsuario) {
-        return await treinoRepository.listarPorUsuario(
-            String(idUsuario)
-        );
+        return await treinoRepository.listarPorUsuario(idUsuario);
     },
 
     async buscarPorId(idUsuario, idTreino) {
-        const treino = await treinoRepository.buscarPorId(
-            String(idTreino)
-        );
+        const treino = await treinoRepository.buscarPorId(idTreino);
+
         if (!treino) {
             throw new Error("Treino não encontrado.");
         }
 
-        const donoDoTreino =
-            treino.calculo?.dados?.usuario?.id === String(idUsuario);
+        const donoDoTreino = treino.idUsuario === idUsuario || treino.calculo?.dados?.idUsuario === idUsuario;
+        const eOficial = treino.is_oficial;
 
-        if (!donoDoTreino) {
-            throw new Error(
-                "Você não possui permissão para acessar este treino."
-            );
+        if (!donoDoTreino && !eOficial) {
+            throw new Error("Você não possui acesso a este treino.");
         }
 
         return treino;
@@ -65,15 +56,12 @@ const treinoService = {
 
     async atualizar(idUsuario, idTreino, dados) {
         await this.buscarPorId(idUsuario, idTreino);
-        return await treinoRepository.atualizar(
-            String(idTreino),
-            dados
-        );
+        return await treinoRepository.atualizar(idTreino, dados);
     },
 
     async deletar(idUsuario, idTreino) {
         await this.buscarPorId(idUsuario, idTreino);
-        return await treinoRepository.deletar(String(idTreino));
+        return await treinoRepository.deletar(idTreino);
     }
 };
 

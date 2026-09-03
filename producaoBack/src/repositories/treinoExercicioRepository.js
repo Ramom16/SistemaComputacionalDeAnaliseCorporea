@@ -14,11 +14,11 @@ const treinoExercicioRepository = {
 
         return await prisma.treinoExercicio.create({
             data: {
-                idTreino: String(idTreino),
-                idExercicio: String(idExercicio),
-                series: Number(series),
-                descanso_segundos: Number(descanso_segundos),
-                repeticoes: Number(repeticoes),
+                idTreino,
+                idExercicio,
+                series,
+                descanso_segundos,
+                repeticoes,
                 grupo_muscular,
                 tipo
             },
@@ -32,7 +32,7 @@ const treinoExercicioRepository = {
 
         return await prisma.treinoExercicio.findMany({
             where: {
-                idTreino: String(idTreino)
+                idTreino
             },
             include: {
                 exercicio: true
@@ -45,8 +45,8 @@ const treinoExercicioRepository = {
         return await prisma.treinoExercicio.findUnique({
             where: {
                 idTreino_idExercicio: {
-                    idTreino: String(idTreino),
-                    idExercicio: String(idExercicio)
+                    idTreino,
+                    idExercicio
                 }
             },
             include: {
@@ -61,8 +61,8 @@ const treinoExercicioRepository = {
         return await prisma.treinoExercicio.update({
             where: {
                 idTreino_idExercicio: {
-                    idTreino: String(idTreino),
-                    idExercicio: String(idExercicio)
+                    idTreino,
+                    idExercicio
                 }
             },
             data: dados,
@@ -77,8 +77,8 @@ const treinoExercicioRepository = {
         return await prisma.treinoExercicio.delete({
             where: {
                 idTreino_idExercicio: {
-                    idTreino: String(idTreino),
-                    idExercicio: String(idExercicio)
+                    idTreino,
+                    idExercicio
                 }
             }
         });

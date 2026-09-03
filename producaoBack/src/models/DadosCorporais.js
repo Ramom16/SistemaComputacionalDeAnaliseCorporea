@@ -1,5 +1,3 @@
-import { validarUUID } from "../utils/cryptoUtils.js";
-
 export class DadosCorporais {
 
     #idDados;
@@ -84,24 +82,29 @@ export class DadosCorporais {
 
         if (
             value !== null &&
-            value !== undefined
+            value !== undefined &&
+            (!Number.isInteger(Number(value)) ||
+             Number(value) <= 0)
         ) {
-            if (typeof value !== "string" || !validarUUID(value)) {
-                throw new Error("ID dos dados corporais deve ser um UUID válido");
-            }
-            this.#idDados = value.trim();
-        } else {
-            this.#idDados = null;
+            throw new Error("ID dos dados corporais inválido");
         }
+
+        this.#idDados =
+            value === null || value === undefined
+                ? null
+                : Number(value);
     }
 
     set idUsuario(value) {
 
-        if (!value || typeof value !== "string" || !validarUUID(value)) {
-            throw new Error("ID do usuário deve ser um UUID válido");
+        if (
+            !Number.isInteger(Number(value)) ||
+            Number(value) <= 0
+        ) {
+            throw new Error("ID do usuário inválido");
         }
 
-        this.#idUsuario = value.trim();
+        this.#idUsuario = Number(value);
     }
 
     set peso_kg(value) {
@@ -253,7 +256,7 @@ export class DadosCorporais {
         }
 
         return new DadosCorporais(
-            String(idUsuario),
+            Number(idUsuario),
             Number(peso_kg),
             Number(altura_cm),
             genero,
@@ -281,13 +284,13 @@ export class DadosCorporais {
         }
 
         return new DadosCorporais(
-            String(idUsuario),
+            Number(idUsuario),
             Number(peso_kg),
             Number(altura_cm),
             genero,
             Number(idade),
             nivel_atividade,
-            String(idDados),
+            Number(idDados),
             data_registro_Inicial,
             data_atualizacao_dados
         );
