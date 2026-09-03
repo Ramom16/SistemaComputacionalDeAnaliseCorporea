@@ -1,0 +1,42 @@
+import prisma from "../database/prismaClient.js";
+
+const emailTokenRepository = {
+  criar: async (usuarioId, token_hash, expira_em) => {
+    return await prisma.emailVerificationToken.create({
+      data: {
+        usuarioId: String(usuarioId),
+        token_hash,
+        expira_em
+      }
+    });
+  },
+
+  buscarPorTokenHash: async (token_hash) => {
+    return await prisma.emailVerificationToken.findUnique({
+      where: { token_hash }
+    });
+  },
+
+  marcarComoUsado: async (id) => {
+    return await prisma.emailVerificationToken.update({
+      where: { id: String(id) },
+      data: {
+        usado_em: new Date()
+      }
+    });
+  },
+
+  deletar: async (id) => {
+    return await prisma.emailVerificationToken.delete({
+      where: { id: String(id) }
+    });
+  },
+
+  deletarPorUsuario: async (usuarioId) => {
+    return await prisma.emailVerificationToken.deleteMany({
+      where: { usuarioId: String(usuarioId) }
+    });
+  }
+};
+
+export default emailTokenRepository;

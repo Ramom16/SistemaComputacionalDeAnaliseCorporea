@@ -1,0 +1,328 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+
+// ============================================================
+// USUÁRIO
+// ============================================================
+
+model Usuario {
+  id               String    @id @default(uuid()) @db.VarChar(36)
+  nome             String    @db.VarChar(250)
+  email            String    @unique @db.VarChar(255)
+  senha_hash       String    @db.VarChar(255)
+  data_nascimento  DateTime? @db.Date
+
+  ativo            Boolean   @default(true)
+  email_verificado Boolean   @default(false)
+
+  ultimo_login     DateTime? @db.Timestamp(0)
+  criado_em        DateTime  @default(now()) @db.Timestamp(0)
+
+  // Segurança contra força bruta
+  tentativas_login Int       @default(0)
+  bloqueado_ate    DateTime? @db.Timestamp(0)
+
+  // Relacionamentos
+  dadosCorporais DadosCorporais?
+  usuariosPerfil UsuariosPerfil[]
+
+  emailTokens EmailVerificationToken[]
+  resetTokens PasswordResetToken[]
+
+  @@map("usuarios")
+}
+
+
+// ============================================================
+// PERFIL
+// ============================================================
+
+model Perfil {
+  idPerfil String @id @default(uuid()) @db.VarChar(36)
+  nome     String @db.VarChar(100)
+
+  usuariosPerfil UsuariosPerfil[]
+
+  @@map("perfil")
+}
+
+
+// ============================================================
+// USUÁRIO ↔ PERFIL
+// ============================================================
+
+model UsuariosPerfil {
+  idUsuario String @db.VarChar(36)
+  idPerfil  String @db.VarChar(36)
+
+  usuario Usuario @relation(fields: [idUsuario], references: [id], onDelete: Cascade)
+  perfil  Perfil  @relation(fields: [idPerfil], references: [idPerfil], onDelete: Cascade)
+
+  @@id([idUsuario, idPerfil])
+  @@index([idPerfil])
+
+  @@map("usuarios_perfil")
+}
+
+
+// ============================================================
+// DADOS CORPORAIS
+// ============================================================
+
+model DadosCorporais {
+  idDados String @id @default(uuid()) @db.VarChar(36)
+
+  idUsuario String @unique @db.VarChar(36)
+
+  peso_kg Decimal @db.Decimal(10, 2)
+  altura_cm Decimal @db.Decimal(5, 2)
+
+  genero Genero
+  idade Int
+  nivel_atividade NivelAtividade
+
+  data_registro_Inicial DateTime @default(now()) @db.Timestamp(0)
+  data_atualizacao_dados DateTime @updatedAt @db.DateTime(3)
+
+  usuario Usuario @relation(fields: [idUsuario], references: [id], onDelete: Cascade)
+
+  historicos HistoricoCorporal[]
+  calculos Calculo[]
+
+  @@map("dados_corporais")
+}
+
+
+// ============================================================
+// CÁLCULOS
+// ============================================================
+
+model Calculo {
+  idCalculo String @id @default(uuid()) @db.VarChar(36)
+
+  idDados String @db.VarChar(36)
+
+  imc Decimal @db.Decimal(10, 2)
+  tmb Decimal @db.Decimal(10, 2)
+  ndc Decimal @db.Decimal(10, 2)
+
+  data_calculo DateTime @default(now()) @db.Timestamp(0)
+  data_atualizacao_calculo DateTime @updatedAt @db.DateTime(3)
+
+  dados DadosCorporais @relation(fields: [idDados], references: [idDados], onDelete: Cascade)
+
+  treinos Treino[]
+
+  @@index([idDados])
+
+  @@map("calculos")
+}
+
+
+// ============================================================
+// TREINO
+// ============================================================
+
+model Treino {
+  idTreino String @id @default(uuid()) @db.VarChar(36)
+
+  idCalculo String @db.VarChar(36)
+
+  objetivo ObjetivoTreino
+  nivel NivelTreino
+
+  data_criacao DateTime @default(now()) @db.Timestamp(0)
+
+  calculo Calculo @relation(fields: [idCalculo], references: [idCalculo], onDelete: Cascade)
+
+  treinoExercicios TreinoExercicio[]
+
+  @@index([idCalculo])
+
+  @@map("treinos")
+}
+
+
+// ============================================================
+// EXERCÍCIO
+// ============================================================
+
+model Exercicio {
+  idExercicio String @id @default(uuid()) @db.VarChar(36)
+
+  nome String @db.VarChar(150)
+  descricao String? @db.VarChar(255)
+  caminho_video String? @db.VarChar(255)
+
+  treinoExercicios TreinoExercicio[]
+
+  @@map("exercicios")
+}
+
+
+// ============================================================
+// TREINO ↔ EXERCÍCIO
+// ============================================================
+
+model TreinoExercicio {
+  idTreino String @db.VarChar(36)
+  idExercicio String @db.VarChar(36)
+
+  series Int
+  descanso_segundos Int
+  repeticoes Int
+
+  grupo_muscular String @db.VarChar(250)
+
+  tipo TipoExercicio
+
+  treino Treino @relation(fields: [idTreino], references: [idTreino], onDelete: Cascade)
+  exercicio Exercicio @relation(fields: [idExercicio], references: [idExercicio], onDelete: Cascade)
+
+  @@id([idTreino, idExercicio])
+
+  @@index([idExercicio])
+
+  @@map("treinos_exercicios")
+}
+
+
+// ============================================================
+// TOKEN DE VERIFICAÇÃO DE E-MAIL
+// ============================================================
+
+model EmailVerificationToken {
+  id String @id @default(uuid()) @db.VarChar(36)
+
+  // SHA-256 do token real
+  token_hash String @unique @db.VarChar(64)
+
+  usuarioId String @db.VarChar(36)
+
+  expira_em DateTime @db.Timestamp(0)
+
+  // NULL = não utilizado
+  // preenchido = utilizado
+  usado_em DateTime? @db.Timestamp(0)
+
+  criado_em DateTime @default(now()) @db.Timestamp(0)
+
+  usuario Usuario @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+
+  @@index([usuarioId])
+  @@index([expira_em])
+
+  @@map("email_verification_tokens")
+}
+
+
+// ============================================================
+// TOKEN DE RECUPERAÇÃO DE SENHA
+// ============================================================
+
+model PasswordResetToken {
+  id String @id @default(uuid()) @db.VarChar(36)
+
+  // SHA-256 do token real
+  token_hash String @unique @db.VarChar(64)
+
+  usuarioId String @db.VarChar(36)
+
+  expira_em DateTime @db.Timestamp(0)
+
+  // NULL = não utilizado
+  // preenchido = utilizado
+  usado_em DateTime? @db.Timestamp(0)
+
+  criado_em DateTime @default(now()) @db.Timestamp(0)
+
+  usuario Usuario @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+
+  @@index([usuarioId])
+  @@index([expira_em])
+
+  @@map("password_reset_tokens")
+}
+
+
+// ============================================================
+// HISTÓRICO CORPORAL
+// ============================================================
+
+model HistoricoCorporal {
+  idHistorico String @id @default(uuid()) @db.VarChar(36)
+
+  idDados String @db.VarChar(36)
+
+  peso_kg Decimal @db.Decimal(10, 2)
+  altura_cm Decimal @db.Decimal(5, 2)
+
+  genero Genero
+  idade Int
+  nivel_atividade NivelAtividade
+
+  imc Decimal @db.Decimal(10, 2)
+  tmb Decimal @db.Decimal(10, 2)
+  ndc Decimal @db.Decimal(10, 2)
+
+  criado_em DateTime @default(now()) @db.Timestamp(0)
+
+  dados DadosCorporais @relation(fields: [idDados], references: [idDados], onDelete: Cascade)
+
+  @@index([idDados])
+  @@index([criado_em])
+
+  @@map("historico_corporal")
+}
+
+
+// ============================================================
+// ENUMS
+// ============================================================
+
+enum Genero {
+  Masculino
+  Feminino
+  Outro
+}
+
+
+enum NivelAtividade {
+  Sedentario
+  Leve
+  Moderado
+  Intenso
+  MuitoIntenso
+}
+
+
+enum ObjetivoTreino {
+  Hipertrofia
+  Emagrecimento
+  Resistencia
+  Condicionamento
+}
+
+
+enum NivelTreino {
+  Iniciante
+  Intermediario
+  Avancado
+}
+
+
+enum TipoExercicio {
+  Forca
+  Cardio
+  Alongamento
+  Mobilidade
+}
+
+
