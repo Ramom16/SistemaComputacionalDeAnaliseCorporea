@@ -1,0 +1,111 @@
+# =============================================
+# DEPENDÊNCIAS - NUNCA VERSIONAR node_modules
+# =============================================
+node_modules/
+**/node_modules/
+
+# =============================================
+# BACK-END (producaoBack)
+# =============================================
+
+# Variáveis de ambiente sensíveis
+producaoBack/.env
+producaoBack/.env.local
+producaoBack/.env.production
+producaoBack/.env*.local
+
+# Prisma - gerado automaticamente
+producaoBack/node_modules/
+producaoBack/prisma/migrations/
+
+# Cobertura de testes
+producaoBack/coverage/
+
+# Logs
+producaoBack/*.log
+producaoBack/logs/
+
+# =============================================
+# FRONT-END (front)
+# =============================================
+front/.env
+front/.env.local
+front/.env.production
+front/.env*.local
+front/node_modules/
+front/dist/
+front/build/
+front/.next/
+front/coverage/
+front/.vite/
+
+# =============================================
+# MOBILE (mobile/IronFit - React Native / Expo)
+# =============================================
+mobile/.env
+mobile/.env.local
+mobile/IronFit/.env
+mobile/IronFit/.env.local
+
+# Node modules do mobile
+mobile/node_modules/
+mobile/IronFit/node_modules/
+
+# Android
+mobile/IronFit/android/app/build/
+mobile/IronFit/android/build/
+mobile/IronFit/android/.gradle/
+mobile/IronFit/android/local.properties
+mobile/IronFit/android/app/src/main/assets/
+
+# iOS
+mobile/IronFit/ios/build/
+mobile/IronFit/ios/Pods/
+mobile/IronFit/ios/*.xcworkspace
+mobile/IronFit/ios/DerivedData/
+
+# Expo
+mobile/IronFit/.expo/
+mobile/IronFit/expo-env.d.ts
+mobile/IronFit/dist/
+
+# Metro Bundler cache
+mobile/IronFit/.metro/
+
+# =============================================
+# SISTEMA OPERACIONAL
+# =============================================
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+# Windows temp
+*.tmp
+*.temp
+
+# =============================================
+# IDEs E EDITORES
+# =============================================
+.vscode/
+!.vscode/extensions.json
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# =============================================
+# LOGS GERAIS
+# =============================================
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*

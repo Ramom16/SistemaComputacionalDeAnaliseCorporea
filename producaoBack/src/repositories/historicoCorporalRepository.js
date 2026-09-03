@@ -7,7 +7,7 @@ const HistoricoCorporalRepository = {
         const dados =
             await prisma.dadosCorporais.findUnique({
                 where: {
-                    idUsuario: Number(idUsuario)
+                    idUsuario: String(idUsuario)
                 },
                 select: {
                     idDados: true

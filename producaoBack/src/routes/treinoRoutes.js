@@ -1,18 +1,17 @@
-import TreinoController from "../controllers/treinoControllers.js";
 import express from "express";
-import {autenticarToken as authMiddleware} from "../middlewares/autenticarToken.js";
+import TreinoController from "../controllers/treinoControllers.js";
+import { autenticarToken as authMiddleware } from "../middlewares/autenticarToken.js";
+import { tratarIdsCriptografados } from "../middlewares/tratarIdsCriptografados.js";
 
 const router = express.Router();
-const treinoRoutes = router
 
-router.post("/",authMiddleware,TreinoController.criar);
+router.use(authMiddleware);
+router.use(tratarIdsCriptografados(["idTreino", "idCalculo"]));
 
-router.get("/", authMiddleware, TreinoController.listar);
+router.post("/", TreinoController.criar);
+router.get("/", TreinoController.listar);
+router.get("/:idTreino", TreinoController.buscar);
+router.put("/:idTreino", TreinoController.atualizar);
+router.delete("/:idTreino", TreinoController.deletar);
 
-router.get("/:idTreino", authMiddleware, TreinoController.buscar);
-
-router.put("/:idTreino", authMiddleware, TreinoController.atualizar);
-
-router.delete("/:idTreino", authMiddleware, TreinoController.deletar);
-
-export default treinoRoutes;
+export default router;

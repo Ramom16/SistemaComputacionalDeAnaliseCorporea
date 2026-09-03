@@ -1,4 +1,5 @@
 import treinoService from "../services/treinoService.js";
+import { anexarIdsCriptografados } from "../middlewares/tratarIdsCriptografados.js";
 
 const treinoController = {
 
@@ -9,13 +10,13 @@ const treinoController = {
             const idUsuario = req.usuario.id;
 
             const treino = await treinoService.criar(
-                idUsuario,
+                String(idUsuario),
                 req.body
             );
 
             return res.status(201).json({
                 message: "Treino criado com sucesso.",
-                data: treino
+                data: anexarIdsCriptografados(treino)
             });
 
         } catch (error) {
@@ -34,11 +35,11 @@ const treinoController = {
 
             const treinos =
                 await treinoService.listarPorUsuario(
-                    idUsuario
+                    String(idUsuario)
                 );
 
             return res.status(200).json({
-                data: treinos
+                data: anexarIdsCriptografados(treinos)
             });
 
         } catch (error) {
@@ -54,16 +55,16 @@ const treinoController = {
         try {
 
             const idUsuario = req.usuario.id;
-            const idTreino = Number(req.params.idTreino);
+            const idTreino = String(req.params.idTreino);
 
             const treino =
                 await treinoService.buscarPorId(
-                    idUsuario,
+                    String(idUsuario),
                     idTreino
                 );
 
             return res.status(200).json({
-                data: treino
+                data: anexarIdsCriptografados(treino)
             });
 
         } catch (error) {
@@ -79,18 +80,18 @@ const treinoController = {
         try {
 
             const idUsuario = req.usuario.id;
-            const idTreino = Number(req.params.idTreino);
+            const idTreino = String(req.params.idTreino);
 
             const treino =
                 await treinoService.atualizar(
-                    idUsuario,
+                    String(idUsuario),
                     idTreino,
                     req.body
                 );
 
             return res.status(200).json({
                 message: "Treino atualizado com sucesso.",
-                data: treino
+                data: anexarIdsCriptografados(treino)
             });
 
         } catch (error) {
@@ -106,10 +107,10 @@ const treinoController = {
         try {
 
             const idUsuario = req.usuario.id;
-            const idTreino = Number(req.params.idTreino);
+            const idTreino = String(req.params.idTreino);
 
             await treinoService.deletar(
-                idUsuario,
+                String(idUsuario),
                 idTreino
             );
 

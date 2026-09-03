@@ -1,4 +1,5 @@
 import exerciciosService from "../services/exerciciosService.js";
+import { anexarIdsCriptografados } from "../middlewares/tratarIdsCriptografados.js";
 
 const exerciciosController = {
 
@@ -11,7 +12,7 @@ const exerciciosController = {
 
             return res.status(201).json({
                 message: "Exercício criado com sucesso.",
-                data: exercicio
+                data: anexarIdsCriptografados(exercicio)
             });
 
         } catch (error) {
@@ -30,7 +31,7 @@ const exerciciosController = {
                 await exerciciosService.listar();
 
             return res.status(200).json({
-                data: exercicios
+                data: anexarIdsCriptografados(exercicios)
             });
 
         } catch (error) {
@@ -46,7 +47,7 @@ const exerciciosController = {
         try {
 
             const idExercicio =
-                Number(req.params.idExercicio);
+                String(req.params.idExercicio);
 
             const exercicio =
                 await exerciciosService.buscarPorId(
@@ -54,7 +55,7 @@ const exerciciosController = {
                 );
 
             return res.status(200).json({
-                data: exercicio
+                data: anexarIdsCriptografados(exercicio)
             });
 
         } catch (error) {
@@ -70,7 +71,7 @@ const exerciciosController = {
         try {
 
             const idExercicio =
-                Number(req.params.idExercicio);
+                String(req.params.idExercicio);
 
             const exercicio =
                 await exerciciosService.atualizar(
@@ -80,7 +81,7 @@ const exerciciosController = {
 
             return res.status(200).json({
                 message: "Exercício atualizado com sucesso.",
-                data: exercicio
+                data: anexarIdsCriptografados(exercicio)
             });
 
         } catch (error) {
@@ -96,7 +97,7 @@ const exerciciosController = {
         try {
 
             const idExercicio =
-                Number(req.params.idExercicio);
+                String(req.params.idExercicio);
 
             await exerciciosService.deletar(idExercicio);
 

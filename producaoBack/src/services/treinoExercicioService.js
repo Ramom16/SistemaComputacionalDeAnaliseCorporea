@@ -8,10 +8,10 @@ const treinoExercicioService = {
 
         const treino = await prisma.treino.findFirst({
             where: {
-                idTreino,
+                idTreino: String(idTreino),
                 calculo: {
                     dados: {
-                        idUsuario
+                        idUsuario: String(idUsuario)
                     }
                 }
             }
@@ -25,7 +25,7 @@ const treinoExercicioService = {
 
         const exercicio = await prisma.exercicio.findUnique({
             where: {
-                idExercicio: dados.idExercicio
+                idExercicio: String(dados.idExercicio)
             }
         });
 
@@ -37,8 +37,8 @@ const treinoExercicioService = {
 
         const existente =
             await treinoExercicioRepository.buscar(
-                idTreino,
-                dados.idExercicio
+                String(idTreino),
+                String(dados.idExercicio)
             );
 
         if (existente) {
@@ -48,8 +48,8 @@ const treinoExercicioService = {
         }
 
         return await treinoExercicioRepository.adicionar({
-            idTreino,
-            idExercicio: dados.idExercicio,
+            idTreino: String(idTreino),
+            idExercicio: String(dados.idExercicio),
             series: dados.series,
             descanso_segundos: dados.descanso_segundos,
             repeticoes: dados.repeticoes,
@@ -62,10 +62,10 @@ const treinoExercicioService = {
 
         const treino = await prisma.treino.findFirst({
             where: {
-                idTreino,
+                idTreino: String(idTreino),
                 calculo: {
                     dados: {
-                        idUsuario
+                        idUsuario: String(idUsuario)
                     }
                 }
             }
@@ -77,16 +77,16 @@ const treinoExercicioService = {
             );
         }
         return await treinoExercicioRepository.listarPorTreino(
-            idTreino
+            String(idTreino)
         );
     },
     async remover(idUsuario, idTreino, idExercicio) {
         const treino = await prisma.treino.findFirst({
             where: {
-                idTreino,
+                idTreino: String(idTreino),
                 calculo: {
                     dados: {
-                        idUsuario
+                        idUsuario: String(idUsuario)
                     }
                 }
             }
@@ -97,17 +97,17 @@ const treinoExercicioService = {
             );
         }
         return await treinoExercicioRepository.remover(
-            idTreino,
-            idExercicio
+            String(idTreino),
+            String(idExercicio)
         );
     },
     async atualizar(idUsuario, idTreino, idExercicio, dados) {
         const treino = await prisma.treino.findFirst({
             where: {
-                idTreino,
+                idTreino: String(idTreino),
                 calculo: {
                     dados: {
-                        idUsuario
+                        idUsuario: String(idUsuario)
                     }
                 }
             }
@@ -119,8 +119,8 @@ const treinoExercicioService = {
         }
         const existente =
             await treinoExercicioRepository.buscar(
-                idTreino,
-                idExercicio
+                String(idTreino),
+                String(idExercicio)
             );
         if (!existente) {
             throw new Error(
@@ -128,8 +128,8 @@ const treinoExercicioService = {
             );
         }
         return await treinoExercicioRepository.atualizar(
-            idTreino,
-            idExercicio,
+            String(idTreino),
+            String(idExercicio),
             dados
         );
     }
