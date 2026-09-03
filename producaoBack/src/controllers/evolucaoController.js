@@ -4,6 +4,7 @@ import EvolucaoService from "../services/evolucaoService.js";
 const EvolucaoController = {
 
     buscar: async (req, res) => {
+<<<<<<< HEAD
         try {
             const idUsuario = req.params.id ? Number(req.params.id) : req.usuario?.id;
 
@@ -13,6 +14,37 @@ const EvolucaoController = {
 
             const historico = await HistoricoCorporalRepository.buscarPorUsuario(idUsuario);
             const grafico = EvolucaoService.gerarGrafico(historico);
+=======
+
+        try {
+
+            const idUsuario = String(req.params.id || req.usuario?.id);
+
+            // Proteção contra IDOR
+            if (req.usuario?.id && idUsuario !== req.usuario.id) {
+                return res.status(403).json({
+                    erro: "Você não possui permissão para visualizar o histórico de evolução deste usuário."
+                });
+            }
+
+            const historico =
+                await HistoricoCorporalRepository
+                    .buscarPorUsuario(idUsuario);
+
+            const grafico =
+                EvolucaoService
+                    .gerarGrafico(historico);
+
+            return res.status(200).json(
+                grafico
+            );
+
+        } catch (error) {
+
+            return res.status(500).json({
+                erro: error.message
+            });
+>>>>>>> producaoBack
 
             return res.status(200).json(grafico);
         } catch (error) {

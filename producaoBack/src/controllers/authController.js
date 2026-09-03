@@ -10,6 +10,9 @@ import { enviarEmailVerificacao, enviarEmailRecuperacaoSenha } from "../services
 import { Usuario } from "../models/Usuarios.js";
 import { envTokenExpiraMinutos } from "../config/env.js";
 
+import { anexarIdsCriptografados } from "../middlewares/tratarIdsCriptografados.js";
+import { criptografarId } from "../utils/cryptoUtils.js";
+
 const conversorMinutos = 60 * 1000;
 
 const authController = {
@@ -134,6 +137,7 @@ const authController = {
         token,
         usuario: {
           id: usuario.id,
+          id_criptografado: criptografarId(usuario.id),
           nome: usuario.nome,
           email: usuario.email,
           role: usuario.role
@@ -342,7 +346,7 @@ const authController = {
         return res.status(404).json({ erro: "Usuário não encontrado" });
       }
 
-      return res.status(200).json({ usuario: usuarioDetalhes });
+      return res.status(200).json({ usuario: anexarIdsCriptografados(usuarioDetalhes) });
     } catch (error) {
       console.error("Erro ao buscar detalhes do usuário logado:", error);
       return res.status(500).json({ erro: error.message });

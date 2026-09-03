@@ -3,9 +3,17 @@ import treinoExercicioRepository from "../repositories/treinoExercicioRepository
 
 const treinoExercicioService = {
 
-    async validarAcessoTreino(idUsuario, idTreino, leituraApenas = false) {
-        const treino = await prisma.treino.findUnique({
-            where: { idTreino }
+    async adicionar(idUsuario, idTreino, dados) {
+
+        const treino = await prisma.treino.findFirst({
+            where: {
+                idTreino: String(idTreino),
+                calculo: {
+                    dados: {
+                        idUsuario: String(idUsuario)
+                    }
+                }
+            }
         });
 
         if (!treino) {
@@ -29,22 +37,28 @@ const treinoExercicioService = {
         await this.validarAcessoTreino(idUsuario, idTreino);
 
         const exercicio = await prisma.exercicio.findUnique({
-            where: { idExercicio: dados.idExercicio }
+            where: {
+                idExercicio: String(dados.idExercicio)
+            }
         });
 
         if (!exercicio) {
             throw new Error("Exercício não encontrado.");
         }
 
-        const existente = await treinoExercicioRepository.buscar(idTreino, dados.idExercicio);
+        const existente =
+            await treinoExercicioRepository.buscar(
+                String(idTreino),
+                String(dados.idExercicio)
+            );
 
         if (existente) {
             throw new Error("Este exercício já está associado ao treino.");
         }
 
         return await treinoExercicioRepository.adicionar({
-            idTreino,
-            idExercicio: dados.idExercicio,
+            idTreino: String(idTreino),
+            idExercicio: String(dados.idExercicio),
             series: dados.series,
             descanso_segundos: dados.descanso_segundos,
             repeticoes: dados.repeticoes,
@@ -54,24 +68,79 @@ const treinoExercicioService = {
     },
 
     async listar(idUsuario, idTreino) {
-        await this.validarAcessoTreino(idUsuario, idTreino, true);
-        return await treinoExercicioRepository.listarPorTreino(idTreino);
+
+        const treino = await prisma.treino.findFirst({
+            where: {
+                idTreino: String(idTreino),
+                calculo: {
+                    dados: {
+                        idUsuario: String(idUsuario)
+                    }
+                }
+            }
+        });
+
+        if (!treino) {
+            throw new Error(
+                "Treino não encontrado ou não pertence ao usuário."
+            );
+        }
+        return await treinoExercicioRepository.listarPorTreino(
+            String(idTreino)
+        );
     },
 
     async remover(idUsuario, idTreino, idExercicio) {
-        await this.validarAcessoTreino(idUsuario, idTreino);
-        return await treinoExercicioRepository.remover(idTreino, idExercicio);
+        const treino = await prisma.treino.findFirst({
+            where: {
+                idTreino: String(idTreino),
+                calculo: {
+                    dados: {
+                        idUsuario: String(idUsuario)
+                    }
+                }
+            }
+        });
+        if (!treino) {
+            throw new Error(
+                "Treino não encontrado ou não pertence ao usuário."
+            );
+        }
+        return await treinoExercicioRepository.remover(
+            String(idTreino),
+            String(idExercicio)
+        );
     },
 
     async atualizar(idUsuario, idTreino, idExercicio, dados) {
-        await this.validarAcessoTreino(idUsuario, idTreino);
-
-        const existente = await treinoExercicioRepository.buscar(idTreino, idExercicio);
+        const treino = await prisma.treino.findFirst({
+            where: {
+                idTreino: String(idTreino),
+                calculo: {
+                    dados: {
+                        idUsuario: String(idUsuario)
+                    }
+                }
+            }
+        });
+        if (!treino) {
+            throw new Error(
+                "Treino não encontrado ou não pertence ao usuário."
+            );
+        }
+        const existente =
+            await treinoExercicioRepository.buscar(
+                String(idTreino),
+                String(idExercicio)
+            );
         if (!existente) {
             throw new Error("Exercício não encontrado neste treino.");
         }
-
-        return await treinoExercicioRepository.atualizar(idTreino, idExercicio, dados);
+        return await treinoExercicioRepository.atualizar(
+            String(idTreino),
+            String(idExercicio),
+            dados
+        );
     }
 };
 

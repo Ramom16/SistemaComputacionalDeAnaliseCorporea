@@ -342,6 +342,58 @@ body {
   width: 100%;
 }
 
+/* Links Secundários e Esqueci a Senha */
+.forgot-password-wrapper {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: -12px;
+  margin-bottom: 20px;
+}
+
+.forgot-password-link {
+  color: var(--primary-yellow);
+  text-decoration: none;
+  font-size: 0.85rem;
+  font-weight: 500;
+  transition: opacity 0.2s;
+}
+
+.forgot-password-link:hover {
+  opacity: 0.8;
+  text-decoration: underline;
+}
+
+.secondary-auth-links {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: center;
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.secondary-auth-links span {
+  color: var(--text-gray);
+  font-size: 0.85rem;
+}
+
+.secondary-auth-links a {
+  color: var(--primary-yellow);
+  text-decoration: none;
+  font-family: var(--font-title);
+  font-weight: 700;
+  font-style: italic;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  transition: all 0.3s;
+}
+
+.secondary-auth-links a:hover {
+  color: #fff;
+}
+
 /* Animations */
 @keyframes fadeInUp {
   from {
