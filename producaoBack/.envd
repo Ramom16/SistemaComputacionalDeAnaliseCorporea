@@ -1,6 +1,6 @@
-DATABASE_URL="mysql://root:DCS24@localhost:3308/sistemaTmbNdcImc" 
-DB_HOST=localhost 
-DB_PORT=3308
+DATABASE_URL="mysql://root:DCS24@localhost:3306/sistemaTmbNdcImc"
+DB_HOST=localhost
+DB_PORT=3306
 DB_USER=root 
 DB_PASS=DCS24 
 DB_NAME=sistemaTmbNdcImc 

@@ -111,9 +111,7 @@ const DadosCorporaisController = {
 
             const dados = await DadosCorporaisRepository.findByUsuario(String(targetId));
             if (!dados) {
-                return res.status(404).json({
-                    erro: "Dados não encontrados"
-                });
+                return res.status(200).json({ calculos: [] });
             }
             return res.status(200).json(anexarIdsCriptografados(dados));
         } catch (error) {

@@ -98,9 +98,8 @@ const DadosCorporaisRepository = {
             genero,
             nivel_atividade
         });
-        await prisma.$transaction(async (tx) => {
         //inicia um registro novo para os dados corporais
-        const registro = await tx.dadosCorporais.create({
+        const registro = await transaction.dadosCorporais.create({
             data: {
                 idUsuario: String(dados.idUsuario),
                 peso_kg: Number(dados.peso_kg),
@@ -118,7 +117,7 @@ const DadosCorporaisRepository = {
         });
 
         //snapshot (salvamento) do estado atual dos dados para o histórico Corporal
-        await tx.historicoCorporal.create({
+        await transaction.historicoCorporal.create({
             data: {
                 idDados: registro.idDados,
 
@@ -137,7 +136,6 @@ const DadosCorporaisRepository = {
             }
         });
         return registro;
-        })
 
     },
     // READ ALL

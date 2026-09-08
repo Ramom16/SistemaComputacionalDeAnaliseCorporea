@@ -15,9 +15,7 @@ const HistoricoCorporalRepository = {
             });
 
         if (!dados) {
-            throw new Error(
-                "Dados corporais não encontrados"
-            );
+            return [];
         }
 
         return await prisma.historicoCorporal.findMany({

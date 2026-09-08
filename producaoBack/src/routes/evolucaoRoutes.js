@@ -9,6 +9,7 @@ evolucaoRoutes.use(autenticarToken);
 evolucaoRoutes.use(tratarIdsCriptografados(["id", "idUsuario"]));
 
 evolucaoRoutes.get("/", EvolucaoController.buscar);
+evolucaoRoutes.get("/estatisticas/:idUsuario", EvolucaoController.estatisticas);
 evolucaoRoutes.get("/:id", EvolucaoController.buscar);
 
 export default evolucaoRoutes;

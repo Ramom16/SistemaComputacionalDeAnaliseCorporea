@@ -28,9 +28,7 @@ export default function MeusTreinos() {
         setUsuarioData(usuarioSalvo);
 
         // Busca os treinos cadastrados no seu banco de dados
-        const response = await api.get("/treinos", {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const response = await api.get("/treinos");
 
         console.log("Treinos recebidos da API:", response.data);
         setTreinos(response.data.data || response.data || []);

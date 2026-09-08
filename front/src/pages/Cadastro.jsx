@@ -28,7 +28,7 @@ export default function Cadastro() {
         data_nascimento,
       });
 
-      setMsg({ text: response.data.mensagem || "Cadastro realizado!", type: "sucesso" });
+      setMsg({ text: response.data.msg || "Cadastro realizado!", type: "sucesso" });
       
       // Limpa os campos após sucesso
       setNome("");

@@ -36,21 +36,7 @@ export default function Dashboard() {
       if (!idUsuario) return;
 
       try {
-        const token = localStorage.getItem('token');
-
-        // Verifica se existe token
-        if (!token) {
-          console.warn('Token não encontrado no localStorage.');
-          return;
-        }
-        const response = await api.get(
-          `/dadosCorporais/usuario/${idUsuario}`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`
-            }
-          }
-        );
+        const response = await api.get(`/dadosCorporais/usuario/${idUsuario}`);
         const data = response.data;
         // Pega o cálculo mais recente
         if (data.calculos && data.calculos.length > 0) {
@@ -67,20 +53,14 @@ export default function Dashboard() {
 
   // BUSCAR TREINOS RECOMENDADOS
   const buscarTreinosRecomendados = async () => {
-    const token = localStorage.getItem('token');
-
-    if (!token || !resultados) {
+    if (!resultados) {
       return;
     }
 
     try {
       setLoadingTreinos(true);
 
-      const response = await api.get('/treinos', {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      });
+      const response = await api.get('/treinos');
 
       const treinos = (
         response.data.data ||
@@ -112,21 +92,6 @@ export default function Dashboard() {
       type: ''
     });
 
-    // Pega o token
-    const token = localStorage.getItem('token');
-
-    // Se não tiver token, não faz a requisição
-    if (!token) {
-      setMsg({
-        text: 'Sessão expirada. Faça login novamente.',
-        type: 'erro'
-      });
-
-      setLoading(false);
-
-      return;
-    }
-
     // Dados enviados para o backend
     const payload = {
       idUsuario,
@@ -143,15 +108,7 @@ export default function Dashboard() {
       // TENTAR CRIAR
 
       try {
-        const response = await api.post(
-          '/dadosCorporais',
-          payload,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`
-            }
-          }
-        );
+        const response = await api.post('/dadosCorporais', payload);
 
         data = response.data;
 
@@ -166,15 +123,7 @@ export default function Dashboard() {
           'Usuário já possui dados corporais'
         ) {
 
-          const putResponse = await api.put(
-            `/dadosCorporais/${idUsuario}`,
-            payload,
-            {
-              headers: {
-                Authorization: `Bearer ${token}`
-              }
-            }
-          );
+          const putResponse = await api.put(`/dadosCorporais/${idUsuario}`, payload);
 
           data = putResponse.data;
 

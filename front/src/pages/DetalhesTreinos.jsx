@@ -25,10 +25,8 @@ export default function DetalhesTreino() {
       try {
         setLoading(true);
         // Busca os dados do treino e seus exercícios direto do Back-end
-        const response = await api.get(`/treinos/${id}`, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
-        setTreino(response.data);
+        const response = await api.get(`/treinos/${id}`);
+        setTreino(response.data.data || response.data);
       } catch (err) {
         console.error("Erro ao buscar detalhes do treino no banco:", err);
         setErro(true);
