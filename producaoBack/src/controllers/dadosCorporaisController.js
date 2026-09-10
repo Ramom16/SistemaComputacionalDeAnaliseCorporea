@@ -87,7 +87,9 @@ const DadosCorporaisController = {
             }
 
             // Proteção contra IDOR: verifica se o dado pertence ao usuário autenticado ou se é ADMIN
-            if (req.usuario?.id && dados.idUsuario !== req.usuario.id && req.usuario.role !== "ADMIN") {
+            const usuarioAutenticadoId = String(req.usuario?.id ?? "");
+            const idUsuarioDados = String(dados.idUsuario ?? "");
+            if (req.usuario?.id && idUsuarioDados !== usuarioAutenticadoId && req.usuario.role !== "ADMIN") {
                 return res.status(403).json({
                     erro: "Você não possui permissão para acessar estes dados."
                 });
@@ -105,9 +107,11 @@ const DadosCorporaisController = {
     buscarPorUsuario: async (req, res) => {
         try {
             const targetId = req.params.id || req.usuario?.id;
+            const usuarioAutenticadoId = String(req.usuario?.id ?? "");
+            const idAlvoNormalizado = String(targetId ?? "");
 
             // Proteção contra IDOR: permite acesso próprio ou por administrador
-            if (req.usuario?.id && targetId !== req.usuario.id && req.usuario.role !== "ADMIN") {
+            if (req.usuario?.id && idAlvoNormalizado !== usuarioAutenticadoId && req.usuario.role !== "ADMIN") {
                 return res.status(403).json({
                     erro: "Você não possui permissão para acessar estes dados."
                 });
@@ -130,8 +134,11 @@ const DadosCorporaisController = {
         try {
             const idUsuario = req.usuario?.id || req.params.idUsuario;
 
+            const usuarioAutenticadoId = String(req.usuario?.id ?? "");
+            const idUsuarioParam = String(req.params.idUsuario ?? "");
+
             // Proteção contra IDOR
-            if (req.usuario?.id && req.params.idUsuario && req.params.idUsuario !== req.usuario.id) {
+            if (req.usuario?.id && req.params.idUsuario && idUsuarioParam !== usuarioAutenticadoId) {
                 return res.status(403).json({
                     erro: "Você não possui permissão para alterar dados deste usuário."
                 });
