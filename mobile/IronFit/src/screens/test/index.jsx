@@ -9,6 +9,8 @@ import {
   View,
 } from 'react-native';
 
+import { SafeAreaView } from 'react-native-safe-area-context';
+
 const { width, height } = Dimensions.get('window');
 
 const slides = [
@@ -92,138 +94,140 @@ export default function LandingPage({ navigation }) {
     const isLast = index === slides.length - 1;
 
     return (
-      <View style={styles.slide}>
+      <SafeAreaView style={styles.safeArea}>
+        <View style={styles.slide}>
 
-        {/* Logo */}
-        <View style={styles.topBar}>
-          <Text style={styles.logo}>
-            IRON<Text style={styles.logoYellow}>FIT</Text>
-          </Text>
-
-          <Pressable
-            onPress={() => navigation.navigate('Login')}
-          >
-            <Text style={styles.loginText}>
-              Entrar
+          {/* Logo */}
+          <View style={styles.topBar}>
+            <Text style={styles.logo}>
+              IRON<Text style={styles.logoYellow}>FIT</Text>
             </Text>
-          </Pressable>
-        </View>
 
-
-        {/* Conteúdo */}
-        <View style={styles.content}>
-
-          <Text style={styles.counter}>
-            {String(index + 1).padStart(2, '0')}
-          </Text>
-
-          <Text style={styles.title}>
-            {item.title}
-          </Text>
-
-          <View style={styles.line} />
-
-          <Text style={styles.description}>
-            {item.description}
-          </Text>
-
-
-          {/* Botão do primeiro slide */}
-          {item.type === 'hero' && (
             <Pressable
-              style={styles.primaryButton}
-              onPress={goToNext}
+              onPress={() => navigation.navigate('Login')}
             >
-              <Text style={styles.primaryButtonText}>
-                CONHECER O SISTEMA
-              </Text>
-
-              <Text style={styles.arrow}>
-                →
+              <Text style={styles.loginText}>
+                Entrar
               </Text>
             </Pressable>
-          )}
+          </View>
 
 
-          {/* Botão do último */}
-          {item.type === 'action' && (
-            <View style={styles.actionButtons}>
+          {/* Conteúdo */}
+          <View style={styles.content}>
 
+            <Text style={styles.counter}>
+              {String(index + 1).padStart(2, '0')}
+            </Text>
+
+            <Text style={styles.title}>
+              {item.title}
+            </Text>
+
+            <View style={styles.line} />
+
+            <Text style={styles.description}>
+              {item.description}
+            </Text>
+
+
+            {/* Botão do primeiro slide */}
+            {item.type === 'hero' && (
               <Pressable
                 style={styles.primaryButton}
-                onPress={() => navigation.navigate('Cadastro')}
+                onPress={goToNext}
               >
                 <Text style={styles.primaryButtonText}>
-                  CRIAR CONTA
+                  CONHECER O SISTEMA
                 </Text>
 
                 <Text style={styles.arrow}>
                   →
                 </Text>
               </Pressable>
-
-              <Pressable
-                style={styles.secondaryButton}
-                onPress={() => navigation.navigate('Login')}
-              >
-                <Text style={styles.secondaryButtonText}>
-                  JÁ TENHO UMA CONTA
-                </Text>
-              </Pressable>
-
-            </View>
-          )}
-
-        </View>
+            )}
 
 
-        {/* Rodapé */}
-        <View style={styles.bottom}>
+            {/* Botão do último */}
+            {item.type === 'action' && (
+              <View style={styles.actionButtons}>
 
-          <View style={styles.pagination}>
-            {slides.map((_, dotIndex) => (
-              <View
-                key={dotIndex}
-                style={[
-                  styles.dot,
-                  dotIndex === currentIndex && styles.activeDot,
-                ]}
-              />
-            ))}
-          </View>
+                <Pressable
+                  style={styles.primaryButton}
+                  onPress={() => navigation.navigate('Cadastro')}
+                >
+                  <Text style={styles.primaryButtonText}>
+                    CRIAR CONTA
+                  </Text>
 
+                  <Text style={styles.arrow}>
+                    →
+                  </Text>
+                </Pressable>
 
-          <View style={styles.navigationButtons}>
+                <Pressable
+                  style={styles.secondaryButton}
+                  onPress={() => navigation.navigate('Login')}
+                >
+                  <Text style={styles.secondaryButtonText}>
+                    JÁ TENHO UMA CONTA
+                  </Text>
+                </Pressable>
 
-            <Pressable
-              onPress={goToPrevious}
-              disabled={currentIndex === 0}
-              style={[
-                styles.navArrow,
-                currentIndex === 0 && styles.disabledArrow,
-              ]}
-            >
-              <Text style={styles.navArrowText}>
-                ←
-              </Text>
-            </Pressable>
-
-            {!isLast && (
-              <Pressable
-                onPress={goToNext}
-                style={styles.navArrow}
-              >
-                <Text style={styles.navArrowText}>
-                  →
-                </Text>
-              </Pressable>
+              </View>
             )}
 
           </View>
 
-        </View>
 
-      </View>
+          {/* Rodapé */}
+          <View style={styles.bottom}>
+
+            <View style={styles.pagination}>
+              {slides.map((_, dotIndex) => (
+                <View
+                  key={dotIndex}
+                  style={[
+                    styles.dot,
+                    dotIndex === currentIndex && styles.activeDot,
+                  ]}
+                />
+              ))}
+            </View>
+
+
+            <View style={styles.navigationButtons}>
+
+              <Pressable
+                onPress={goToPrevious}
+                disabled={currentIndex === 0}
+                style={[
+                  styles.navArrow,
+                  currentIndex === 0 && styles.disabledArrow,
+                ]}
+              >
+                <Text style={styles.navArrowText}>
+                  ←
+                </Text>
+              </Pressable>
+
+              {!isLast && (
+                <Pressable
+                  onPress={goToNext}
+                  style={styles.navArrow}
+                >
+                  <Text style={styles.navArrowText}>
+                    →
+                  </Text>
+                </Pressable>
+              )}
+
+            </View>
+
+          </View>
+
+        </View>
+      </SafeAreaView>
     );
   }
 
@@ -265,15 +269,19 @@ const styles = StyleSheet.create({
     backgroundColor: '#080808',
   },
 
-  slide: {
+  safeArea: {
     width,
     height,
+    backgroundColor: '#080808',
+  },
 
+  slide: {
+    flex: 1,
     backgroundColor: '#080808',
 
     paddingHorizontal: 28,
-    paddingTop: 55,
-    paddingBottom: 35,
+    paddingTop: 10,
+    paddingBottom: 20,
 
     justifyContent: 'space-between',
   },

@@ -278,6 +278,7 @@ export function AuthProvider({ children }) {
         login,
         register,
         logout,
+        updateUser,
         adicionarAvaliacao,
         carregarDadosCorporais,
         alterarSenha,

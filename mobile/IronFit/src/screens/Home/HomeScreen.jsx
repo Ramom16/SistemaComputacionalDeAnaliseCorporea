@@ -7,8 +7,8 @@ import {
   Pressable,
   RefreshControl,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useAuth } from '../../context/AuthContext';
-import { api } from '../../services/api';
 
 export default function HomeScreen({ navigation }) {
   const { user, ultimaAvaliacao, carregarDadosCorporais } = useAuth();
@@ -47,27 +47,17 @@ export default function HomeScreen({ navigation }) {
   const totalExerciciosTreino = treinoDestaque?.exercicios?.length || treinoDestaque?.treinoExercicios?.length || 5;
 
   return (
-    <ScrollView
-      style={styles.container}
-      contentContainerStyle={styles.contentContainer}
-      refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#FFD400" />}
-    >
-      {/* Header com Boas-Vindas */}
-      <View style={styles.header}>
-        <View>
-          <Text style={styles.welcomeText}>BEM-VINDO,</Text>
-          <Text style={styles.userName}>{user?.nome || 'Atleta'}</Text>
-        </View>
-        <View style={styles.badge}>
-          <Text style={styles.badgeText}>ATIVO</Text>
-        </View>
-      </View>
-
-      {/* Card de Destaque Metabólico */}
-      <View style={styles.heroCard}>
-        <View style={styles.heroCardHeader}>
-          <Text style={styles.heroTag}>ÚLTIMA AVALIAÇÃO CORPORAL</Text>
-          <Text style={styles.heroDate}>{dataAvaliacao}</Text>
+    <SafeAreaView style={{ flex: 1, backgroundColor: '#080808' }}>
+      <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
+        {/* Header com Boas-Vindas */}
+        <View style={styles.header}>
+          <View>
+            <Text style={styles.welcomeText}>BEM-VINDO,</Text>
+            <Text style={styles.userName}>{user?.nome || 'Atleta'}</Text>
+          </View>
+          <View style={styles.badge}>
+            <Text style={styles.badgeText}>ATIVO</Text>
+          </View>
         </View>
 
         <View style={styles.metricsRow}>
@@ -95,7 +85,6 @@ export default function HomeScreen({ navigation }) {
             <Text style={styles.metricSub}>kcal/dia (Meta)</Text>
           </View>
         </View>
-      </View>
 
       {/* Seção de Treino Atual */}
       <View style={styles.sectionHeader}>
@@ -122,36 +111,22 @@ export default function HomeScreen({ navigation }) {
         <Pressable
           style={styles.workoutButton}
           onPress={() => navigation.navigate('TreinosTab')}
-        >
+          >
           <Text style={styles.workoutButtonText}>ABRIR TREINO COMPLETO →</Text>
         </Pressable>
       </View>
 
-      {/* Ações Rápidas */}
-      <View style={styles.sectionHeader}>
-        <Text style={styles.sectionTitle}>AÇÕES RÁPIDAS</Text>
-      </View>
-
-      <View style={styles.quickGrid}>
-        <Pressable
-          style={styles.quickCard}
-          onPress={() => navigation.navigate('AvaliacaoTab')}
-        >
-          <Text style={styles.quickIcon}>🧮</Text>
-          <Text style={styles.quickTitle}>Nova Avaliação</Text>
-          <Text style={styles.quickSub}>Calcule seu IMC/TMB</Text>
-        </Pressable>
-
-        <Pressable
-          style={styles.quickCard}
-          onPress={() => navigation.navigate('EvolucaoTab')}
-        >
-          <Text style={styles.quickIcon}>📈</Text>
-          <Text style={styles.quickTitle}>Ver Evolução</Text>
-          <Text style={styles.quickSub}>Histórico e métricas</Text>
-        </Pressable>
-      </View>
-    </ScrollView>
+      <Pressable
+        style={styles.quickCard}
+        onPress={() => navigation.navigate('EvolucaoTab')}
+      >
+        <Text style={styles.quickIcon}>📈</Text>
+        <Text style={styles.quickTitle}>Ver Evolução</Text>
+        <Text style={styles.quickSub}>Histórico e métricas</Text>
+      </Pressable>
+        </ScrollView>
+    </SafeAreaView >
+    
   );
 }
 
@@ -162,7 +137,7 @@ const styles = StyleSheet.create({
   },
   contentContainer: {
     paddingHorizontal: 20,
-    paddingTop: 55,
+    paddingTop: 20,
     paddingBottom: 40,
   },
   header: {
@@ -337,4 +312,8 @@ const styles = StyleSheet.create({
     color: '#888888',
     fontSize: 12,
   },
+<<<<<<< HEAD
 });
+=======
+});
+>>>>>>> 8a7b1d3ae39dfab37f301037cd1d713b01c219b8

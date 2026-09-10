@@ -2,15 +2,16 @@ import React, { useState } from 'react';
 import {
   StyleSheet,
   Text,
-  View,
   TextInput,
   Pressable,
   ActivityIndicator,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
+  View,
   Alert,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useAuth } from '../../context/AuthContext';
 
 export default function CadastroScreen({ navigation }) {
@@ -71,25 +72,26 @@ export default function CadastroScreen({ navigation }) {
   }
 
   return (
-    <KeyboardAvoidingView
-      style={{ flex: 1 }}
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-    >
-      <ScrollView
-        contentContainerStyle={styles.scrollContainer}
-        keyboardShouldPersistTaps="handled"
+    <SafeAreaView style={{ flex: 1, backgroundColor: '#080808' }}>
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       >
-        <View style={styles.container}>
-          {/* Header */}
-          <View style={styles.header}>
-            <Pressable style={styles.backButton} onPress={() => navigation.goBack()}>
-              <Text style={styles.backButtonText}>← Voltar</Text>
-            </Pressable>
+        <ScrollView
+          contentContainerStyle={styles.scrollContainer}
+          keyboardShouldPersistTaps="handled"
+        >
+          <View style={styles.container}>
+            {/* Header */}
+            <View style={styles.header}>
+              <Pressable style={styles.backButton} onPress={() => navigation.goBack()}>
+                <Text style={styles.backButtonText}>← Voltar</Text>
+              </Pressable>
 
-            <Text style={styles.logo}>
-              IRON<Text style={styles.logoYellow}>FIT</Text>
-            </Text>
-          </View>
+              <Text style={styles.logo}>
+                IRON<Text style={styles.logoYellow}>FIT</Text>
+              </Text>
+            </View>
 
           {/* Form */}
           <View style={styles.content}>
@@ -208,16 +210,17 @@ export default function CadastroScreen({ navigation }) {
             </Pressable>
           </View>
 
-          {/* Footer */}
-          <View style={styles.footer}>
-            <Text style={styles.footerText}>Já possui uma conta? </Text>
-            <Pressable onPress={() => navigation.navigate('Login')}>
-              <Text style={styles.loginLinkText}>Fazer Login</Text>
-            </Pressable>
+            {/* Footer */}
+            <View style={styles.footer}>
+              <Text style={styles.footerText}>Já possui uma conta? </Text>
+              <Pressable onPress={() => navigation.navigate('Login')}>
+                <Text style={styles.loginLinkText}>Fazer Login</Text>
+              </Pressable>
+            </View>
           </View>
-        </View>
-      </ScrollView>
-    </KeyboardAvoidingView>
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 }
 
@@ -229,9 +232,9 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     paddingHorizontal: 28,
-    paddingTop: 50,
+    paddingTop: 20,
     paddingBottom: 40,
-    justifyContent: 'space-between',
+    justify: 'space-between',
   },
   header: {
     flexDirection: 'row',

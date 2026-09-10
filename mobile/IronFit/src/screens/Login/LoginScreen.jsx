@@ -12,6 +12,7 @@ import {
   Alert,
   Modal,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useAuth } from '../../context/AuthContext';
 
 export default function LoginScreen({ navigation }) {
@@ -93,183 +94,140 @@ export default function LoginScreen({ navigation }) {
   }
 
   return (
-    <KeyboardAvoidingView
-      style={{ flex: 1 }}
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-    >
-      <ScrollView
-        contentContainerStyle={styles.scrollContainer}
-        keyboardShouldPersistTaps="handled"
+    <SafeAreaView style={styles.safeArea}>
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       >
-        <View style={styles.container}>
-          {/* Header */}
-          <View style={styles.header}>
-            <Pressable style={styles.backButton} onPress={() => navigation.goBack()}>
-              <Text style={styles.backButtonText}>← Voltar</Text>
-            </Pressable>
+        <ScrollView
+          contentContainerStyle={styles.scrollContainer}
+          keyboardShouldPersistTaps="handled"
+        >
+          <View style={styles.container}>
+            {/* Header */}
+            <View style={styles.header}>
+              <Pressable
+                style={styles.backButton}
+                onPress={() => navigation.goBack()}
+              >
+                <Text style={styles.backButtonText}>← Voltar</Text>
+              </Pressable>
 
-            <Text style={styles.logo}>
-              IRON<Text style={styles.logoYellow}>FIT</Text>
-            </Text>
-          </View>
-
-          {/* Conteúdo do Form */}
-          <View style={styles.content}>
-            <Text style={styles.title}>BEM-VINDO DE VOLTA</Text>
-            <Text style={styles.subtitle}>
-              Acesse sua conta para visualizar seus dados e treinos.
-            </Text>
-
-            {erro ? (
-              <View style={styles.errorBox}>
-                <Text style={styles.errorText}>{erro}</Text>
-                {/* Botão de reenvio caso o e-mail não esteja verificado */}
-                {statusErro === 403 && (
-                  <Pressable
-                    style={styles.reenviarBtn}
-                    onPress={handleReenviarAtivacao}
-                    disabled={loadingReenvio}
-                  >
-                    {loadingReenvio ? (
-                      <ActivityIndicator size="small" color="#FFD400" />
-                    ) : (
-                      <Text style={styles.reenviarBtnText}>📧 Reenviar e-mail de ativação</Text>
-                    )}
-                  </Pressable>
-                )}
-              </View>
-            ) : null}
-
-            {/* Input Email */}
-            <View style={styles.inputGroup}>
-              <Text style={styles.label}>E-MAIL</Text>
-              <TextInput
-                style={styles.input}
-                placeholder="seu.email@exemplo.com"
-                placeholderTextColor="#666666"
-                value={email}
-                onChangeText={(txt) => { setEmail(txt); setErro(''); }}
-                keyboardType="email-address"
-                autoCapitalize="none"
-                autoCorrect={false}
-              />
+              <Text style={styles.logo}>
+                IRON<Text style={styles.logoYellow}>FIT</Text>
+              </Text>
             </View>
 
-            {/* Input Senha */}
-            <View style={styles.inputGroup}>
-              <Text style={styles.label}>SENHA</Text>
-              <View style={styles.passwordContainer}>
+            {/* Conteúdo do Form */}
+            <View style={styles.content}>
+              <Text style={styles.title}>BEM-VINDO DE VOLTA</Text>
+              <Text style={styles.subtitle}>
+                Acesse sua conta para visualizar seus dados e treinos.
+              </Text>
+
+              {erro ? (
+                <View style={styles.errorBox}>
+                  <Text style={styles.errorText}>{erro}</Text>
+                </View>
+              ) : null}
+
+              {/* Input Email */}
+              <View style={styles.inputGroup}>
+                <Text style={styles.label}>E-MAIL</Text>
                 <TextInput
-                  style={[styles.input, { flex: 1 }]}
-                  placeholder="••••••••"
+                  style={styles.input}
+                  placeholder="seu.email@exemplo.com"
                   placeholderTextColor="#666666"
-                  value={senha}
-                  onChangeText={(txt) => { setSenha(txt); setErro(''); }}
-                  secureTextEntry={!mostrarSenha}
+                  value={email}
+                  onChangeText={(txt) => {
+                    setEmail(txt);
+                    setErro('');
+                  }}
+                  keyboardType="email-address"
+                  autoCapitalize="none"
+                  autoCorrect={false}
                 />
-                <Pressable
-                  style={styles.togglePassword}
-                  onPress={() => setMostrarSenha(!mostrarSenha)}
-                >
-                  <Text style={styles.togglePasswordText}>
-                    {mostrarSenha ? 'Ocultar' : 'Ver'}
-                  </Text>
-                </Pressable>
               </View>
-            </View>
 
-            {/* Esqueceu a Senha */}
-            <Pressable
-              style={styles.forgotButton}
-              onPress={() => {
-                setEmailRecuperacao(email.trim());
-                setModalRecuperacao(true);
-              }}
-            >
-              <Text style={styles.forgotText}>Esqueceu sua senha?</Text>
-            </Pressable>
+              {/* Input Senha */}
+              <View style={styles.inputGroup}>
+                <Text style={styles.label}>SENHA</Text>
+                <View style={styles.passwordContainer}>
+                  <TextInput
+                    style={[styles.input, { flex: 1 }]}
+                    placeholder="••••••••"
+                    placeholderTextColor="#666666"
+                    value={senha}
+                    onChangeText={(txt) => {
+                      setSenha(txt);
+                      setErro('');
+                    }}
+                    secureTextEntry={!mostrarSenha}
+                  />
+                  <Pressable
+                    style={styles.togglePassword}
+                    onPress={() => setMostrarSenha(!mostrarSenha)}
+                  >
+                    <Text style={styles.togglePasswordText}>
+                      {mostrarSenha ? 'Ocultar' : 'Ver'}
+                    </Text>
+                  </Pressable>
+                </View>
+              </View>
 
-            {/* Botão Entrar */}
-            <Pressable
-              style={[styles.primaryButton, loading && styles.disabledButton]}
-              onPress={handleLogin}
-              disabled={loading}
-            >
-              {loading ? (
-                <ActivityIndicator color="#000000" />
-              ) : (
-                <Text style={styles.primaryButtonText}>ENTRAR NA CONTA</Text>
-              )}
-            </Pressable>
-
-            {/* Botão Demo / Acesso Rápido */}
-            <Pressable style={styles.demoButton} onPress={handleDemoLogin}>
-              <Text style={styles.demoButtonText}>⚡ Acesso Rápido (Modo Demo)</Text>
-            </Pressable>
-          </View>
-
-          {/* Rodapé / Link para Cadastro */}
-          <View style={styles.footer}>
-            <Text style={styles.footerText}>Ainda não possui uma conta? </Text>
-            <Pressable onPress={() => navigation.navigate('Cadastro')}>
-              <Text style={styles.signupText}>Cadastre-se</Text>
-            </Pressable>
-          </View>
-        </View>
-      </ScrollView>
-
-      {/* Modal de Recuperação de Senha */}
-      <Modal
-        visible={modalRecuperacao}
-        transparent
-        animationType="fade"
-        onRequestClose={() => setModalRecuperacao(false)}
-      >
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalCard}>
-            <Text style={styles.modalTitle}>RECUPERAR SENHA</Text>
-            <Text style={styles.modalSub}>
-              Digite seu e-mail cadastrado. Enviaremos um link para você redefinir sua senha.
-            </Text>
-
-            <TextInput
-              style={styles.input}
-              placeholder="seu.email@exemplo.com"
-              placeholderTextColor="#666666"
-              value={emailRecuperacao}
-              onChangeText={setEmailRecuperacao}
-              keyboardType="email-address"
-              autoCapitalize="none"
-            />
-
-            <View style={styles.modalActions}>
+              {/* Esqueceu a Senha */}
               <Pressable
-                style={styles.modalCancelBtn}
-                onPress={() => setModalRecuperacao(false)}
+                style={styles.forgotButton}
+                onPress={() =>
+                  Alert.alert(
+                    'Recuperação de Senha',
+                    'Instruções enviadas para seu e-mail registrado.'
+                  )
+                }
               >
-                <Text style={styles.modalCancelText}>Cancelar</Text>
+                <Text style={styles.forgotText}>Esqueceu sua senha?</Text>
               </Pressable>
 
+              {/* Botão Entrar */}
               <Pressable
-                style={styles.modalSubmitBtn}
-                onPress={handleEnviarRecuperacao}
-                disabled={loadingRecuperacao}
+                style={[styles.primaryButton, loading && styles.disabledButton]}
+                onPress={handleLogin}
+                disabled={loading}
               >
-                {loadingRecuperacao ? (
-                  <ActivityIndicator size="small" color="#000" />
+                {loading ? (
+                  <ActivityIndicator color="#000000" />
                 ) : (
-                  <Text style={styles.modalSubmitText}>Enviar Link</Text>
+                  <Text style={styles.primaryButtonText}>ENTRAR NA CONTA</Text>
                 )}
               </Pressable>
+
+              {/* Botão Demo / Acesso Rápido */}
+              <Pressable style={styles.demoButton} onPress={handleDemoLogin}>
+                <Text style={styles.demoButtonText}>
+                  ⚡ Acesso Rápido (Modo Demo)
+                </Text>
+              </Pressable>
+            </View>
+
+            {/* Rodapé / Link para Cadastro */}
+            <View style={styles.footer}>
+              <Text style={styles.footerText}>Ainda não possui uma conta? </Text>
+              <Pressable onPress={() => navigation.navigate('Cadastro')}>
+                <Text style={styles.signupText}>Cadastre-se</Text>
+              </Pressable>
             </View>
           </View>
-        </View>
-      </Modal>
-    </KeyboardAvoidingView>
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: '#080808',
+  },
   scrollContainer: {
     flexGrow: 1,
     backgroundColor: '#080808',
@@ -277,15 +235,15 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     paddingHorizontal: 28,
-    paddingTop: 50,
-    paddingBottom: 40,
+    paddingTop: 10,
+    paddingBottom: 20,
     justifyContent: 'space-between',
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginBottom: 40,
+    marginBottom: 30,
   },
   backButton: {
     paddingVertical: 8,
