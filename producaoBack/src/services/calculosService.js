@@ -1,3 +1,9 @@
+import {
+    calcularIMC,
+    calcularTMB,
+    calcularNDC
+} from "../utils/calculosFisicos.js";
+
 const CalculosService = {
 
     gerarCalculos: (dados) => {

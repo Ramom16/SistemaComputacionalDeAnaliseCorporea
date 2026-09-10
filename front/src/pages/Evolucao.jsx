@@ -19,6 +19,7 @@ export default function Evolucao() {
 
     const {
         loading,
+        erro,
         cards,
         historico,
         exercicios,
@@ -36,6 +37,14 @@ export default function Evolucao() {
         return (
             <div className="loading">
                 Carregando evolução...
+            </div>
+        );
+    }
+
+    if (erro) {
+        return (
+            <div className="loading" role="alert">
+                {erro}
             </div>
         );
     }
@@ -85,4 +94,4 @@ export default function Evolucao() {
             </main>
         </div>
     );
-}
+}

@@ -1,3 +1,5 @@
+import { validarUUID } from "../utils/cryptoUtils.js";
+
 export class Treino {
 
     #idTreino;
@@ -53,33 +55,24 @@ export class Treino {
 
         if (
             value !== null &&
-            value !== undefined &&
-            (!Number.isInteger(Number(value)) ||
-             Number(value) <= 0)
+            value !== undefined
         ) {
-            throw new Error(
-                "ID do treino inválido"
-            );
+            if (typeof value !== "string" || !validarUUID(value)) {
+                throw new Error("ID do treino deve ser um UUID válido");
+            }
+            this.#idTreino = value.trim();
+        } else {
+            this.#idTreino = null;
         }
-
-        this.#idTreino =
-            value === null || value === undefined
-                ? null
-                : Number(value);
     }
 
     set idCalculo(value) {
 
-        if (
-            !Number.isInteger(Number(value)) ||
-            Number(value) <= 0
-        ) {
-            throw new Error(
-                "ID do cálculo inválido"
-            );
+        if (!value || typeof value !== "string" || !validarUUID(value)) {
+            throw new Error("ID do cálculo deve ser um UUID válido");
         }
 
-        this.#idCalculo = Number(value);
+        this.#idCalculo = value.trim();
     }
 
     set objetivo(value) {
@@ -149,7 +142,7 @@ export class Treino {
     }) {
 
         if (
-            idCalculo === undefined ||
+            !idCalculo ||
             !objetivo ||
             !nivel
         ) {
@@ -159,7 +152,7 @@ export class Treino {
         }
 
         return new Treino(
-            Number(idCalculo),
+            String(idCalculo),
             objetivo,
             nivel
         );
@@ -180,10 +173,10 @@ export class Treino {
         }
 
         return new Treino(
-            Number(idCalculo),
+            String(idCalculo),
             objetivo,
             nivel,
-            Number(idTreino),
+            String(idTreino),
             data_criacao
         );
     }

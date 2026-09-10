@@ -7,7 +7,7 @@ const HistoricoCorporalRepository = {
         const dados =
             await prisma.dadosCorporais.findUnique({
                 where: {
-                    idUsuario: Number(idUsuario)
+                    idUsuario: String(idUsuario)
                 },
                 select: {
                     idDados: true
@@ -15,9 +15,7 @@ const HistoricoCorporalRepository = {
             });
 
         if (!dados) {
-            throw new Error(
-                "Dados corporais não encontrados"
-            );
+            return [];
         }
 
         return await prisma.historicoCorporal.findMany({

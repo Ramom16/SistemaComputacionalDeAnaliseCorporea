@@ -5,7 +5,7 @@ const treinoRepository = {
     async criar({ idCalculo, objetivo, nivel }) {
         return await prisma.treino.create({
             data: {
-                idCalculo,
+                idCalculo: String(idCalculo),
                 objetivo,
                 nivel
             }
@@ -15,7 +15,7 @@ const treinoRepository = {
     async buscarPorId(idTreino) {
         return await prisma.treino.findUnique({
             where: {
-                idTreino
+                idTreino: String(idTreino)
             },
             include: {
                 calculo: {
@@ -41,7 +41,7 @@ const treinoRepository = {
             where: {
                 calculo: {
                     dados: {
-                        idUsuario
+                        idUsuario: String(idUsuario)
                     }
                 }
             },
@@ -62,7 +62,7 @@ const treinoRepository = {
     async atualizar(idTreino, dados) {
         return await prisma.treino.update({
             where: {
-                idTreino
+                idTreino: String(idTreino)
             },
             data: dados
         });
@@ -71,7 +71,7 @@ const treinoRepository = {
     async deletar(idTreino) {
         return await prisma.treino.delete({
             where: {
-                idTreino
+                idTreino: String(idTreino)
             }
         });
     }

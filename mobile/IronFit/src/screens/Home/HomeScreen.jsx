@@ -1,18 +1,57 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   StyleSheet,
   Text,
   View,
   ScrollView,
   Pressable,
+  RefreshControl,
 } from 'react-native';
 import { useAuth } from '../../context/AuthContext';
+import { api } from '../../services/api';
 
 export default function HomeScreen({ navigation }) {
-  const { user, ultimaAvaliacao } = useAuth();
+  const { user, ultimaAvaliacao, carregarDadosCorporais } = useAuth();
+  const [refreshing, setRefreshing] = useState(false);
+  const [treinoDestaque, setTreinoDestaque] = useState(null);
+
+  async function carregarDadosHome() {
+    try {
+      if (user?.id) {
+        await carregarDadosCorporais(user.id);
+      }
+      const treinos = await api.getTreinos();
+      if (Array.isArray(treinos) && treinos.length > 0) {
+        setTreinoDestaque(treinos[0]);
+      }
+    } catch (e) {
+      console.warn('Erro ao carregar resumo da Home:', e.message);
+    } finally {
+      setRefreshing(false);
+    }
+  }
+
+  useEffect(() => {
+    carregarDadosHome();
+  }, [user]);
+
+  function onRefresh() {
+    setRefreshing(true);
+    carregarDadosHome();
+  }
+
+  const dataAvaliacao = ultimaAvaliacao?.data_registro
+    ? (ultimaAvaliacao.data_registro.includes('/') ? ultimaAvaliacao.data_registro : new Date(ultimaAvaliacao.data_registro).toLocaleDateString('pt-BR'))
+    : 'Hoje';
+
+  const totalExerciciosTreino = treinoDestaque?.exercicios?.length || treinoDestaque?.treinoExercicios?.length || 5;
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
+    <ScrollView
+      style={styles.container}
+      contentContainerStyle={styles.contentContainer}
+      refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#FFD400" />}
+    >
       {/* Header com Boas-Vindas */}
       <View style={styles.header}>
         <View>
@@ -28,16 +67,16 @@ export default function HomeScreen({ navigation }) {
       <View style={styles.heroCard}>
         <View style={styles.heroCardHeader}>
           <Text style={styles.heroTag}>ÚLTIMA AVALIAÇÃO CORPORAL</Text>
-          <Text style={styles.heroDate}>
-            {ultimaAvaliacao ? new Date(ultimaAvaliacao.data_registro).toLocaleDateString('pt-BR') : 'Hoje'}
-          </Text>
+          <Text style={styles.heroDate}>{dataAvaliacao}</Text>
         </View>
 
         <View style={styles.metricsRow}>
           <View style={styles.metricItem}>
             <Text style={styles.metricLabel}>IMC</Text>
             <Text style={styles.metricValue}>{ultimaAvaliacao?.imc || '--'}</Text>
-            <Text style={styles.metricSub}>{ultimaAvaliacao?.classificacaoImc || 'Não registrado'}</Text>
+            <Text style={styles.metricSub}>
+              {ultimaAvaliacao?.classificacaoImc || ultimaAvaliacao?.classificacao_imc || 'Avaliação recente'}
+            </Text>
           </View>
 
           <View style={styles.divider} />
@@ -65,12 +104,20 @@ export default function HomeScreen({ navigation }) {
 
       <View style={styles.workoutCard}>
         <View style={styles.workoutTop}>
-          <Text style={styles.workoutBadge}>TREINO A</Text>
-          <Text style={styles.workoutGoal}>Foco: Hipertrofia</Text>
+          <Text style={styles.workoutBadge}>
+            {treinoDestaque?.titulo ? treinoDestaque.titulo.split('-')[0].trim() : 'TREINO A'}
+          </Text>
+          <Text style={styles.workoutGoal}>
+            Foco: {treinoDestaque?.foco || treinoDestaque?.objetivo || 'Hipertrofia'}
+          </Text>
         </View>
 
-        <Text style={styles.workoutTitle}>Peito & Tríceps</Text>
-        <Text style={styles.workoutDesc}>5 exercícios • Duração estimada: 50 min</Text>
+        <Text style={styles.workoutTitle}>
+          {treinoDestaque?.nome || treinoDestaque?.titulo || 'Peito & Tríceps'}
+        </Text>
+        <Text style={styles.workoutDesc}>
+          {totalExerciciosTreino} exercícios • Nível: {treinoDestaque?.nivel || 'Intermediário'}
+        </Text>
 
         <Pressable
           style={styles.workoutButton}

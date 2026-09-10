@@ -39,7 +39,16 @@ export default function Login() {
 
     } catch (error) {
       const mensagemErro = error.response?.data?.erro || 'Erro: API não respondeu';
-      setMsg({ text: mensagemErro, type: 'erro' });
+      
+      // Verificar se a conta está desativada
+      if (error.response?.status === 403 && mensagemErro.includes("desativada")) {
+        setMsg({ 
+          text: "Sua conta está desativada. Contate o suporte para reativar. Email: sistema.verificacao.login@gmail.com", 
+          type: 'erro' 
+        });
+      } else {
+        setMsg({ text: mensagemErro, type: 'erro' });
+      }
     } finally {
       setLoading(false);
     }
@@ -79,11 +88,6 @@ export default function Login() {
                 value={senha}
                 onChange={(e) => setSenha(e.target.value)}
               />
-              <div className="forgot-password-wrapper">
-                <Link to="/recuperar-senha" className="forgot-password-link">
-                  Esqueceu a senha?
-                </Link>
-              </div>
               <button type="submit" id="btnLogin" className="btn-login" disabled={loading}>
                 {loading ? 'Entrando...' : 'Entrar'}
               </button>
@@ -108,12 +112,6 @@ export default function Login() {
             <div className="link-cadastro">
               <span>Não tem conta? </span>
               <Link to="/cadastro">Cadastre-se</Link>
-            </div>
-
-            <div style={{ textAlign: 'center', marginTop: '14px' }}>
-              <Link to="/verificar-email" style={{ color: 'var(--text-gray)', fontSize: '0.85rem', textDecoration: 'none', transition: 'color 0.2s' }} onMouseOver={(e) => e.target.style.color = '#fff'} onMouseOut={(e) => e.target.style.color = 'var(--text-gray)'}>
-                Precisa reenviar o e-mail de verificação?
-              </Link>
             </div>
           </div>
         </div>

@@ -8,6 +8,8 @@ import Dashboard from './pages/Dashboard';
 import MeusTreinos from './pages/MeusTreinos';
 import DetalhesTreinos from './pages/DetalhesTreinos';
 import Evolucao from './pages/Evolucao';
+import RedefinirSenha from './pages/RedefinirSenha';
+import ProtectedRoute from './components/ProtectedRoute';
 
 
 function App() {
@@ -18,11 +20,14 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/cadastro" element={<Cadastro />} />
         <Route path="/recuperar-senha" element={<RecuperarSenha />} />
+        <Route path="/redefinir-senha" element={<RedefinirSenha />} />
         <Route path="/verificar-email" element={<Verify />} />
-        <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/meus-treinos" element={<MeusTreinos />} />
-        <Route path="/treino/:id" element={<DetalhesTreinos />} />
-        <Route path="/evolucao" element={<Evolucao/>}/>
+        <Route element={<ProtectedRoute />}>
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/meus-treinos" element={<MeusTreinos />} />
+          <Route path="/treino/:id" element={<DetalhesTreinos />} />
+          <Route path="/evolucao" element={<Evolucao />} />
+        </Route>
       </Routes>
     </BrowserRouter>
   );
