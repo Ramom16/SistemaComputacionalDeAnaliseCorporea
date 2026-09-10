@@ -89,7 +89,7 @@ const usuariosRepository = {
 
   atualizarSenha: async (id, senha_hash) => {
     return await prisma.usuario.update({
-      where: { id: String(id) },
+      where: { id: Number(id) },
       data: {
         senha_hash,
         tentativas_login: 0,
@@ -101,7 +101,7 @@ const usuariosRepository = {
   // Atualizar apenas ultimo_login (muito usado no login)
   atualizarUltimoLogin: async (id) => {
     return await prisma.usuario.update({
-      where: { id: String(id) },
+      where: { id: Number(id) },
       data: {
         ultimo_login: new Date(),
         tentativas_login: 0,
