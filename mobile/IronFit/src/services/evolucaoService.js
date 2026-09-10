@@ -1,13 +1,17 @@
 import { api } from './api';
 
 export const evolucaoService = {
-  // Busca o histórico de dados corporais / evolução do usuário
-  getHistoricoEvolucao: async () => {
-    return await api.get('/evolucao'); 
+
+  getHistoricoEvolucao: async (usuarioId) => {
+    const historico = await api.getHistorico(usuarioId);
+    if (historico) return historico;
+
+    const dados = await api.getDadosCorporais(usuarioId);
+    return dados ? [dados] : [];
   },
 
-  // Envia um novo registro de peso/medidas
-  salvarEvolucao: async (dados) => {
-    return await api.post('/evolucao', dados);
+ 
+  salvarEvolucao: async (dados, usuarioId) => {
+    return await api.salvarDadosCorporais(dados, usuarioId);
   },
 };

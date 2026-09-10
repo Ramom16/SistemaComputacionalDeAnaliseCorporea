@@ -9,21 +9,39 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { api } from '../../services/api';
+import { useAuth } from '../../context/AuthContext';
 
 export default function EvolucaoScreen() {
+  const { user } = useAuth();
   const [registros, setRegistros] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    carregarHistorico();
-  }, []);
+    if (user?.id) {
+      carregarHistorico();
+    } else {
+      setLoading(false);
+    }
+  }, [user]);
 
   async function carregarHistorico() {
     try {
       setLoading(true);
-      // Chamada real ao endpoint da API/Banco de Dados
-      const data = await api.get('/evolucao'); 
-      setRegistros(data || []);
+      // Busca o histórico usando o método correto da api.js passando o ID do usuário
+      const data = await api.getHistorico(user.id);
+      
+      let lista = [];
+      if (Array.isArray(data)) {
+        lista = data;
+      } else if (data && typeof data === 'object') {
+        lista = [data];
+      } else {
+        // Se não houver histórico gravado, tenta buscar os dados corporais mais recentes
+        const dadosCorpo = await api.getDadosCorporais(user.id);
+        if (dadosCorpo) lista = [dadosCorpo];
+      }
+
+      setRegistros(lista);
     } catch (error) {
       console.log('Erro ao carregar histórico:', error);
       Alert.alert('Erro', 'Não foi possível carregar o histórico de avaliações.');
@@ -85,11 +103,11 @@ export default function EvolucaoScreen() {
         ) : (
           <View style={styles.historyList}>
             {registros.map((item, idx) => (
-              <View key={item.idDados || idx} style={styles.historyCard}>
+              <View key={item.idDados || item.id || idx} style={styles.historyCard}>
                 <View style={styles.historyHeader}>
                   <View style={styles.dateBadge}>
                     <Text style={styles.dateText}>
-                      📅 {new Date(item.data_registro).toLocaleDateString('pt-BR')}
+                      📅 {item.data_registro ? new Date(item.data_registro).toLocaleDateString('pt-BR') : 'Recente'}
                     </Text>
                   </View>
                   <Text style={styles.badgeIndex}>#{registros.length - idx}</Text>
@@ -98,27 +116,27 @@ export default function EvolucaoScreen() {
                 <View style={styles.historyMetrics}>
                   <View style={styles.hMetric}>
                     <Text style={styles.hLabel}>Peso</Text>
-                    <Text style={styles.hVal}>{item.peso_kg} kg</Text>
+                    <Text style={styles.hVal}>{item.peso_kg || '--'} kg</Text>
                   </View>
 
                   <View style={styles.hMetric}>
                     <Text style={styles.hLabel}>Altura</Text>
-                    <Text style={styles.hVal}>{item.altura_cm} cm</Text>
+                    <Text style={styles.hVal}>{item.altura_cm || '--'} cm</Text>
                   </View>
 
                   <View style={styles.hMetric}>
                     <Text style={styles.hLabel}>IMC</Text>
-                    <Text style={styles.hVal}>{item.imc}</Text>
+                    <Text style={styles.hVal}>{item.imc || '--'}</Text>
                   </View>
 
                   <View style={styles.hMetric}>
                     <Text style={styles.hLabel}>TMB</Text>
-                    <Text style={styles.hVal}>{item.tmb} kcal</Text>
+                    <Text style={styles.hVal}>{item.tmb ? `${item.tmb} kcal` : '--'}</Text>
                   </View>
 
                   <View style={styles.hMetric}>
                     <Text style={styles.hLabel}>NDC</Text>
-                    <Text style={styles.hVal}>{item.ndc} kcal</Text>
+                    <Text style={styles.hVal}>{item.ndc ? `${item.ndc} kcal` : '--'}</Text>
                   </View>
                 </View>
               </View>
@@ -164,32 +182,6 @@ const styles = StyleSheet.create({
     fontSize: 14,
     lineHeight: 20,
     marginBottom: 20,
-  },
-  statsGrid: {
-    flexDirection: 'row',
-    gap: 10,
-    marginBottom: 20,
-  },
-  statCard: {
-    flex: 1,
-    backgroundColor: '#121212',
-    borderWidth: 1,
-    borderColor: '#262626',
-    borderRadius: 10,
-    padding: 12,
-    alignItems: 'center',
-  },
-  statCardValue: {
-    color: '#FFD400',
-    fontSize: 20,
-    fontWeight: '900',
-  },
-  statCardLabel: {
-    color: '#888888',
-    fontSize: 10,
-    fontWeight: '700',
-    marginTop: 4,
-    textAlign: 'center',
   },
   summaryCard: {
     backgroundColor: '#121212',

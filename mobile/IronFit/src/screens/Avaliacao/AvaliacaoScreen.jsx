@@ -220,7 +220,7 @@ export default function AvaliacaoScreen({ navigation }) {
         </Pressable>
       </ScrollView>
     </SafeAreaView>
-          ));
+          );
 }
 
 const styles = StyleSheet.create({
