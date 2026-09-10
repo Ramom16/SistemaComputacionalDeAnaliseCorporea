@@ -10,16 +10,25 @@ import {
   Platform,
   ScrollView,
   Alert,
+  Modal,
 } from 'react-native';
 import { useAuth } from '../../context/AuthContext';
 
 export default function LoginScreen({ navigation }) {
-  const { login, loading } = useAuth();
+  const { login, loading, solicitarRecuperacao, reenviarEmail } = useAuth();
 
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
   const [mostrarSenha, setMostrarSenha] = useState(false);
   const [erro, setErro] = useState('');
+  const [statusErro, setStatusErro] = useState(null);
+
+  // Estados de Modais
+  const [modalRecuperacao, setModalRecuperacao] = useState(false);
+  const [emailRecuperacao, setEmailRecuperacao] = useState('');
+  const [loadingRecuperacao, setLoadingRecuperacao] = useState(false);
+
+  const [loadingReenvio, setLoadingReenvio] = useState(false);
 
   async function handleLogin() {
     if (!email.trim() || !senha.trim()) {
@@ -28,12 +37,13 @@ export default function LoginScreen({ navigation }) {
     }
 
     setErro('');
+    setStatusErro(null);
+
     const res = await login(email.trim(), senha);
 
-    if (res.success) {
-      // Login realizado com sucesso. A navegação será atualizada via AuthContext
-    } else {
+    if (!res.success) {
       setErro(res.error || 'Credenciais inválidas. Tente novamente.');
+      setStatusErro(res.status);
     }
   }
 
@@ -41,7 +51,45 @@ export default function LoginScreen({ navigation }) {
     setEmail('atleta@ironfit.com');
     setSenha('123456');
     setErro('');
+    setStatusErro(null);
     login('atleta@ironfit.com', '123456');
+  }
+
+  async function handleEnviarRecuperacao() {
+    if (!emailRecuperacao.trim()) {
+      Alert.alert('Atenção', 'Informe seu e-mail para receber o link de recuperação.');
+      return;
+    }
+
+    setLoadingRecuperacao(true);
+    const res = await solicitarRecuperacao(emailRecuperacao.trim());
+    setLoadingRecuperacao(false);
+
+    if (res.success) {
+      setModalRecuperacao(false);
+      setEmailRecuperacao('');
+      Alert.alert('E-mail enviado', res.message || 'Verifique sua caixa de entrada.');
+    } else {
+      Alert.alert('Erro', res.error || 'Não foi possível solicitar a recuperação.');
+    }
+  }
+
+  async function handleReenviarAtivacao() {
+    const alvo = email.trim();
+    if (!alvo) {
+      Alert.alert('Atenção', 'Digite seu e-mail no campo de login primeiro.');
+      return;
+    }
+
+    setLoadingReenvio(true);
+    const res = await reenviarEmail(alvo);
+    setLoadingReenvio(false);
+
+    if (res.success) {
+      Alert.alert('Sucesso', res.message || 'Link de ativação reenviado para seu e-mail.');
+    } else {
+      Alert.alert('Erro', res.error || 'Não foi possível reenviar o link.');
+    }
   }
 
   return (
@@ -59,7 +107,7 @@ export default function LoginScreen({ navigation }) {
             <Pressable style={styles.backButton} onPress={() => navigation.goBack()}>
               <Text style={styles.backButtonText}>← Voltar</Text>
             </Pressable>
-            
+
             <Text style={styles.logo}>
               IRON<Text style={styles.logoYellow}>FIT</Text>
             </Text>
@@ -75,6 +123,20 @@ export default function LoginScreen({ navigation }) {
             {erro ? (
               <View style={styles.errorBox}>
                 <Text style={styles.errorText}>{erro}</Text>
+                {/* Botão de reenvio caso o e-mail não esteja verificado */}
+                {statusErro === 403 && (
+                  <Pressable
+                    style={styles.reenviarBtn}
+                    onPress={handleReenviarAtivacao}
+                    disabled={loadingReenvio}
+                  >
+                    {loadingReenvio ? (
+                      <ActivityIndicator size="small" color="#FFD400" />
+                    ) : (
+                      <Text style={styles.reenviarBtnText}>📧 Reenviar e-mail de ativação</Text>
+                    )}
+                  </Pressable>
+                )}
               </View>
             ) : null}
 
@@ -119,7 +181,10 @@ export default function LoginScreen({ navigation }) {
             {/* Esqueceu a Senha */}
             <Pressable
               style={styles.forgotButton}
-              onPress={() => Alert.alert('Recuperação de Senha', 'Instruções enviadas para seu e-mail registrado.')}
+              onPress={() => {
+                setEmailRecuperacao(email.trim());
+                setModalRecuperacao(true);
+              }}
             >
               <Text style={styles.forgotText}>Esqueceu sua senha?</Text>
             </Pressable>
@@ -152,6 +217,54 @@ export default function LoginScreen({ navigation }) {
           </View>
         </View>
       </ScrollView>
+
+      {/* Modal de Recuperação de Senha */}
+      <Modal
+        visible={modalRecuperacao}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setModalRecuperacao(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalCard}>
+            <Text style={styles.modalTitle}>RECUPERAR SENHA</Text>
+            <Text style={styles.modalSub}>
+              Digite seu e-mail cadastrado. Enviaremos um link para você redefinir sua senha.
+            </Text>
+
+            <TextInput
+              style={styles.input}
+              placeholder="seu.email@exemplo.com"
+              placeholderTextColor="#666666"
+              value={emailRecuperacao}
+              onChangeText={setEmailRecuperacao}
+              keyboardType="email-address"
+              autoCapitalize="none"
+            />
+
+            <View style={styles.modalActions}>
+              <Pressable
+                style={styles.modalCancelBtn}
+                onPress={() => setModalRecuperacao(false)}
+              >
+                <Text style={styles.modalCancelText}>Cancelar</Text>
+              </Pressable>
+
+              <Pressable
+                style={styles.modalSubmitBtn}
+                onPress={handleEnviarRecuperacao}
+                disabled={loadingRecuperacao}
+              >
+                {loadingRecuperacao ? (
+                  <ActivityIndicator size="small" color="#000" />
+                ) : (
+                  <Text style={styles.modalSubmitText}>Enviar Link</Text>
+                )}
+              </Pressable>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </KeyboardAvoidingView>
   );
 }
@@ -221,6 +334,21 @@ const styles = StyleSheet.create({
     color: '#FF6666',
     fontSize: 14,
     fontWeight: '600',
+  },
+  reenviarBtn: {
+    marginTop: 10,
+    alignSelf: 'flex-start',
+    backgroundColor: 'rgba(255, 212, 0, 0.15)',
+    borderWidth: 1,
+    borderColor: '#FFD400',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 6,
+  },
+  reenviarBtnText: {
+    color: '#FFD400',
+    fontSize: 12,
+    fontWeight: '800',
   },
   inputGroup: {
     marginBottom: 20,
@@ -311,5 +439,56 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '800',
     textDecorationLine: 'underline',
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.8)',
+    justifyContent: 'center',
+    paddingHorizontal: 24,
+  },
+  modalCard: {
+    backgroundColor: '#141414',
+    borderWidth: 1,
+    borderColor: '#333333',
+    borderRadius: 12,
+    padding: 24,
+  },
+  modalTitle: {
+    color: '#FFD400',
+    fontSize: 18,
+    fontWeight: '900',
+    marginBottom: 8,
+  },
+  modalSub: {
+    color: '#AAAAAA',
+    fontSize: 14,
+    lineHeight: 20,
+    marginBottom: 20,
+  },
+  modalActions: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    gap: 12,
+    marginTop: 20,
+  },
+  modalCancelBtn: {
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+  },
+  modalCancelText: {
+    color: '#AAAAAA',
+    fontSize: 14,
+    fontWeight: '700',
+  },
+  modalSubmitBtn: {
+    backgroundColor: '#FFD400',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 6,
+  },
+  modalSubmitText: {
+    color: '#000000',
+    fontSize: 14,
+    fontWeight: '900',
   },
 });

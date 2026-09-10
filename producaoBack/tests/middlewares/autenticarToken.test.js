@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { autenticarToken } from "../../src/middlewares/autenticarToken.js";
+import { autenticarToken, eAdmin, autorizarRoles } from "../../src/middlewares/autenticarToken.js";
 import jwt from "jsonwebtoken";
 
 const JWT_SECRET = "segredo_teste_jwt_2026";
@@ -9,7 +9,7 @@ vi.stubEnv("JWT_SECRET", JWT_SECRET);
 
 function criarTokenValido(payload = {}) {
   return jwt.sign(
-    { id: "test-id", email: "test@email.com", nome: "Teste", ...payload },
+    { id: "test-id", email: "test@email.com", nome: "Teste", role: "USER", ...payload },
     JWT_SECRET,
     { expiresIn: "1h" }
   );
@@ -40,6 +40,7 @@ describe("Middleware autenticarToken", () => {
     expect(next).toHaveBeenCalledOnce();
     expect(req.usuario).toBeDefined();
     expect(req.usuario.email).toBe("test@email.com");
+    expect(req.usuario.role).toBe("USER");
   });
 
   it("deve retornar 401 se não houver header Authorization", () => {
@@ -93,12 +94,60 @@ describe("Middleware autenticarToken", () => {
     expect(next).not.toHaveBeenCalled();
   });
 
-  it("deve popular req.usuario com dados do payload JWT", () => {
-    const token = criarTokenValido({ id: "uuid-teste", nome: "Carlos Teste" });
+  it("deve popular req.usuario com dados do payload JWT incluindo role", () => {
+    const token = criarTokenValido({ id: "uuid-teste", nome: "Carlos Teste", role: "ADMIN" });
     const req = { headers: { authorization: `Bearer ${token}` } };
     const res = criarResMock();
     autenticarToken(req, res, next);
     expect(req.usuario.id).toBe("uuid-teste");
     expect(req.usuario.nome).toBe("Carlos Teste");
+    expect(req.usuario.role).toBe("ADMIN");
+  });
+});
+
+describe("Middleware eAdmin e autorizarRoles", () => {
+  let next;
+
+  beforeEach(() => {
+    next = vi.fn();
+  });
+
+  it("deve permitir acesso para usuário com role ADMIN", () => {
+    const req = { usuario: { id: "admin-1", role: "ADMIN" } };
+    const res = criarResMock();
+    eAdmin(req, res, next);
+    expect(next).toHaveBeenCalledOnce();
+  });
+
+  it("deve bloquear usuário com role USER com status 403", () => {
+    const req = { usuario: { id: "user-1", role: "USER" } };
+    const res = criarResMock();
+    eAdmin(req, res, next);
+    expect(res.status).toHaveBeenCalledWith(403);
+    expect(next).not.toHaveBeenCalled();
+  });
+
+  it("deve bloquear requisição sem req.usuario com status 401", () => {
+    const req = {};
+    const res = criarResMock();
+    eAdmin(req, res, next);
+    expect(res.status).toHaveBeenCalledWith(401);
+    expect(next).not.toHaveBeenCalled();
+  });
+
+  it("autorizarRoles deve aceitar múltiplas roles configuradas", () => {
+    const middleware = autorizarRoles("ADMIN", "TREINADOR");
+    const req = { usuario: { id: "treinador-1", role: "TREINADOR" } };
+    const res = criarResMock();
+    middleware(req, res, next);
+    expect(next).toHaveBeenCalledOnce();
+  });
+
+  it("autorizarRoles deve ser insensível a maiúsculas/minúsculas", () => {
+    const middleware = autorizarRoles("admin");
+    const req = { usuario: { id: "admin-1", role: "ADMIN" } };
+    const res = criarResMock();
+    middleware(req, res, next);
+    expect(next).toHaveBeenCalledOnce();
   });
 });
