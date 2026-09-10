@@ -1,5 +1,26 @@
 import { validarUUID } from "../utils/cryptoUtils.js";
 
+function normalizarIdUsuario(value) {
+    if (value === null || value === undefined) return null;
+
+    if (typeof value === "number") {
+        return Number.isInteger(value) && value > 0 ? value : null;
+    }
+
+    if (typeof value === "string") {
+        const texto = value.trim();
+
+        if (/^\d+$/.test(texto)) {
+            const numero = Number(texto);
+            return Number.isInteger(numero) && numero > 0 ? numero : null;
+        }
+
+        return validarUUID(texto) ? texto : null;
+    }
+
+    return null;
+}
+
 export class DadosCorporais {
 
     #idDados;
@@ -82,26 +103,51 @@ export class DadosCorporais {
 
     set idDados(value) {
 
-        if (
-            value !== null &&
-            value !== undefined
-        ) {
-            if (typeof value !== "string" || !validarUUID(value)) {
+        if (value === null || value === undefined) {
+            this.#idDados = null;
+            return;
+        }
+
+        if (typeof value === "number") {
+            if (!Number.isInteger(value) || value <= 0) {
                 throw new Error("ID dos dados corporais deve ser um UUID válido");
             }
-            this.#idDados = value.trim();
-        } else {
-            this.#idDados = null;
+            this.#idDados = String(value);
+            return;
         }
+
+        if (typeof value === "string") {
+            const texto = value.trim();
+
+            if (/^\d+$/.test(texto)) {
+                const numero = Number(texto);
+                if (!Number.isInteger(numero) || numero <= 0) {
+                    throw new Error("ID dos dados corporais deve ser um UUID válido");
+                }
+                this.#idDados = String(numero);
+                return;
+            }
+
+            if (!validarUUID(texto)) {
+                throw new Error("ID dos dados corporais deve ser um UUID válido");
+            }
+
+            this.#idDados = texto;
+            return;
+        }
+
+        throw new Error("ID dos dados corporais deve ser um UUID válido");
     }
 
     set idUsuario(value) {
 
-        if (!value || typeof value !== "string" || !validarUUID(value)) {
+        const idNormalizado = normalizarIdUsuario(value);
+
+        if (idNormalizado === null) {
             throw new Error("ID do usuário deve ser um UUID válido");
         }
 
-        this.#idUsuario = value.trim();
+        this.#idUsuario = typeof idNormalizado === "string" ? idNormalizado.trim() : String(idNormalizado);
     }
 
     set peso_kg(value) {

@@ -58,6 +58,10 @@ const DadosCorporaisController = {
     // LISTAR (Apenas dados corporais do usuário autenticado ou lista geral se aplicável)
     listar: async (req, res) => {
         try {
+            if (req.usuario?.role === "ADMIN") {
+                const dados = await DadosCorporaisRepository.findAll();
+                return res.status(200).json(anexarIdsCriptografados(dados));
+            }
             if (req.usuario?.id) {
                 const dados = await DadosCorporaisRepository.findByUsuario(String(req.usuario.id));
                 return res.status(200).json(anexarIdsCriptografados(dados ? [dados] : []));
@@ -82,8 +86,8 @@ const DadosCorporaisController = {
                 });
             }
 
-            // Proteção contra IDOR: verifica se o dado pertence ao usuário autenticado
-            if (req.usuario?.id && dados.idUsuario !== req.usuario.id) {
+            // Proteção contra IDOR: verifica se o dado pertence ao usuário autenticado ou se é ADMIN
+            if (req.usuario?.id && dados.idUsuario !== req.usuario.id && req.usuario.role !== "ADMIN") {
                 return res.status(403).json({
                     erro: "Você não possui permissão para acessar estes dados."
                 });
@@ -102,8 +106,8 @@ const DadosCorporaisController = {
         try {
             const targetId = req.params.id || req.usuario?.id;
 
-            // Proteção contra IDOR
-            if (req.usuario?.id && targetId !== req.usuario.id) {
+            // Proteção contra IDOR: permite acesso próprio ou por administrador
+            if (req.usuario?.id && targetId !== req.usuario.id && req.usuario.role !== "ADMIN") {
                 return res.status(403).json({
                     erro: "Você não possui permissão para acessar estes dados."
                 });

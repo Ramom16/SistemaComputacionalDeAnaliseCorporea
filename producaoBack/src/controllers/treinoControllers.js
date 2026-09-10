@@ -7,7 +7,9 @@ const treinoController = {
 
         try {
 
-            const idUsuario = req.usuario.id;
+            const idUsuario = (req.usuario.role === "ADMIN" && req.body.idUsuario)
+                ? req.body.idUsuario
+                : req.usuario.id;
 
             const treino = await treinoService.criar(
                 String(idUsuario),
@@ -31,11 +33,13 @@ const treinoController = {
 
         try {
 
-            const idUsuario = req.usuario.id;
+            const targetId = (req.usuario.role === "ADMIN" && (req.query.idUsuario || req.query.id))
+                ? (req.query.idUsuario || req.query.id)
+                : req.usuario.id;
 
             const treinos =
                 await treinoService.listarPorUsuario(
-                    String(idUsuario)
+                    String(targetId)
                 );
 
             return res.status(200).json({
@@ -60,7 +64,8 @@ const treinoController = {
             const treino =
                 await treinoService.buscarPorId(
                     String(idUsuario),
-                    idTreino
+                    idTreino,
+                    req.usuario.role
                 );
 
             return res.status(200).json({

@@ -193,6 +193,47 @@ export default function Dashboard() {
     navigate('/login');
   };
 
+  // DESATIVAR CONTA
+
+  const handleDesativarConta = async () => {
+    // Pedir confirmação dupla (segurança)
+    const confirmar1 = window.confirm(
+      "Tem certeza que deseja desativar sua conta? Esta ação pode ser revertida contactando o suporte."
+    );
+    
+    if (!confirmar1) return;
+
+    const confirmar2 = window.confirm(
+      "Tem certeza? Esta ação desativará sua conta e você não poderá fazer login. Seus dados serão preservados."
+    );
+    
+    if (!confirmar2) return;
+
+    try {
+      const response = await api.delete("/usuarios/desativar-conta");
+      
+      setMsg({
+        text: response.data.msg,
+        type: "sucesso"
+      });
+
+      // Limpar localStorage
+      localStorage.removeItem("token");
+      localStorage.removeItem("usuario");
+
+      // Redirecionar após 2 segundos
+      setTimeout(() => {
+        navigate("/login");
+      }, 2000);
+    } catch (error) {
+      const mensagemErro = error.response?.data?.erro || "Erro ao desativar conta";
+      setMsg({
+        text: mensagemErro,
+        type: "erro"
+      });
+    }
+  };
+
   // INTERFACE
 
   return (
