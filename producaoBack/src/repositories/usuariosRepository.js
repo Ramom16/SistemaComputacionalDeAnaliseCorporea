@@ -29,7 +29,7 @@ const usuariosRepository = {
 
   buscarPorId: async (id) => {
     return await prisma.usuario.findUnique({
-      where: { id: String(id) }
+      where: { id: Number(id) }
     });
   },
 
@@ -41,7 +41,7 @@ const usuariosRepository = {
 
   buscarPorIdComDetalhes: async (id) => {
     return await prisma.usuario.findUnique({
-      where: { id: String(id) },
+      where: { id: Number(id) },
       select: {
         id: true,
         nome: true,
@@ -73,7 +73,7 @@ const usuariosRepository = {
   // UPDATE
   atualizar: async (id, usuario) => {
     const usuarioAtualizado = await prisma.usuario.update({
-      where: { id: String(id) },
+      where: { id: Number(id) },
       data: {
         nome: usuario.nome,
         email: usuario.email,
@@ -122,7 +122,7 @@ const usuariosRepository = {
     }
 
     return await prisma.usuario.update({
-      where: { id: String(id) },
+      where: { id: Number(id) },
       data: {
         tentativas_login: novasTentativas,
         bloqueado_ate
@@ -132,7 +132,7 @@ const usuariosRepository = {
 
   resetarTentativasEBloqueio: async (id) => {
     return await prisma.usuario.update({
-      where: { id: String(id) },
+      where: { id: Number(id) },
       data: {
         tentativas_login: 0,
         bloqueado_ate: null
@@ -143,14 +143,14 @@ const usuariosRepository = {
   // DELETE
   deletar: async (id) => {
     return await prisma.usuario.delete({
-      where: { id: String(id) }
+      where: { id: Number(id) }
     });
   },
 
   // DESATIVAR (mais seguro que deletar)
   desativar: async (id) => {
     return await prisma.usuario.update({
-      where: { id: String(id) },
+      where: { id: Number(id) },
       data: {
         ativo: false
       }
@@ -159,7 +159,7 @@ const usuariosRepository = {
 
   ativar: async (id) => {
     return await prisma.usuario.update({
-      where: { id: String(id) },
+      where: { id: Number(id) },
       data: {
         ativo: true
       }
@@ -169,7 +169,7 @@ const usuariosRepository = {
   // EMAIL VERIFICADO
   verificarEmail: async (id) => {
     return await prisma.usuario.update({
-      where: { id: String(id) },
+      where: { id: Number(id) },
       data: {
         email_verificado: true
       }
@@ -183,7 +183,7 @@ const usuariosRepository = {
       throw new Error("Role inválida. Deve ser 'USER' ou 'ADMIN'");
     }
     return await prisma.usuario.update({
-      where: { id: String(id) },
+      where: { id: Number(id) },
       data: { role: roleValida }
     });
   }
