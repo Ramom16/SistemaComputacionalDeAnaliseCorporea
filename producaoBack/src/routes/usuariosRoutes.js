@@ -11,4 +11,7 @@ router.use(tratarIdsCriptografados(["id"]));
 // Rota para buscar dados do usuário autenticado ou por ID
 router.get("/", usuariosController.selecionarUsuario);
 
+// Rota para desativar a conta do usuário
+router.delete("/desativar-conta", usuariosController.desativarConta);
+
 export default router;

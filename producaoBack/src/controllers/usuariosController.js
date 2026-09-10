@@ -30,6 +30,31 @@ const usuariosController = {
     } catch (error) {
       return res.status(500).json({ erro: error.message });
     }
+  },
+
+  /**
+   * Desativa a conta do usuário autenticado.
+   * Dados e histórico são preservados (soft delete).
+   */
+  desativarConta: async (req, res) => {
+    try {
+      const usuarioId = req.usuario?.id;
+
+      if (!usuarioId) {
+        return res.status(401).json({ erro: "Usuário não autenticado" });
+      }
+
+      // Desativa o usuário no banco de dados
+      await usuariosRepository.desativar(usuarioId);
+
+      return res.status(200).json({
+        msg: "Conta desativada com sucesso. Você será desconectado.",
+        usuario_desativado: true
+      });
+    } catch (error) {
+      console.error("Erro ao desativar conta:", error);
+      return res.status(500).json({ erro: error.message });
+    }
   }
 };
 
