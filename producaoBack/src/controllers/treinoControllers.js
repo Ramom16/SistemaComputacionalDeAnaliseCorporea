@@ -13,7 +13,8 @@ const treinoController = {
 
             const treino = await treinoService.criar(
                 String(idUsuario),
-                req.body
+                req.body,
+                req.usuario.role
             );
 
             return res.status(201).json({

@@ -68,16 +68,48 @@ export default function MeusTreinos() {
       <DashboardNavbar onLogout={handleLogout} />
       <div className="dashboard-layout">
         <main className="dashboard-content">
-          <section className="welcome-section">
+        {/* Seção de Bem-vindo + Botão Admin */}
+        <div style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'flex-start',
+          marginBottom: '30px'
+        }}>
+          <div style={{ flex: 1 }}>
             <h1 className="welcome-title">
               Meus <span>Treinos</span>
             </h1>
             <p className="welcome-desc">
               {usuarioData?.nome ? `Explore os planos de treino personalizados para você, ${usuarioData.nome}.` : "Explore os planos de treino disponíveis no sistema para o seu perfil."}
             </p>
-          </section>
-
-        {/* Filtros */}
+          </div>
+          
+          {usuarioData?.role === 'ADMIN' && (
+            <button
+              onClick={() => navigate('/admin/criar-treino')}
+              style={{
+                background: 'linear-gradient(135deg, var(--primary-yellow) 0%, #ffd700 100%)',
+                color: '#000',
+                border: 'none',
+                padding: '12px 24px',
+                borderRadius: '8px',
+                fontSize: '0.95rem',
+                fontWeight: '700',
+                cursor: 'pointer',
+                whiteSpace: 'nowrap',
+                marginLeft: '20px',
+                transition: 'all 0.3s',
+                boxShadow: '0 4px 15px rgba(255, 230, 0, 0.2)'
+              }}
+              onMouseHover={{
+                transform: 'translateY(-2px)',
+                boxShadow: '0 8px 25px rgba(255, 230, 0, 0.4)'
+              }}
+            >
+              + Criar Treino Global
+            </button>
+          )}
+        </div>
         <div className="treinos-filtros">
           {objetivos.map((obj) => (
             <button

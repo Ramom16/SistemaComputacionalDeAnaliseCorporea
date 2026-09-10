@@ -2,12 +2,22 @@ import prisma from "../database/prismaClient.js";
 
 const treinoRepository = {
 
-    async criar({ idCalculo, objetivo, nivel }) {
+    async criar({ idCalculo, objetivo, nivel, is_oficial, titulo, descricao, idUsuario }) {
         return await prisma.treino.create({
             data: {
-                idCalculo: String(idCalculo),
+                idCalculo: idCalculo ? String(idCalculo) : null,
                 objetivo,
-                nivel
+                nivel,
+                is_oficial: is_oficial || false,
+                titulo: titulo || "Novo Treino",
+                idUsuario: idUsuario ? String(idUsuario) : null
+            },
+            include: {
+                treinoExercicios: {
+                    include: {
+                        exercicio: true
+                    }
+                }
             }
         });
     },
@@ -39,11 +49,20 @@ const treinoRepository = {
     async listarPorUsuario(idUsuario) {
         return await prisma.treino.findMany({
             where: {
-                calculo: {
-                    dados: {
-                        idUsuario: String(idUsuario)
+                OR: [
+                    // Treinos pessoais do usuário
+                    {
+                        calculo: {
+                            dados: {
+                                idUsuario: String(idUsuario)
+                            }
+                        }
+                    },
+                    // Treinos globais (oficiais)
+                    {
+                        is_oficial: true
                     }
-                }
+                ]
             },
             include: {
                 treinoExercicios: {

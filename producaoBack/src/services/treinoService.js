@@ -2,13 +2,41 @@ import prisma from "../database/prismaClient.js";
 import treinoRepository from "../repositories/treinoRepository.js";
 
 const treinoService = {
-    async criar(idUsuario, dados) {
+    async criar(idUsuario, dados, userRole = "USER") {
 
-        const { idCalculo, objetivo, nivel } = dados;
+        const { idCalculo, objetivo, nivel, is_oficial, titulo, descricao } = dados;
 
-        if (!idCalculo || !objetivo || !nivel) {
+        // Validar objetivo e nivel (obrigatórios)
+        if (!objetivo || !nivel) {
             throw new Error(
-                "idCalculo, objetivo e nivel são obrigatórios."
+                "objetivo e nivel são obrigatórios."
+            );
+        }
+
+        // Se for treino global (oficial), apenas ADMIN pode criar
+        if (is_oficial && userRole !== "ADMIN") {
+            throw new Error(
+                "Apenas ADMINs podem criar treinos globais."
+            );
+        }
+
+        // Se for treino global, não precisa de idCalculo
+        if (is_oficial) {
+            return await treinoRepository.criar({
+                objetivo,
+                nivel,
+                is_oficial: true,
+                titulo: titulo || "Novo Treino Global",
+                descricao: descricao || null,
+                idCalculo: null,
+                idUsuario: null
+            });
+        }
+
+        // Se for treino pessoal, requer idCalculo
+        if (!idCalculo) {
+            throw new Error(
+                "idCalculo é obrigatório para treinos pessoais."
             );
         }
 
@@ -31,7 +59,11 @@ const treinoService = {
         return await treinoRepository.criar({
             idCalculo: String(idCalculo),
             objetivo,
-            nivel
+            nivel,
+            is_oficial: false,
+            titulo: titulo || "Novo Treino",
+            descricao: descricao || null,
+            idUsuario: String(idUsuario)
         });
     },
 
