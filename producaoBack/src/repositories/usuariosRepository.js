@@ -11,7 +11,16 @@ const usuariosRepository = {
         data_nascimento: usuario.data_nascimento,
         ativo: usuario.ativo,
         email_verificado: usuario.email_verificado,
-        role: usuario.role || "USER"
+        role: usuario.role || "USER",
+
+        perfil: {
+          create: {
+            fotoPerfil: null
+          }
+        }
+      },
+      include: {
+        perfil: true
       }
     });
 
@@ -29,7 +38,10 @@ const usuariosRepository = {
 
   buscarPorId: async (id) => {
     return await prisma.usuario.findUnique({
-      where: { id: String(id) }
+      where: { id: String(id) },
+      include: {
+        perfil: true
+      }
     });
   },
 
@@ -186,6 +198,24 @@ const usuariosRepository = {
       where: { id: String(id) },
       data: { role: roleValida }
     });
+  },
+  /**
+   * 
+   * @param {string} id id de usuario para realizar a atualização da foto de perfil
+   * @param {string} fotoPerfil Caminho ou URL da nova foto de perfil 
+   * @returns 
+   */
+  atualizarFotoPerfil: async (id, fotoPerfil) => {
+    return await prisma.usuario.update({
+      where: { id: String(id) },
+      data: {
+        perfil: {
+          update: {
+            fotoPerfil: fotoPerfil
+          }
+        }
+      }
+    })
   }
 };
 

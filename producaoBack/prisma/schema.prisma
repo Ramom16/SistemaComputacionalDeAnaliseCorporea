@@ -31,7 +31,7 @@ model Usuario {
   bloqueado_ate    DateTime? @db.Timestamp(0)
 
   dadosCorporais DadosCorporais?
-  usuariosPerfil UsuariosPerfil[]
+  perfil Perfil?
 
   emailTokens EmailVerificationToken[]
   resetTokens PasswordResetToken[]
@@ -48,28 +48,12 @@ model Usuario {
 
 model Perfil {
   idPerfil     String @id @default(uuid()) @db.VarChar(36)
-  nome     String @db.VarChar(100)
+  idUsuario String @unique @db.VarChar(36)
+  fotoPerfil  String? @db.VarChar(255)
 
-  usuariosPerfil UsuariosPerfil[]
+  usuario Usuario @realtion( fields: [idUsuario], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
   @@map("perfil")
-}
-
-
-// ============================================================
-// USUÁRIO ↔ PERFIL
-// ============================================================
-
-model UsuariosPerfil {
-  idUsuario String
-  idPerfil  String
-
-  usuario Usuario @relation(fields: [idUsuario], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  perfil  Perfil  @relation(fields: [idPerfil], references: [idPerfil], onDelete: Cascade, onUpdate: Cascade)
-
-  @@id([idUsuario, idPerfil])
-  @@index([idPerfil])
-  @@map("usuarios_perfil")
 }
 
 
