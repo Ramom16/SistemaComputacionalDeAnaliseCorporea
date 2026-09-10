@@ -181,3 +181,39 @@ describe("Modelo Usuario - método estático editar", () => {
     expect(u.email_verificado).toBe(true);
   });
 });
+
+describe("Modelo Usuario - getter e setter role", () => {
+  it("deve definir role padrão como USER", () => {
+    const u = criarUsuarioValido();
+    expect(u.role).toBe("USER");
+  });
+
+  it("deve permitir alterar role para ADMIN", () => {
+    const u = criarUsuarioValido();
+    u.role = "ADMIN";
+    expect(u.role).toBe("ADMIN");
+  });
+
+  it("deve aceitar role em minúsculas e normalizar para maiúsculas", () => {
+    const u = criarUsuarioValido();
+    u.role = "admin";
+    expect(u.role).toBe("ADMIN");
+  });
+
+  it("deve rejeitar role inválida", () => {
+    const u = criarUsuarioValido();
+    expect(() => { u.role = "SUPERUSER"; }).toThrow("Role inválida. Deve ser 'USER' ou 'ADMIN'");
+  });
+
+  it("deve aceitar role no factory Usuario.criar", () => {
+    const u = Usuario.criar({
+      nome: "Admin Teste",
+      email: "admin@teste.com",
+      senha_hash: HASH_VALIDO,
+      data_nascimento: "1992-05-10",
+      role: "ADMIN"
+    });
+    expect(u.role).toBe("ADMIN");
+  });
+});
+
