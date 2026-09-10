@@ -9,6 +9,7 @@ import {
   Alert,
   ActivityIndicator,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useAuth } from '../../context/AuthContext';
 import { calcularMetabolismo } from '../../services/api';
 
@@ -63,141 +64,143 @@ export default function AvaliacaoScreen({ navigation }) {
   ];
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
-      <Text style={styles.title}>CALCULADORA METABÓLICA</Text>
-      <Text style={styles.subtitle}>
-        Informe seus dados corporais para calcular IMC, TMB e NDC instantaneamente.
-      </Text>
+    <SafeAreaView style={{ flex: 1, backgroundColor: '#080808' }}>
+      <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
+        <Text style={styles.title}>CALCULADORA METABÓLICA</Text>
+        <Text style={styles.subtitle}>
+          Informe seus dados corporais para calcular IMC, TMB e NDC instantaneamente.
+        </Text>
 
-      {/* Formulário */}
-      <View style={styles.formSection}>
-        <View style={styles.row}>
-          <View style={[styles.inputGroup, { flex: 1 }]}>
-            <Text style={styles.label}>PESO (KG) *</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Ex: 75.5"
-              placeholderTextColor="#666666"
-              keyboardType="decimal-pad"
-              value={peso}
-              onChangeText={setPeso}
-            />
+        {/* Formulário */}
+        <View style={styles.formSection}>
+          <View style={styles.row}>
+            <View style={[styles.inputGroup, { flex: 1 }]}>
+              <Text style={styles.label}>PESO (KG) *</Text>
+              <TextInput
+                style={styles.input}
+                placeholder="Ex: 75.5"
+                placeholderTextColor="#666666"
+                keyboardType="decimal-pad"
+                value={peso}
+                onChangeText={setPeso}
+              />
+            </View>
+
+            <View style={[styles.inputGroup, { flex: 1 }]}>
+              <Text style={styles.label}>ALTURA (CM) *</Text>
+              <TextInput
+                style={styles.input}
+                placeholder="Ex: 175"
+                placeholderTextColor="#666666"
+                keyboardType="number-pad"
+                value={altura}
+                onChangeText={setAltura}
+              />
+            </View>
+
+            <View style={[styles.inputGroup, { flex: 0.8 }]}>
+              <Text style={styles.label}>IDADE *</Text>
+              <TextInput
+                style={styles.input}
+                placeholder="Ex: 25"
+                placeholderTextColor="#666666"
+                keyboardType="number-pad"
+                value={idade}
+                onChangeText={setIdade}
+              />
+            </View>
           </View>
 
-          <View style={[styles.inputGroup, { flex: 1 }]}>
-            <Text style={styles.label}>ALTURA (CM) *</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Ex: 175"
-              placeholderTextColor="#666666"
-              keyboardType="number-pad"
-              value={altura}
-              onChangeText={setAltura}
-            />
-          </View>
-
-          <View style={[styles.inputGroup, { flex: 0.8 }]}>
-            <Text style={styles.label}>IDADE *</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Ex: 25"
-              placeholderTextColor="#666666"
-              keyboardType="number-pad"
-              value={idade}
-              onChangeText={setIdade}
-            />
-          </View>
-        </View>
-
-        {/* Seletor Gênero */}
-        <View style={styles.inputGroup}>
-          <Text style={styles.label}>GÊNERO</Text>
-          <View style={styles.genderRow}>
-            <Pressable
-              style={[styles.genderBtn, genero === 'masculino' && styles.genderBtnActive]}
-              onPress={() => setGenero('masculino')}
-            >
-              <Text style={[styles.genderBtnText, genero === 'masculino' && styles.genderBtnTextActive]}>
-                ♂ Masculino
-              </Text>
-            </Pressable>
-
-            <Pressable
-              style={[styles.genderBtn, genero === 'feminino' && styles.genderBtnActive]}
-              onPress={() => setGenero('feminino')}
-            >
-              <Text style={[styles.genderBtnText, genero === 'feminino' && styles.genderBtnTextActive]}>
-                ♀ Feminino
-              </Text>
-            </Pressable>
-          </View>
-        </View>
-
-        {/* Nível de Atividade */}
-        <View style={styles.inputGroup}>
-          <Text style={styles.label}>NÍVEL DE ATIVIDADE FÍSICA</Text>
-          {niveis.map((item) => (
-            <Pressable
-              key={item.key}
-              style={[styles.levelOption, nivelAtividade === item.key && styles.levelOptionActive]}
-              onPress={() => setNivelAtividade(item.key)}
-            >
-              <View style={styles.levelRadio}>
-                {nivelAtividade === item.key && <View style={styles.levelRadioInner} />}
-              </View>
-              <View style={{ flex: 1 }}>
-                <Text style={[styles.levelTitle, nivelAtividade === item.key && styles.levelTitleActive]}>
-                  {item.label}
+          {/* Seletor Gênero */}
+          <View style={styles.inputGroup}>
+            <Text style={styles.label}>GÊNERO</Text>
+            <View style={styles.genderRow}>
+              <Pressable
+                style={[styles.genderBtn, genero === 'masculino' && styles.genderBtnActive]}
+                onPress={() => setGenero('masculino')}
+              >
+                <Text style={[styles.genderBtnText, genero === 'masculino' && styles.genderBtnTextActive]}>
+                  ♂ Masculino
                 </Text>
-                <Text style={styles.levelSub}>{item.sub}</Text>
-              </View>
-            </Pressable>
-          ))}
-        </View>
-      </View>
+              </Pressable>
 
-      {/* Card de Pré-visualização do Resultado */}
-      {resultado && (
-        <View style={styles.resultCard}>
-          <Text style={styles.resultCardTitle}>RESULTADO CALCULADO</Text>
-
-          <View style={styles.resultGrid}>
-            <View style={styles.resultBox}>
-              <Text style={styles.resultBoxLabel}>IMC (Índice Corporamente)</Text>
-              <Text style={styles.resultBoxValue}>{resultado.imc}</Text>
-              <View style={styles.badgeClassificacao}>
-                <Text style={styles.badgeClassificacaoText}>{resultado.classificacaoImc}</Text>
-              </View>
-            </View>
-
-            <View style={styles.resultBox}>
-              <Text style={styles.resultBoxLabel}>TMB (Taxa Metabólica Basal)</Text>
-              <Text style={styles.resultBoxValue}>{resultado.tmb} <Text style={styles.unit}>kcal</Text></Text>
-              <Text style={styles.resultBoxSub}>Energia em repouso absoluto</Text>
-            </View>
-
-            <View style={styles.resultBox}>
-              <Text style={styles.resultBoxLabel}>NDC (Gasto Diário Total)</Text>
-              <Text style={styles.resultBoxValue}>{resultado.ndc} <Text style={styles.unit}>kcal</Text></Text>
-              <Text style={styles.resultBoxSub}>Calorias p/ manter peso</Text>
+              <Pressable
+                style={[styles.genderBtn, genero === 'feminino' && styles.genderBtnActive]}
+                onPress={() => setGenero('feminino')}
+              >
+                <Text style={[styles.genderBtnText, genero === 'feminino' && styles.genderBtnTextActive]}>
+                  ♀ Feminino
+                </Text>
+              </Pressable>
             </View>
           </View>
-        </View>
-      )}
 
-      {/* Botão Salvar */}
-      <Pressable
-        style={[styles.saveButton, loading && { opacity: 0.7 }]}
-        onPress={handleSalvar}
-        disabled={loading}
-      >
-        {loading ? (
-          <ActivityIndicator color="#000000" />
-        ) : (
-          <Text style={styles.saveButtonText}>SALVAR AVALIAÇÃO NO HISTÓRICO</Text>
+          {/* Nível de Atividade */}
+          <View style={styles.inputGroup}>
+            <Text style={styles.label}>NÍVEL DE ATIVIDADE FÍSICA</Text>
+            {niveis.map((item) => (
+              <Pressable
+                key={item.key}
+                style={[styles.levelOption, nivelAtividade === item.key && styles.levelOptionActive]}
+                onPress={() => setNivelAtividade(item.key)}
+              >
+                <View style={styles.levelRadio}>
+                  {nivelAtividade === item.key && <View style={styles.levelRadioInner} />}
+                </View>
+                <View style={{ flex: 1 }}>
+                  <Text style={[styles.levelTitle, nivelAtividade === item.key && styles.levelTitleActive]}>
+                    {item.label}
+                  </Text>
+                  <Text style={styles.levelSub}>{item.sub}</Text>
+                </View>
+              </Pressable>
+            ))}
+          </View>
+        </View>
+
+        {/* Card de Pré-visualização do Resultado */}
+        {resultado && (
+          <View style={styles.resultCard}>
+            <Text style={styles.resultCardTitle}>RESULTADO CALCULADO</Text>
+
+            <View style={styles.resultGrid}>
+              <View style={styles.resultBox}>
+                <Text style={styles.resultBoxLabel}>IMC (Índice Corporamente)</Text>
+                <Text style={styles.resultBoxValue}>{resultado.imc}</Text>
+                <View style={styles.badgeClassificacao}>
+                  <Text style={styles.badgeClassificacaoText}>{resultado.classificacaoImc}</Text>
+                </View>
+              </View>
+
+              <View style={styles.resultBox}>
+                <Text style={styles.resultBoxLabel}>TMB (Taxa Metabólica Basal)</Text>
+                <Text style={styles.resultBoxValue}>{resultado.tmb} <Text style={styles.unit}>kcal</Text></Text>
+                <Text style={styles.resultBoxSub}>Energia em repouso absoluto</Text>
+              </View>
+
+              <View style={styles.resultBox}>
+                <Text style={styles.resultBoxLabel}>NDC (Gasto Diário Total)</Text>
+                <Text style={styles.resultBoxValue}>{resultado.ndc} <Text style={styles.unit}>kcal</Text></Text>
+                <Text style={styles.resultBoxSub}>Calorias p/ manter peso</Text>
+              </View>
+            </View>
+          </View>
         )}
-      </Pressable>
-    </ScrollView>
+
+        {/* Botão Salvar */}
+        <Pressable
+          style={[styles.saveButton, loading && { opacity: 0.7 }]}
+          onPress={handleSalvar}
+          disabled={loading}
+        >
+          {loading ? (
+            <ActivityIndicator color="#000000" />
+          ) : (
+            <Text style={styles.saveButtonText}>SALVAR AVALIAÇÃO NO HISTÓRICO</Text>
+          )}
+        </Pressable>
+      </ScrollView>
+    </SafeAreaView>
   );
 }
 
@@ -208,7 +211,7 @@ const styles = StyleSheet.create({
   },
   contentContainer: {
     paddingHorizontal: 20,
-    paddingTop: 55,
+    paddingTop: 20,
     paddingBottom: 40,
   },
   title: {

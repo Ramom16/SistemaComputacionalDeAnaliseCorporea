@@ -4,9 +4,9 @@ import {
   View,
   Text,
   Pressable,
-  SafeAreaView,
   Platform,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 import HomeScreen from '../screens/Home/HomeScreen';
 import AvaliacaoScreen from '../screens/Avaliacao/AvaliacaoScreen';
@@ -57,8 +57,8 @@ export default function TabNavigator() {
       {/* Área da Tela Ativa */}
       <View style={styles.screenContainer}>{renderScreen()}</View>
 
-      {/* Barra de Navegação Inferior (Bottom Bar) */}
-      <SafeAreaView style={styles.bottomBarSafeArea}>
+      {/* Barra de Navegação Inferior configurada apenas para a borda inferior */}
+      <SafeAreaView edges={['bottom']} style={styles.bottomBarSafeArea}>
         <View style={styles.bottomBar}>
           {tabs.map((tab) => {
             const isActive = activeTab === tab.key;

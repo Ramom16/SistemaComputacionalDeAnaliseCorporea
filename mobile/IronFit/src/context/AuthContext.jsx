@@ -7,21 +7,15 @@ export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [token, setToken] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [dadosCorporais, setDadosCorporais] = useState([
-    {
-      idDados: 1,
-      peso_kg: 78.5,
-      altura_cm: 175,
-      genero: 'masculino',
-      idade: 28,
-      nivel_atividade: 'moderado',
-      imc: 25.63,
-      classificacaoImc: 'Sobrepeso',
-      tmb: 1752,
-      ndc: 2715,
-      data_registro: new Date().toISOString(),
-    },
-  ]);
+  const [dadosCorporais, setDadosCorporais] = useState([]); // Iniciado vazio para receber do banco
+
+  // Permite atualizar os dados do perfil globalmente
+  function updateUser(newUserData) {
+    setUser((prevUser) => ({
+      ...prevUser,
+      ...newUserData,
+    }));
+  }
 
   async function login(email, senha) {
     setLoading(true);
@@ -45,7 +39,6 @@ export function AuthProvider({ children }) {
     try {
       const response = await api.register(dados);
       if (response) {
-        // Auto-login ou login mock com os dados fornecidos
         const newUser = {
           id: Date.now(),
           nome: dados.nome,
@@ -68,6 +61,7 @@ export function AuthProvider({ children }) {
   function logout() {
     setUser(null);
     setToken(null);
+    setDadosCorporais([]);
   }
 
   async function adicionarAvaliacao(novaAvaliacao) {
@@ -113,6 +107,7 @@ export function AuthProvider({ children }) {
         login,
         register,
         logout,
+        updateUser,
         adicionarAvaliacao,
       }}
     >

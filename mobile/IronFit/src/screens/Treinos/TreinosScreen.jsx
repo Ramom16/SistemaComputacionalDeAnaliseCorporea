@@ -7,6 +7,7 @@ import {
   Pressable,
   ActivityIndicator,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { api } from '../../services/api';
 
 export default function TreinosScreen() {
@@ -30,101 +31,109 @@ export default function TreinosScreen() {
 
   if (loading) {
     return (
-      <View style={[styles.container, styles.center]}>
-        <ActivityIndicator size="large" color="#FFD400" />
-        <Text style={styles.loadingText}>Carregando fichas de treino...</Text>
-      </View>
+      <SafeAreaView style={styles.safeArea}>
+        <View style={[styles.container, styles.center]}>
+          <ActivityIndicator size="large" color="#FFD400" />
+          <Text style={styles.loadingText}>Carregando fichas de treino...</Text>
+        </View>
+      </SafeAreaView>
     );
   }
 
   const treinoAtual = treinos[treinoAtivoIndex] || treinos[0];
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
-      <Text style={styles.title}>FICHA DE TREINOS</Text>
-      <Text style={styles.subtitle}>
-        Selecione uma divisão para visualizar a lista completa de exercícios e prescrições.
-      </Text>
+    <SafeAreaView style={styles.safeArea}>
+      <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
+        <Text style={styles.title}>FICHA DE TREINOS</Text>
+        <Text style={styles.subtitle}>
+          Selecione uma divisão para visualizar a lista completa de exercícios e prescrições.
+        </Text>
 
-      {/* Tabs de Divisão (Treino A, B, C) */}
-      <View style={styles.tabRow}>
-        {treinos.map((t, idx) => (
-          <Pressable
-            key={t.idTreino || idx}
-            style={[styles.tabItem, idx === treinoAtivoIndex && styles.tabItemActive]}
-            onPress={() => setTreinoAtivoIndex(idx)}
-          >
-            <Text style={[styles.tabItemText, idx === treinoAtivoIndex && styles.tabItemTextActive]}>
-              {`TREINO ${String.fromCharCode(65 + idx)}`}
-            </Text>
-          </Pressable>
-        ))}
-      </View>
-
-      {/* Header do Treino Selecionado */}
-      {treinoAtual && (
-        <View style={styles.workoutHeader}>
-          <View style={styles.workoutHeaderTop}>
-            <Text style={styles.workoutName}>{treinoAtual.nome}</Text>
-            <View style={styles.nivelBadge}>
-              <Text style={styles.nivelBadgeText}>{treinoAtual.nivel}</Text>
-            </View>
-          </View>
-
-          <Text style={styles.workoutSub}>
-            Objetivo: <Text style={{ color: '#FFD400', fontWeight: '800' }}>{treinoAtual.foco}</Text> • {treinoAtual.exercicios?.length || 0} Exercícios
-          </Text>
+        {/* Tabs de Divisão (Treino A, B, C) */}
+        <View style={styles.tabRow}>
+          {treinos.map((t, idx) => (
+            <Pressable
+              key={t.idTreino || idx}
+              style={[styles.tabItem, idx === treinoAtivoIndex && styles.tabItemActive]}
+              onPress={() => setTreinoAtivoIndex(idx)}
+            >
+              <Text style={[styles.tabItemText, idx === treinoAtivoIndex && styles.tabItemTextActive]}>
+                {`TREINO ${String.fromCharCode(65 + idx)}`}
+              </Text>
+            </Pressable>
+          ))}
         </View>
-      )}
 
-      {/* Lista de Exercícios */}
-      <View style={styles.exerciseList}>
-        {treinoAtual?.exercicios?.map((ex, idx) => (
-          <View key={ex.idExercicio || idx} style={styles.exerciseCard}>
-            <View style={styles.exerciseNumberContainer}>
-              <Text style={styles.exerciseNumber}>{String(idx + 1).padStart(2, '0')}</Text>
+        {/* Header do Treino Selecionado */}
+        {treinoAtual && (
+          <View style={styles.workoutHeader}>
+            <View style={styles.workoutHeaderTop}>
+              <Text style={styles.workoutName}>{treinoAtual.nome}</Text>
+              <View style={styles.nivelBadge}>
+                <Text style={styles.nivelBadgeText}>{treinoAtual.nivel}</Text>
+              </View>
             </View>
 
-            <View style={styles.exerciseInfo}>
-              <Text style={styles.exerciseGroup}>{ex.grupo?.toUpperCase()}</Text>
-              <Text style={styles.exerciseName}>{ex.nome}</Text>
+            <Text style={styles.workoutSub}>
+              Objetivo: <Text style={{ color: '#FFD400', fontWeight: '800' }}>{treinoAtual.foco}</Text> • {treinoAtual.exercicios?.length || 0} Exercícios
+            </Text>
+          </View>
+        )}
 
-              <View style={styles.exerciseMetricsRow}>
-                <View style={styles.exMetric}>
-                  <Text style={styles.exMetricVal}>{ex.series}</Text>
-                  <Text style={styles.exMetricLab}>Séries</Text>
-                </View>
+        {/* Lista de Exercícios */}
+        <View style={styles.exerciseList}>
+          {treinoAtual?.exercicios?.map((ex, idx) => (
+            <View key={ex.idExercicio || idx} style={styles.exerciseCard}>
+              <View style={styles.exerciseNumberContainer}>
+                <Text style={styles.exerciseNumber}>{String(idx + 1).padStart(2, '0')}</Text>
+              </View>
 
-                <View style={styles.exMetricDot} />
+              <View style={styles.exerciseInfo}>
+                <Text style={styles.exerciseGroup}>{ex.grupo?.toUpperCase()}</Text>
+                <Text style={styles.exerciseName}>{ex.nome}</Text>
 
-                <View style={styles.exMetric}>
-                  <Text style={styles.exMetricVal}>{ex.repeticoes}</Text>
-                  <Text style={styles.exMetricLab}>Reps</Text>
-                </View>
+                <View style={styles.exerciseMetricsRow}>
+                  <View style={styles.exMetric}>
+                    <Text style={styles.exMetricVal}>{ex.series}</Text>
+                    <Text style={styles.exMetricLab}>Séries</Text>
+                  </View>
 
-                <View style={styles.exMetricDot} />
+                  <View style={styles.exMetricDot} />
 
-                <View style={styles.exMetric}>
-                  <Text style={styles.exMetricVal}>{ex.descanso}</Text>
-                  <Text style={styles.exMetricLab}>Descanso</Text>
+                  <View style={styles.exMetric}>
+                    <Text style={styles.exMetricVal}>{ex.repeticoes}</Text>
+                    <Text style={styles.exMetricLab}>Reps</Text>
+                  </View>
+
+                  <View style={styles.exMetricDot} />
+
+                  <View style={styles.exMetric}>
+                    <Text style={styles.exMetricVal}>{ex.descanso}</Text>
+                    <Text style={styles.exMetricLab}>Descanso</Text>
+                  </View>
                 </View>
               </View>
             </View>
-          </View>
-        ))}
-      </View>
-    </ScrollView>
+          ))}
+        </View>
+      </ScrollView>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: '#080808',
+  },
   container: {
     flex: 1,
     backgroundColor: '#080808',
   },
   contentContainer: {
     paddingHorizontal: 20,
-    paddingTop: 55,
+    paddingTop: 10,
     paddingBottom: 40,
   },
   center: {

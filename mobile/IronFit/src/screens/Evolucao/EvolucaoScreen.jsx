@@ -1,111 +1,156 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   StyleSheet,
   Text,
   View,
   ScrollView,
+  ActivityIndicator,
+  Alert,
 } from 'react-native';
-import { useAuth } from '../../context/AuthContext';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { api } from '../../services/api';
 
 export default function EvolucaoScreen() {
-  const { dadosCorporais } = useAuth();
+  const [registros, setRegistros] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const registros = dadosCorporais || [];
+  useEffect(() => {
+    carregarHistorico();
+  }, []);
+
+  async function carregarHistorico() {
+    try {
+      setLoading(true);
+      // Chamada real ao endpoint da API/Banco de Dados
+      const data = await api.get('/evolucao'); 
+      setRegistros(data || []);
+    } catch (error) {
+      console.log('Erro ao carregar histórico:', error);
+      Alert.alert('Erro', 'Não foi possível carregar o histórico de avaliações.');
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  if (loading) {
+    return (
+      <SafeAreaView style={styles.safeArea}>
+        <View style={[styles.container, styles.center]}>
+          <ActivityIndicator size="large" color="#FFD400" />
+          <Text style={styles.loadingText}>Carregando histórico corporal...</Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
-      <Text style={styles.title}>EVOLUÇÃO E HISTÓRICO</Text>
-      <Text style={styles.subtitle}>
-        Acompanhe sua trajetória física e histórico de avaliações corporais salvas.
-      </Text>
+    <SafeAreaView style={styles.safeArea}>
+      <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
+        <Text style={styles.title}>EVOLUÇÃO E HISTÓRICO</Text>
+        <Text style={styles.subtitle}>
+          Acompanhe sua trajetória física e histórico de avaliações corporais salvas.
+        </Text>
 
-      {/* Resumo de Progresso */}
-      <View style={styles.summaryCard}>
-        <Text style={styles.summaryTitle}>RESUMO GERAL</Text>
-        <View style={styles.summaryRow}>
-          <View style={styles.summaryStat}>
-            <Text style={styles.statLabel}>AVALIAÇÕES</Text>
-            <Text style={styles.statVal}>{registros.length}</Text>
-          </View>
-
-          <View style={styles.statDivider} />
-
-          <View style={styles.summaryStat}>
-            <Text style={styles.statLabel}>PESO ATUAL</Text>
-            <Text style={styles.statVal}>{registros[0]?.peso_kg || '--'} kg</Text>
-          </View>
-
-          <View style={styles.statDivider} />
-
-          <View style={styles.summaryStat}>
-            <Text style={styles.statLabel}>ÚLTIMO IMC</Text>
-            <Text style={styles.statVal}>{registros[0]?.imc || '--'}</Text>
-          </View>
-        </View>
-      </View>
-
-      <Text style={styles.sectionTitle}>HISTÓRICO REGISTRADO</Text>
-
-      {registros.length === 0 ? (
-        <View style={styles.emptyCard}>
-          <Text style={styles.emptyText}>Nenhuma avaliação registrada até o momento.</Text>
-        </View>
-      ) : (
-        <View style={styles.historyList}>
-          {registros.map((item, idx) => (
-            <View key={item.idDados || idx} style={styles.historyCard}>
-              <View style={styles.historyHeader}>
-                <View style={styles.dateBadge}>
-                  <Text style={styles.dateText}>
-                    📅 {new Date(item.data_registro).toLocaleDateString('pt-BR')}
-                  </Text>
-                </View>
-                <Text style={styles.badgeIndex}>#{registros.length - idx}</Text>
-              </View>
-
-              <View style={styles.historyMetrics}>
-                <View style={styles.hMetric}>
-                  <Text style={styles.hLabel}>Peso</Text>
-                  <Text style={styles.hVal}>{item.peso_kg} kg</Text>
-                </View>
-
-                <View style={styles.hMetric}>
-                  <Text style={styles.hLabel}>Altura</Text>
-                  <Text style={styles.hVal}>{item.altura_cm} cm</Text>
-                </View>
-
-                <View style={styles.hMetric}>
-                  <Text style={styles.hLabel}>IMC</Text>
-                  <Text style={styles.hVal}>{item.imc}</Text>
-                </View>
-
-                <View style={styles.hMetric}>
-                  <Text style={styles.hLabel}>TMB</Text>
-                  <Text style={styles.hVal}>{item.tmb} kcal</Text>
-                </View>
-
-                <View style={styles.hMetric}>
-                  <Text style={styles.hLabel}>NDC</Text>
-                  <Text style={styles.hVal}>{item.ndc} kcal</Text>
-                </View>
-              </View>
+        {/* Resumo de Progresso */}
+        <View style={styles.summaryCard}>
+          <Text style={styles.summaryTitle}>RESUMO GERAL</Text>
+          <View style={styles.summaryRow}>
+            <View style={styles.summaryStat}>
+              <Text style={styles.statLabel}>AVALIAÇÕES</Text>
+              <Text style={styles.statVal}>{registros.length}</Text>
             </View>
-          ))}
+
+            <View style={styles.statDivider} />
+
+            <View style={styles.summaryStat}>
+              <Text style={styles.statLabel}>PESO ATUAL</Text>
+              <Text style={styles.statVal}>{registros[0]?.peso_kg || '--'} kg</Text>
+            </View>
+
+            <View style={styles.statDivider} />
+
+            <View style={styles.summaryStat}>
+              <Text style={styles.statLabel}>ÚLTIMO IMC</Text>
+              <Text style={styles.statVal}>{registros[0]?.imc || '--'}</Text>
+            </View>
+          </View>
         </View>
-      )}
-    </ScrollView>
+
+        <Text style={styles.sectionTitle}>HISTÓRICO REGISTRADO</Text>
+
+        {registros.length === 0 ? (
+          <View style={styles.emptyCard}>
+            <Text style={styles.emptyText}>Nenhuma avaliação registrada até o momento.</Text>
+          </View>
+        ) : (
+          <View style={styles.historyList}>
+            {registros.map((item, idx) => (
+              <View key={item.idDados || idx} style={styles.historyCard}>
+                <View style={styles.historyHeader}>
+                  <View style={styles.dateBadge}>
+                    <Text style={styles.dateText}>
+                      📅 {new Date(item.data_registro).toLocaleDateString('pt-BR')}
+                    </Text>
+                  </View>
+                  <Text style={styles.badgeIndex}>#{registros.length - idx}</Text>
+                </View>
+
+                <View style={styles.historyMetrics}>
+                  <View style={styles.hMetric}>
+                    <Text style={styles.hLabel}>Peso</Text>
+                    <Text style={styles.hVal}>{item.peso_kg} kg</Text>
+                  </View>
+
+                  <View style={styles.hMetric}>
+                    <Text style={styles.hLabel}>Altura</Text>
+                    <Text style={styles.hVal}>{item.altura_cm} cm</Text>
+                  </View>
+
+                  <View style={styles.hMetric}>
+                    <Text style={styles.hLabel}>IMC</Text>
+                    <Text style={styles.hVal}>{item.imc}</Text>
+                  </View>
+
+                  <View style={styles.hMetric}>
+                    <Text style={styles.hLabel}>TMB</Text>
+                    <Text style={styles.hVal}>{item.tmb} kcal</Text>
+                  </View>
+
+                  <View style={styles.hMetric}>
+                    <Text style={styles.hLabel}>NDC</Text>
+                    <Text style={styles.hVal}>{item.ndc} kcal</Text>
+                  </View>
+                </View>
+              </View>
+            ))}
+          </View>
+        )}
+      </ScrollView>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: '#080808',
+  },
   container: {
     flex: 1,
     backgroundColor: '#080808',
   },
   contentContainer: {
     paddingHorizontal: 20,
-    paddingTop: 55,
+    paddingTop: 20,
     paddingBottom: 40,
+  },
+  center: {
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  loadingText: {
+    color: '#A5A5A5',
+    marginTop: 12,
   },
   title: {
     color: '#FFFFFF',

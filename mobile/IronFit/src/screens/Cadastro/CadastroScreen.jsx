@@ -2,14 +2,15 @@ import React, { useState } from 'react';
 import {
   StyleSheet,
   Text,
-  View,
   TextInput,
   Pressable,
   ActivityIndicator,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
+  View,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useAuth } from '../../context/AuthContext';
 
 export default function CadastroScreen({ navigation }) {
@@ -56,153 +57,155 @@ export default function CadastroScreen({ navigation }) {
   }
 
   return (
-    <KeyboardAvoidingView
-      style={{ flex: 1 }}
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-    >
-      <ScrollView
-        contentContainerStyle={styles.scrollContainer}
-        keyboardShouldPersistTaps="handled"
+    <SafeAreaView style={{ flex: 1, backgroundColor: '#080808' }}>
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       >
-        <View style={styles.container}>
-          {/* Header */}
-          <View style={styles.header}>
-            <Pressable style={styles.backButton} onPress={() => navigation.goBack()}>
-              <Text style={styles.backButtonText}>← Voltar</Text>
-            </Pressable>
+        <ScrollView
+          contentContainerStyle={styles.scrollContainer}
+          keyboardShouldPersistTaps="handled"
+        >
+          <View style={styles.container}>
+            {/* Header */}
+            <View style={styles.header}>
+              <Pressable style={styles.backButton} onPress={() => navigation.goBack()}>
+                <Text style={styles.backButtonText}>← Voltar</Text>
+              </Pressable>
 
-            <Text style={styles.logo}>
-              IRON<Text style={styles.logoYellow}>FIT</Text>
-            </Text>
-          </View>
+              <Text style={styles.logo}>
+                IRON<Text style={styles.logoYellow}>FIT</Text>
+              </Text>
+            </View>
 
-          {/* Form */}
-          <View style={styles.content}>
-            <Text style={styles.title}>CRIE SUA CONTA</Text>
-            <Text style={styles.subtitle}>
-              Preencha os dados abaixo para iniciar seu acompanhamento corporamento.
-            </Text>
+            {/* Form */}
+            <View style={styles.content}>
+              <Text style={styles.title}>CRIE SUA CONTA</Text>
+              <Text style={styles.subtitle}>
+                Preencha os dados abaixo para iniciar seu acompanhamento corporal.
+              </Text>
 
-            {erro ? (
-              <View style={styles.errorBox}>
-                <Text style={styles.errorText}>{erro}</Text>
+              {erro ? (
+                <View style={styles.errorBox}>
+                  <Text style={styles.errorText}>{erro}</Text>
+                </View>
+              ) : null}
+
+              {/* Nome Completo */}
+              <View style={styles.inputGroup}>
+                <Text style={styles.label}>NOME COMPLETO *</Text>
+                <TextInput
+                  style={styles.input}
+                  placeholder="Seu nome completo"
+                  placeholderTextColor="#666666"
+                  value={nome}
+                  onChangeText={(txt) => { setNome(txt); setErro(''); }}
+                />
               </View>
-            ) : null}
 
-            {/* Nome Completo */}
-            <View style={styles.inputGroup}>
-              <Text style={styles.label}>NOME COMPLETO *</Text>
-              <TextInput
-                style={styles.input}
-                placeholder="Seu nome completo"
-                placeholderTextColor="#666666"
-                value={nome}
-                onChangeText={(txt) => { setNome(txt); setErro(''); }}
-              />
-            </View>
-
-            {/* Email */}
-            <View style={styles.inputGroup}>
-              <Text style={styles.label}>E-MAIL *</Text>
-              <TextInput
-                style={styles.input}
-                placeholder="seu.email@exemplo.com"
-                placeholderTextColor="#666666"
-                value={email}
-                onChangeText={(txt) => { setEmail(txt); setErro(''); }}
-                keyboardType="email-address"
-                autoCapitalize="none"
-                autoCorrect={false}
-              />
-            </View>
-
-            {/* Data de Nascimento */}
-            <View style={styles.inputGroup}>
-              <Text style={styles.label}>DATA DE NASCIMENTO (DD/MM/AAAA)</Text>
-              <TextInput
-                style={styles.input}
-                placeholder="15/05/1998"
-                placeholderTextColor="#666666"
-                value={dataNascimento}
-                onChangeText={setDataNascimento}
-                keyboardType="numeric"
-              />
-            </View>
-
-            {/* Gênero */}
-            <View style={styles.inputGroup}>
-              <Text style={styles.label}>GÊNERO</Text>
-              <View style={styles.genderContainer}>
-                <Pressable
-                  style={[styles.genderOption, genero === 'masculino' && styles.genderActive]}
-                  onPress={() => setGenero('masculino')}
-                >
-                  <Text style={[styles.genderText, genero === 'masculino' && styles.genderActiveText]}>
-                    Masculino
-                  </Text>
-                </Pressable>
-
-                <Pressable
-                  style={[styles.genderOption, genero === 'feminino' && styles.genderActive]}
-                  onPress={() => setGenero('feminino')}
-                >
-                  <Text style={[styles.genderText, genero === 'feminino' && styles.genderActiveText]}>
-                    Feminino
-                  </Text>
-                </Pressable>
+              {/* Email */}
+              <View style={styles.inputGroup}>
+                <Text style={styles.label}>E-MAIL *</Text>
+                <TextInput
+                  style={styles.input}
+                  placeholder="seu.email@exemplo.com"
+                  placeholderTextColor="#666666"
+                  value={email}
+                  onChangeText={(txt) => { setEmail(txt); setErro(''); }}
+                  keyboardType="email-address"
+                  autoCapitalize="none"
+                  autoCorrect={false}
+                />
               </View>
+
+              {/* Data de Nascimento */}
+              <View style={styles.inputGroup}>
+                <Text style={styles.label}>DATA DE NASCIMENTO (DD/MM/AAAA)</Text>
+                <TextInput
+                  style={styles.input}
+                  placeholder="15/05/1998"
+                  placeholderTextColor="#666666"
+                  value={dataNascimento}
+                  onChangeText={setDataNascimento}
+                  keyboardType="numeric"
+                />
+              </View>
+
+              {/* Gênero */}
+              <View style={styles.inputGroup}>
+                <Text style={styles.label}>GÊNERO</Text>
+                <View style={styles.genderContainer}>
+                  <Pressable
+                    style={[styles.genderOption, genero === 'masculino' && styles.genderActive]}
+                    onPress={() => setGenero('masculino')}
+                  >
+                    <Text style={[styles.genderText, genero === 'masculino' && styles.genderActiveText]}>
+                      Masculino
+                    </Text>
+                  </Pressable>
+
+                  <Pressable
+                    style={[styles.genderOption, genero === 'feminino' && styles.genderActive]}
+                    onPress={() => setGenero('feminino')}
+                  >
+                    <Text style={[styles.genderText, genero === 'feminino' && styles.genderActiveText]}>
+                      Feminino
+                    </Text>
+                  </Pressable>
+                </View>
+              </View>
+
+              {/* Senha */}
+              <View style={styles.inputGroup}>
+                <Text style={styles.label}>SENHA *</Text>
+                <TextInput
+                  style={styles.input}
+                  placeholder="•••••••• (mínimo 6 caracteres)"
+                  placeholderTextColor="#666666"
+                  value={senha}
+                  onChangeText={(txt) => { setSenha(txt); setErro(''); }}
+                  secureTextEntry
+                />
+              </View>
+
+              {/* Confirmar Senha */}
+              <View style={styles.inputGroup}>
+                <Text style={styles.label}>CONFIRMAR SENHA *</Text>
+                <TextInput
+                  style={styles.input}
+                  placeholder="••••••••"
+                  placeholderTextColor="#666666"
+                  value={confirmarSenha}
+                  onChangeText={(txt) => { setConfirmarSenha(txt); setErro(''); }}
+                  secureTextEntry
+                />
+              </View>
+
+              {/* Botão Finalizar */}
+              <Pressable
+                style={[styles.primaryButton, loading && styles.disabledButton]}
+                onPress={handleCadastro}
+                disabled={loading}
+              >
+                {loading ? (
+                  <ActivityIndicator color="#000000" />
+                ) : (
+                  <Text style={styles.primaryButtonText}>CRIAR MINHA CONTA</Text>
+                )}
+              </Pressable>
             </View>
 
-            {/* Senha */}
-            <View style={styles.inputGroup}>
-              <Text style={styles.label}>SENHA *</Text>
-              <TextInput
-                style={styles.input}
-                placeholder="•••••••• (mínimo 6 caracteres)"
-                placeholderTextColor="#666666"
-                value={senha}
-                onChangeText={(txt) => { setSenha(txt); setErro(''); }}
-                secureTextEntry
-              />
+            {/* Footer */}
+            <View style={styles.footer}>
+              <Text style={styles.footerText}>Já possui uma conta? </Text>
+              <Pressable onPress={() => navigation.navigate('Login')}>
+                <Text style={styles.loginLinkText}>Fazer Login</Text>
+              </Pressable>
             </View>
-
-            {/* Confirmar Senha */}
-            <View style={styles.inputGroup}>
-              <Text style={styles.label}>CONFIRMAR SENHA *</Text>
-              <TextInput
-                style={styles.input}
-                placeholder="••••••••"
-                placeholderTextColor="#666666"
-                value={confirmarSenha}
-                onChangeText={(txt) => { setConfirmarSenha(txt); setErro(''); }}
-                secureTextEntry
-              />
-            </View>
-
-            {/* Botão Finalizar */}
-            <Pressable
-              style={[styles.primaryButton, loading && styles.disabledButton]}
-              onPress={handleCadastro}
-              disabled={loading}
-            >
-              {loading ? (
-                <ActivityIndicator color="#000000" />
-              ) : (
-                <Text style={styles.primaryButtonText}>CRIAR MINHA CONTA</Text>
-              )}
-            </Pressable>
           </View>
-
-          {/* Footer */}
-          <View style={styles.footer}>
-            <Text style={styles.footerText}>Já possui uma conta? </Text>
-            <Pressable onPress={() => navigation.navigate('Login')}>
-              <Text style={styles.loginLinkText}>Fazer Login</Text>
-            </Pressable>
-          </View>
-        </View>
-      </ScrollView>
-    </KeyboardAvoidingView>
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 }
 
@@ -214,9 +217,9 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     paddingHorizontal: 28,
-    paddingTop: 50,
+    paddingTop: 20,
     paddingBottom: 40,
-    justifyContent: 'space-between',
+    justify: 'space-between',
   },
   header: {
     flexDirection: 'row',

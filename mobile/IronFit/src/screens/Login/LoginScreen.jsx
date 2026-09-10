@@ -11,6 +11,7 @@ import {
   ScrollView,
   Alert,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useAuth } from '../../context/AuthContext';
 
 export default function LoginScreen({ navigation }) {
@@ -30,9 +31,7 @@ export default function LoginScreen({ navigation }) {
     setErro('');
     const res = await login(email.trim(), senha);
 
-    if (res.success) {
-      // Login realizado com sucesso. A navegação será atualizada via AuthContext
-    } else {
+    if (!res.success) {
       setErro(res.error || 'Credenciais inválidas. Tente novamente.');
     }
   }
@@ -45,118 +44,140 @@ export default function LoginScreen({ navigation }) {
   }
 
   return (
-    <KeyboardAvoidingView
-      style={{ flex: 1 }}
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-    >
-      <ScrollView
-        contentContainerStyle={styles.scrollContainer}
-        keyboardShouldPersistTaps="handled"
+    <SafeAreaView style={styles.safeArea}>
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       >
-        <View style={styles.container}>
-          {/* Header */}
-          <View style={styles.header}>
-            <Pressable style={styles.backButton} onPress={() => navigation.goBack()}>
-              <Text style={styles.backButtonText}>← Voltar</Text>
-            </Pressable>
-            
-            <Text style={styles.logo}>
-              IRON<Text style={styles.logoYellow}>FIT</Text>
-            </Text>
-          </View>
+        <ScrollView
+          contentContainerStyle={styles.scrollContainer}
+          keyboardShouldPersistTaps="handled"
+        >
+          <View style={styles.container}>
+            {/* Header */}
+            <View style={styles.header}>
+              <Pressable
+                style={styles.backButton}
+                onPress={() => navigation.goBack()}
+              >
+                <Text style={styles.backButtonText}>← Voltar</Text>
+              </Pressable>
 
-          {/* Conteúdo do Form */}
-          <View style={styles.content}>
-            <Text style={styles.title}>BEM-VINDO DE VOLTA</Text>
-            <Text style={styles.subtitle}>
-              Acesse sua conta para visualizar seus dados e treinos.
-            </Text>
-
-            {erro ? (
-              <View style={styles.errorBox}>
-                <Text style={styles.errorText}>{erro}</Text>
-              </View>
-            ) : null}
-
-            {/* Input Email */}
-            <View style={styles.inputGroup}>
-              <Text style={styles.label}>E-MAIL</Text>
-              <TextInput
-                style={styles.input}
-                placeholder="seu.email@exemplo.com"
-                placeholderTextColor="#666666"
-                value={email}
-                onChangeText={(txt) => { setEmail(txt); setErro(''); }}
-                keyboardType="email-address"
-                autoCapitalize="none"
-                autoCorrect={false}
-              />
+              <Text style={styles.logo}>
+                IRON<Text style={styles.logoYellow}>FIT</Text>
+              </Text>
             </View>
 
-            {/* Input Senha */}
-            <View style={styles.inputGroup}>
-              <Text style={styles.label}>SENHA</Text>
-              <View style={styles.passwordContainer}>
+            {/* Conteúdo do Form */}
+            <View style={styles.content}>
+              <Text style={styles.title}>BEM-VINDO DE VOLTA</Text>
+              <Text style={styles.subtitle}>
+                Acesse sua conta para visualizar seus dados e treinos.
+              </Text>
+
+              {erro ? (
+                <View style={styles.errorBox}>
+                  <Text style={styles.errorText}>{erro}</Text>
+                </View>
+              ) : null}
+
+              {/* Input Email */}
+              <View style={styles.inputGroup}>
+                <Text style={styles.label}>E-MAIL</Text>
                 <TextInput
-                  style={[styles.input, { flex: 1 }]}
-                  placeholder="••••••••"
+                  style={styles.input}
+                  placeholder="seu.email@exemplo.com"
                   placeholderTextColor="#666666"
-                  value={senha}
-                  onChangeText={(txt) => { setSenha(txt); setErro(''); }}
-                  secureTextEntry={!mostrarSenha}
+                  value={email}
+                  onChangeText={(txt) => {
+                    setEmail(txt);
+                    setErro('');
+                  }}
+                  keyboardType="email-address"
+                  autoCapitalize="none"
+                  autoCorrect={false}
                 />
-                <Pressable
-                  style={styles.togglePassword}
-                  onPress={() => setMostrarSenha(!mostrarSenha)}
-                >
-                  <Text style={styles.togglePasswordText}>
-                    {mostrarSenha ? 'Ocultar' : 'Ver'}
-                  </Text>
-                </Pressable>
               </View>
+
+              {/* Input Senha */}
+              <View style={styles.inputGroup}>
+                <Text style={styles.label}>SENHA</Text>
+                <View style={styles.passwordContainer}>
+                  <TextInput
+                    style={[styles.input, { flex: 1 }]}
+                    placeholder="••••••••"
+                    placeholderTextColor="#666666"
+                    value={senha}
+                    onChangeText={(txt) => {
+                      setSenha(txt);
+                      setErro('');
+                    }}
+                    secureTextEntry={!mostrarSenha}
+                  />
+                  <Pressable
+                    style={styles.togglePassword}
+                    onPress={() => setMostrarSenha(!mostrarSenha)}
+                  >
+                    <Text style={styles.togglePasswordText}>
+                      {mostrarSenha ? 'Ocultar' : 'Ver'}
+                    </Text>
+                  </Pressable>
+                </View>
+              </View>
+
+              {/* Esqueceu a Senha */}
+              <Pressable
+                style={styles.forgotButton}
+                onPress={() =>
+                  Alert.alert(
+                    'Recuperação de Senha',
+                    'Instruções enviadas para seu e-mail registrado.'
+                  )
+                }
+              >
+                <Text style={styles.forgotText}>Esqueceu sua senha?</Text>
+              </Pressable>
+
+              {/* Botão Entrar */}
+              <Pressable
+                style={[styles.primaryButton, loading && styles.disabledButton]}
+                onPress={handleLogin}
+                disabled={loading}
+              >
+                {loading ? (
+                  <ActivityIndicator color="#000000" />
+                ) : (
+                  <Text style={styles.primaryButtonText}>ENTRAR NA CONTA</Text>
+                )}
+              </Pressable>
+
+              {/* Botão Demo / Acesso Rápido */}
+              <Pressable style={styles.demoButton} onPress={handleDemoLogin}>
+                <Text style={styles.demoButtonText}>
+                  ⚡ Acesso Rápido (Modo Demo)
+                </Text>
+              </Pressable>
             </View>
 
-            {/* Esqueceu a Senha */}
-            <Pressable
-              style={styles.forgotButton}
-              onPress={() => Alert.alert('Recuperação de Senha', 'Instruções enviadas para seu e-mail registrado.')}
-            >
-              <Text style={styles.forgotText}>Esqueceu sua senha?</Text>
-            </Pressable>
-
-            {/* Botão Entrar */}
-            <Pressable
-              style={[styles.primaryButton, loading && styles.disabledButton]}
-              onPress={handleLogin}
-              disabled={loading}
-            >
-              {loading ? (
-                <ActivityIndicator color="#000000" />
-              ) : (
-                <Text style={styles.primaryButtonText}>ENTRAR NA CONTA</Text>
-              )}
-            </Pressable>
-
-            {/* Botão Demo / Acesso Rápido */}
-            <Pressable style={styles.demoButton} onPress={handleDemoLogin}>
-              <Text style={styles.demoButtonText}>⚡ Acesso Rápido (Modo Demo)</Text>
-            </Pressable>
+            {/* Rodapé / Link para Cadastro */}
+            <View style={styles.footer}>
+              <Text style={styles.footerText}>Ainda não possui uma conta? </Text>
+              <Pressable onPress={() => navigation.navigate('Cadastro')}>
+                <Text style={styles.signupText}>Cadastre-se</Text>
+              </Pressable>
+            </View>
           </View>
-
-          {/* Rodapé / Link para Cadastro */}
-          <View style={styles.footer}>
-            <Text style={styles.footerText}>Ainda não possui uma conta? </Text>
-            <Pressable onPress={() => navigation.navigate('Cadastro')}>
-              <Text style={styles.signupText}>Cadastre-se</Text>
-            </Pressable>
-          </View>
-        </View>
-      </ScrollView>
-    </KeyboardAvoidingView>
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: '#080808',
+  },
   scrollContainer: {
     flexGrow: 1,
     backgroundColor: '#080808',
@@ -164,15 +185,15 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     paddingHorizontal: 28,
-    paddingTop: 50,
-    paddingBottom: 40,
+    paddingTop: 10,
+    paddingBottom: 20,
     justifyContent: 'space-between',
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginBottom: 40,
+    marginBottom: 30,
   },
   backButton: {
     paddingVertical: 8,

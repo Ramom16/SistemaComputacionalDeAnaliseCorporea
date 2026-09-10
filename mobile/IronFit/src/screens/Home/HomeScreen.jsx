@@ -6,16 +6,15 @@ import {
   ScrollView,
   Pressable,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useAuth } from '../../context/AuthContext';
-import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function HomeScreen({ navigation }) {
   const { user, ultimaAvaliacao } = useAuth();
 
   return (
-
-    <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
-      <SafeAreaView>
+    <SafeAreaView style={{ flex: 1, backgroundColor: '#080808' }}>
+      <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
         {/* Header com Boas-Vindas */}
         <View style={styles.header}>
           <View>
@@ -107,8 +106,8 @@ export default function HomeScreen({ navigation }) {
             <Text style={styles.quickSub}>Histórico e métricas</Text>
           </Pressable>
         </View>
-      </SafeAreaView>
-    </ScrollView>
+      </ScrollView>
+    </SafeAreaView>
   );
 }
 
@@ -119,7 +118,7 @@ const styles = StyleSheet.create({
   },
   contentContainer: {
     paddingHorizontal: 20,
-    paddingTop: 55,
+    paddingTop: 20,
     paddingBottom: 40,
   },
   header: {
@@ -293,9 +292,5 @@ const styles = StyleSheet.create({
   quickSub: {
     color: '#888888',
     fontSize: 12,
-  },
-  safeArea: {
-    flex: 1,
-    backgroundColor: "#F6F7F8",
   },
 });

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   StyleSheet,
   Text,
@@ -6,11 +6,15 @@ import {
   ScrollView,
   Pressable,
   Alert,
+  ActivityIndicator,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useAuth } from '../../context/AuthContext';
+import { api } from '../../services/api';
 
 export default function PerfilScreen() {
-  const { user, logout } = useAuth();
+  const { user, updateUser, logout } = useAuth();
+  const [loading, setLoading] = useState(false);
 
   function handleLogout() {
     Alert.alert('Sair da Conta', 'Deseja realmente encerrar sua sessão?', [
@@ -19,79 +23,131 @@ export default function PerfilScreen() {
     ]);
   }
 
+  // Função para salvar alterações do perfil no backend
+  async function handleUpdateProfile(novosDados) {
+    try {
+      setLoading(true);
+      const response = await api.put('/usuario/perfil', novosDados);
+      if (updateUser) {
+        updateUser(response.data || novosDados);
+      }
+      Alert.alert('Sucesso', 'Perfil atualizado com sucesso!');
+    } catch (error) {
+      console.log('Erro ao atualizar perfil:', error);
+      Alert.alert('Erro', 'Não foi possível atualizar os dados do perfil.');
+    } finally {
+      setLoading(false);
+    }
+  }
+
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
-      <Text style={styles.title}>PERFIL DO ATLETA</Text>
-      <Text style={styles.subtitle}>
-        Gerencie suas informações pessoais e configurações da sua conta IronFit.
-      </Text>
+    <SafeAreaView style={styles.safeArea}>
+      <ScrollView
+        style={styles.container}
+        contentContainerStyle={styles.contentContainer}
+      >
+        <Text style={styles.title}>PERFIL DO ATLETA</Text>
+        <Text style={styles.subtitle}>
+          Gerencie suas informações pessoais e configurações da sua conta IronFit.
+        </Text>
 
-      {/* Card de Identificação */}
-      <View style={styles.profileCard}>
-        <View style={styles.avatar}>
-          <Text style={styles.avatarText}>
-            {user?.nome ? user.nome.charAt(0).toUpperCase() : 'A'}
-          </Text>
+        {/* Card de Identificação */}
+        <View style={styles.profileCard}>
+          <View style={styles.avatar}>
+            <Text style={styles.avatarText}>
+              {user?.nome ? user.nome.charAt(0).toUpperCase() : 'A'}
+            </Text>
+          </View>
+
+          <Text style={styles.userName}>{user?.nome || 'Atleta'}</Text>
+          <Text style={styles.userEmail}>{user?.email || 'email@ironfit.com'}</Text>
+
+          <View style={styles.tagRow}>
+            <View style={styles.tag}>
+              <Text style={styles.tagText}>
+                Gênero: {user?.genero || 'Não informado'}
+              </Text>
+            </View>
+            <View style={styles.tag}>
+              <Text style={styles.tagText}>
+                Nascimento: {user?.data_nascimento || 'Não informado'}
+              </Text>
+            </View>
+          </View>
         </View>
 
-        <Text style={styles.userName}>{user?.nome || 'Atleta IronFit'}</Text>
-        <Text style={styles.userEmail}>{user?.email || 'atleta@ironfit.com'}</Text>
-
-        <View style={styles.tagRow}>
-          <View style={styles.tag}>
-            <Text style={styles.tagText}>Gênero: {user?.genero || 'Masculino'}</Text>
-          </View>
-          <View style={styles.tag}>
-            <Text style={styles.tagText}>Nascimento: {user?.data_nascimento || '15/05/1998'}</Text>
-          </View>
+        {/* Seções de Configuração */}
+        <View style={styles.sectionHeader}>
+          <Text style={styles.sectionTitle}>CONFIGURAÇÕES DA CONTA</Text>
         </View>
-      </View>
 
-      {/* Seções de Configuração */}
-      <View style={styles.sectionHeader}>
-        <Text style={styles.sectionTitle}>CONFIGURAÇÕES DA CONTA</Text>
-      </View>
+        <View style={styles.optionsGroup}>
+          <Pressable
+            style={styles.optionItem}
+            onPress={() =>
+              Alert.alert('Perfil', 'Recurso de alteração de senha em breve.')
+            }
+          >
+            <Text style={styles.optionIcon}>🔒</Text>
+            <Text style={styles.optionText}>Alterar Senha</Text>
+            <Text style={styles.optionArrow}>→</Text>
+          </Pressable>
 
-      <View style={styles.optionsGroup}>
-        <Pressable style={styles.optionItem} onPress={() => Alert.alert('Perfil', 'Recurso de alteração de senha em breve.')}>
-          <Text style={styles.optionIcon}>🔒</Text>
-          <Text style={styles.optionText}>Alterar Senha</Text>
-          <Text style={styles.optionArrow}>→</Text>
+          <View style={styles.optionDivider} />
+
+          <Pressable
+            style={styles.optionItem}
+            onPress={() =>
+              Alert.alert('Notificações', 'Lembretes de treino estão ativados.')
+            }
+          >
+            <Text style={styles.optionIcon}>🔔</Text>
+            <Text style={styles.optionText}>Lembretes de Treino</Text>
+            <Text style={styles.optionArrow}>→</Text>
+          </Pressable>
+
+          <View style={styles.optionDivider} />
+
+          <Pressable
+            style={styles.optionItem}
+            onPress={() =>
+              Alert.alert(
+                'Sobre',
+                'IronFit App v1.0.0 (Sistema de Análise Corpórea).'
+              )
+            }
+          >
+            <Text style={styles.optionIcon}>ℹ️</Text>
+            <Text style={styles.optionText}>Sobre o Sistema IronFit</Text>
+            <Text style={styles.optionArrow}>→</Text>
+          </Pressable>
+        </View>
+
+        {/* Botão de Logout */}
+        <Pressable style={styles.logoutButton} onPress={handleLogout} disabled={loading}>
+          {loading ? (
+            <ActivityIndicator color="#FF4444" />
+          ) : (
+            <Text style={styles.logoutButtonText}>SAIR DA CONTA</Text>
+          )}
         </Pressable>
-
-        <View style={styles.optionDivider} />
-
-        <Pressable style={styles.optionItem} onPress={() => Alert.alert('Notificações', 'Lembretes de treino estão ativados.')}>
-          <Text style={styles.optionIcon}>🔔</Text>
-          <Text style={styles.optionText}>Lembretes de Treino</Text>
-          <Text style={styles.optionArrow}>→</Text>
-        </Pressable>
-
-        <View style={styles.optionDivider} />
-
-        <Pressable style={styles.optionItem} onPress={() => Alert.alert('Sobre', 'IronFit App v1.0.0 (Sistema de Análise Corpórea).')}>
-          <Text style={styles.optionIcon}>ℹ️</Text>
-          <Text style={styles.optionText}>Sobre o Sistema IronFit</Text>
-          <Text style={styles.optionArrow}>→</Text>
-        </Pressable>
-      </View>
-
-      {/* Botão de Logout */}
-      <Pressable style={styles.logoutButton} onPress={handleLogout}>
-        <Text style={styles.logoutButtonText}>SAIR DA CONTA</Text>
-      </Pressable>
-    </ScrollView>
+      </ScrollView>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: '#080808',
+  },
   container: {
     flex: 1,
     backgroundColor: '#080808',
   },
   contentContainer: {
     paddingHorizontal: 20,
-    paddingTop: 55,
+    paddingTop: 10,
     paddingBottom: 40,
   },
   title: {
