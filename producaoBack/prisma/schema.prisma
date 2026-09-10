@@ -61,8 +61,8 @@ model Perfil {
 // ============================================================
 
 model UsuariosPerfil {
-  idUsuario Int
-  idPerfil  Int
+  idUsuario String
+  idPerfil  String
 
   usuario Usuario @relation(fields: [idUsuario], references: [id], onDelete: Cascade, onUpdate: Cascade)
   perfil  Perfil  @relation(fields: [idPerfil], references: [idPerfil], onDelete: Cascade, onUpdate: Cascade)
@@ -80,7 +80,7 @@ model UsuariosPerfil {
 model DadosCorporais {
   idDados  String @id @default(uuid()) @db.VarChar(36)
 
-  idUsuario Int @unique
+  idUsuario String @unique
 
   peso_kg   Decimal @db.Decimal(10, 2)
   altura_cm Decimal @db.Decimal(5, 2)
@@ -108,7 +108,7 @@ model DadosCorporais {
 model Calculo {
   idCalculo  String @id @default(uuid()) @db.VarChar(36)
 
-  idDados Int
+  idDados String
 
   imc Decimal @db.Decimal(10, 2)
   tmb Decimal @db.Decimal(10, 2)
@@ -135,8 +135,8 @@ model Treino {
 
   titulo String @default("Novo Treino") @db.VarChar(150)
 
-  idCalculo Int?
-  idUsuario Int?
+  idCalculo String?
+  idUsuario String?
 
   objetivo ObjetivoTreino
   nivel    NivelTreino
@@ -180,8 +180,8 @@ model Exercicio {
 // ============================================================
 
 model TreinoExercicio {
-  idTreino    Int
-  idExercicio Int
+  idTreino    String
+  idExercicio String
 
   series            Int
   descanso_segundos Int
@@ -209,7 +209,7 @@ model EmailVerificationToken {
 
   token_hash String @unique @db.VarChar(64)
 
-  usuarioId Int
+  usuarioId String
 
   expira_em DateTime  @db.Timestamp(0)
   usado_em  DateTime? @db.Timestamp(0)
@@ -233,7 +233,7 @@ model PasswordResetToken {
 
   token_hash String @unique @db.VarChar(64)
 
-  usuarioId Int
+  usuarioId String
 
   expira_em DateTime  @db.Timestamp(0)
   usado_em  DateTime? @db.Timestamp(0)
@@ -255,7 +255,7 @@ model PasswordResetToken {
 model HistoricoCorporal {
   idHistorico  String @id @default(uuid()) @db.VarChar(36)
 
-  idDados Int
+  idDados String
 
   peso_kg   Decimal @db.Decimal(10, 2)
   altura_cm Decimal @db.Decimal(5, 2)
