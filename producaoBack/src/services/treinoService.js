@@ -41,7 +41,7 @@ const treinoService = {
         );
     },
 
-    async buscarPorId(idUsuario, idTreino) {
+    async buscarPorId(idUsuario, idTreino, role = "USER") {
         const treino = await treinoRepository.buscarPorId(
             String(idTreino)
         );
@@ -52,7 +52,7 @@ const treinoService = {
         const donoDoTreino =
             treino.calculo?.dados?.usuario?.id === String(idUsuario);
 
-        if (!donoDoTreino) {
+        if (!donoDoTreino && role !== "ADMIN") {
             throw new Error(
                 "Você não possui permissão para acessar este treino."
             );

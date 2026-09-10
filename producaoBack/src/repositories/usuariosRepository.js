@@ -10,7 +10,8 @@ const usuariosRepository = {
         senha_hash: usuario.senha_hash,
         data_nascimento: usuario.data_nascimento,
         ativo: usuario.ativo,
-        email_verificado: usuario.email_verificado
+        email_verificado: usuario.email_verificado,
+        role: usuario.role || "USER"
       }
     });
 
@@ -48,6 +49,7 @@ const usuariosRepository = {
         data_nascimento: true,
         ativo: true,
         email_verificado: true,
+        role: true,
         ultimo_login: true,
         criado_em: true,
         dadosCorporais: {
@@ -171,6 +173,18 @@ const usuariosRepository = {
       data: {
         email_verificado: true
       }
+    });
+  },
+
+  // ATUALIZAR ROLE (ADMIN / USER)
+  atualizarRole: async (id, role) => {
+    const roleValida = String(role).toUpperCase().trim();
+    if (roleValida !== "ADMIN" && roleValida !== "USER") {
+      throw new Error("Role inválida. Deve ser 'USER' ou 'ADMIN'");
+    }
+    return await prisma.usuario.update({
+      where: { id: String(id) },
+      data: { role: roleValida }
     });
   }
 };

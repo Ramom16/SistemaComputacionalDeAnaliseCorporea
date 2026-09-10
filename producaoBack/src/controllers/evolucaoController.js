@@ -9,8 +9,8 @@ const EvolucaoController = {
 
             const idUsuario = String(req.params.id || req.usuario?.id);
 
-            // Proteção contra IDOR
-            if (req.usuario?.id && idUsuario !== req.usuario.id) {
+            // Proteção contra IDOR: permite visualização própria ou por administrador
+            if (req.usuario?.id && idUsuario !== req.usuario.id && req.usuario.role !== "ADMIN") {
                 return res.status(403).json({
                     erro: "Você não possui permissão para visualizar o histórico de evolução deste usuário."
                 });
@@ -42,7 +42,8 @@ const EvolucaoController = {
         try {
             const idUsuario = String(req.params.idUsuario);
 
-            if (req.usuario?.id && idUsuario !== req.usuario.id) {
+            // Proteção contra IDOR: permite visualização própria ou por administrador
+            if (req.usuario?.id && idUsuario !== req.usuario.id && req.usuario.role !== "ADMIN") {
                 return res.status(403).json({
                     erro: "Você não possui permissão para visualizar estas estatísticas."
                 });

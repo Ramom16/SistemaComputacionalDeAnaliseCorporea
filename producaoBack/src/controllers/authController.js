@@ -44,7 +44,8 @@ const authController = {
         nome,
         email: emailFormatado,
         senha_hash,
-        data_nascimento
+        data_nascimento,
+        role: "USER"
       });
 
       const novoUsuario = await usuariosRepository.criar(usuarioObj);
@@ -139,7 +140,8 @@ const authController = {
           id: usuario.id,
           id_criptografado: criptografarId(usuario.id),
           nome: usuario.nome,
-          email: usuario.email
+          email: usuario.email,
+          role: usuario.role || "USER"
         }
       });
     } catch (error) {
