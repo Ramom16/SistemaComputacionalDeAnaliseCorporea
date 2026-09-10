@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import api from '../services/api';
+import DashboardNavbar from '../components/DashboardNavbar';
 import ExercicioItem from '../components/ExercicioItem';
 import '../styles/dashboard.css';
 import '../styles/meustreinos.css';
@@ -46,43 +47,32 @@ export default function DetalhesTreino() {
 
   if (loading) {
     return (
-      <div className="dashboard-layout">
-        <main className="dashboard-content" style={{ textAlign: 'center', paddingTop: '4rem' }}>
-          <h2>Carregando detalhes do treino...</h2>
-        </main>
-      </div>
+      <>
+        <DashboardNavbar onLogout={handleLogout} />
+        <div className="dashboard-layout">
+          <main className="dashboard-content" style={{ textAlign: 'center', paddingTop: '4rem' }}>
+            <h2>Carregando detalhes do treino...</h2>
+          </main>
+        </div>
+      </>
     );
   }
 
   if (erro || !treino) {
     return (
-      <div className="dashboard-layout">
-        <aside className="dashboard-sidebar">
-          <Link to="/" className="sidebar-logo">
-            <div className="logo-icon">
-              <span className="logo-bar"></span>
-              <span className="logo-bar"></span>
-              <span className="logo-bar"></span>
+      <>
+        <DashboardNavbar onLogout={handleLogout} />
+        <div className="dashboard-layout">
+          <main className="dashboard-content">
+            <div className="treino-nao-encontrado">
+              <h2>Treino não encontrado no banco de dados</h2>
+              <button className="btn-voltar" onClick={() => navigate('/meus-treinos')}>
+                ← Voltar para Meus Treinos
+              </button>
             </div>
-            <span className="logo-text">IRONFIT</span>
-          </Link>
-          <nav className="sidebar-nav">
-            <Link to="/dashboard">Análise Corporal</Link>
-            <Link to="/meus-treinos" className="active">Meus Treinos</Link>
-            <Link to="/evolucao">Evolução</Link>
-            <Link to="#">Configurações</Link>
-          </nav>
-          <button onClick={handleLogout} className="logout-btn">Sair da Conta</button>
-        </aside>
-        <main className="dashboard-content">
-          <div className="treino-nao-encontrado">
-            <h2>Treino não encontrado no banco de dados</h2>
-            <button className="btn-voltar" onClick={() => navigate('/meus-treinos')}>
-              ← Voltar para Meus Treinos
-            </button>
-          </div>
-        </main>
-      </div>
+          </main>
+        </div>
+      </>
     );
   }
 
@@ -91,29 +81,13 @@ export default function DetalhesTreino() {
   const temDivisoes = Array.isArray(treino.divisao) && treino.divisao.length > 0;
 
   return (
-    <div className="dashboard-layout">
-      <aside className="dashboard-sidebar">
-        <Link to="/" className="sidebar-logo">
-          <div className="logo-icon">
-            <span className="logo-bar"></span>
-            <span className="logo-bar"></span>
-            <span className="logo-bar"></span>
-          </div>
-          <span className="logo-text">IRONFIT</span>
-        </Link>
-        <nav className="sidebar-nav">
-          <Link to="/dashboard">Análise Corporal</Link>
-          <Link to="/meus-treinos" className="active">Meus Treinos</Link>
-          <Link to="/evolucao">Evolução</Link>
-          <Link to="#">Configurações</Link>
-        </nav>
-        <button onClick={handleLogout} className="logout-btn">Sair da Conta</button>
-      </aside>
-
-      <main className="dashboard-content">
-        <button className="btn-voltar" onClick={() => navigate('/meus-treinos')}>
-          ← Voltar para Meus Treinos
-        </button>
+    <>
+      <DashboardNavbar onLogout={handleLogout} />
+      <div className="dashboard-layout">
+        <main className="dashboard-content">
+          <button className="btn-voltar" onClick={() => navigate('/meus-treinos')}>
+            ← Voltar para Meus Treinos
+          </button>
 
         {/* Header do treino */}
         <div className="detalhe-header">
@@ -169,7 +143,8 @@ export default function DetalhesTreino() {
         <p className="aviso-legal">
           ⚠️ Este treino é uma recomendação inicial baseada no seu perfil. Consulte um profissional de educação física para acompanhamento personalizado.
         </p>
-      </main>
-    </div>
+        </main>
+      </div>
+    </>
   );
 }

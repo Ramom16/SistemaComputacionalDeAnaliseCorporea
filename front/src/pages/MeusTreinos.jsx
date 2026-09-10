@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import DashboardNavbar from "../components/DashboardNavbar";
 import "../styles/dashboard.css";
 import "../styles/meustreinos.css";
 import api from "../services/api";
@@ -63,40 +64,18 @@ export default function MeusTreinos() {
   );
 
   return (
-    <div className="dashboard-layout">
-      <aside className="dashboard-sidebar">
-        <Link to="/" className="sidebar-logo">
-          <div className="logo-icon">
-            <span className="logo-bar"></span>
-            <span className="logo-bar"></span>
-            <span className="logo-bar"></span>
-          </div>
-          <span className="logo-text">IRONFIT</span>
-        </Link>
-
-        <nav className="sidebar-nav">
-          <Link to="/dashboard">Análise Corporal</Link>
-          <Link to="/meus-treinos" className="active">
-            Meus Treinos
-          </Link>
-          <Link to="/evolucao">Evolução</Link>
-          <Link to="#">Configurações</Link>
-        </nav>
-
-        <button onClick={handleLogout} className="logout-btn">
-          Sair da Conta
-        </button>
-      </aside>
-
-      <main className="dashboard-content">
-        <section className="welcome-section">
-          <h1 className="welcome-title">
-            Meus <span>Treinos</span>
-          </h1>
-          <p className="welcome-desc">
-            {usuarioData?.nome ? `Explore os planos de treino personalizados para você, ${usuarioData.nome}.` : "Explore os planos de treino disponíveis no sistema para o seu perfil."}
-          </p>
-        </section>
+    <>
+      <DashboardNavbar onLogout={handleLogout} />
+      <div className="dashboard-layout">
+        <main className="dashboard-content">
+          <section className="welcome-section">
+            <h1 className="welcome-title">
+              Meus <span>Treinos</span>
+            </h1>
+            <p className="welcome-desc">
+              {usuarioData?.nome ? `Explore os planos de treino personalizados para você, ${usuarioData.nome}.` : "Explore os planos de treino disponíveis no sistema para o seu perfil."}
+            </p>
+          </section>
 
         {/* Filtros */}
         <div className="treinos-filtros">
@@ -135,6 +114,7 @@ export default function MeusTreinos() {
         )}
       </main>
     </div>
+    </>
   );
 }
 

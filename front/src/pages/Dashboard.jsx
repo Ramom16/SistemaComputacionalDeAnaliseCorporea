@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import api from '../services/api';
+import DashboardNavbar from '../components/DashboardNavbar';
 import '../styles/dashboard.css';
 
 export default function Dashboard() {
@@ -237,59 +238,11 @@ export default function Dashboard() {
   // INTERFACE
 
   return (
-    <div className="dashboard-layout">
-
-      {/* SIDEBAR */}
-      <aside className="dashboard-sidebar">
-
-        <Link to="/" className="sidebar-logo">
-
-          <div className="logo-icon">
-            <span className="logo-bar"></span>
-            <span className="logo-bar"></span>
-            <span className="logo-bar"></span>
-          </div>
-
-          <span className="logo-text">
-            IRONFIT
-          </span>
-
-        </Link>
-
-        <nav className="sidebar-nav">
-
-          <Link
-            to="/dashboard"
-            className="active"
-          >
-            Análise Corporal
-          </Link>
-
-          <Link to="/meus-treinos">
-            Meus Treinos
-          </Link>
-
-          <Link to="/evolucao">
-            Evolução
-          </Link>
-
-          <Link to="#">
-            Configurações
-          </Link>
-
-        </nav>
-
-        <button
-          onClick={handleLogout}
-          className="logout-btn"
-        >
-          Sair da Conta
-        </button>
-
-      </aside>
-
-      {/* CONTEÚDO */}
-      <main className="dashboard-content">
+    <>
+      <DashboardNavbar onLogout={handleLogout} />
+      <div className="dashboard-layout">
+        {/* CONTEÚDO */}
+        <main className="dashboard-content">
 
         {/* BOAS-VINDAS */}
         <section className="welcome-section">
@@ -826,6 +779,7 @@ export default function Dashboard() {
         )}
       </main>
     </div>
+    </>
   );
 }
 

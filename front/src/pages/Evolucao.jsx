@@ -1,6 +1,7 @@
 import React, { useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useEvolucao } from "../hooks/useEvolucao";
+import DashboardNavbar from "../components/DashboardNavbar";
 
 import Header from "../components/evolucao/Header";
 import DashboardCards from "../components/evolucao/DashboardCards";
@@ -50,32 +51,11 @@ export default function Evolucao() {
     }
 
     return (
-        <div className="dashboard-layout">
-            {/* Sidebar de Navegação */}
-            <aside className="dashboard-sidebar">
-                <Link to="/" className="sidebar-logo">
-                    <div className="logo-icon">
-                        <span className="logo-bar"></span>
-                        <span className="logo-bar"></span>
-                        <span className="logo-bar"></span>
-                    </div>
-                    <span className="logo-text">IRONFIT</span>
-                </Link>
-
-                <nav className="sidebar-nav">
-                    <Link to="/dashboard">Análise Corporal</Link>
-                    <Link to="/meus-treinos">Meus Treinos</Link>
-                    <Link to="/evolucao" className="active">Evolução</Link>
-                    <Link to="#">Configurações</Link>
-                </nav>
-
-                <button onClick={handleLogout} className="logout-btn">
-                    Sair da Conta
-                </button>
-            </aside>
-
-            {/* Conteúdo Principal */}
-            <main className="dashboard-content">
+        <>
+            <DashboardNavbar onLogout={handleLogout} />
+            <div className="dashboard-layout">
+                {/* Conteúdo Principal */}
+                <main className="dashboard-content">
                 <Header />
 
                 <DashboardCards cards={cards} />
@@ -93,5 +73,6 @@ export default function Evolucao() {
                 <HistoricoTabela dados={historico} />
             </main>
         </div>
+        </>
     );
 }

@@ -23,20 +23,127 @@ body {
 /* Dashboard Layout */
 .dashboard-layout {
   display: flex;
+  flex-direction: column;
   min-height: 100vh;
+  padding-top: 80px;
 }
 
-/* Sidebar */
+/* Sidebar (DEPRECATED - Use DashboardNavbar instead) */
 .dashboard-sidebar {
-  width: 260px;
-  background-color: #0a0a0a;
-  border-right: 1px solid var(--border-light);
-  display: flex;
-  flex-direction: column;
-  padding: 30px 20px;
+  display: none;
+}
+
+/* Dashboard Navbar - Horizontal Header */
+.dashboard-navbar {
   position: fixed;
-  height: 100vh;
-  z-index: 10;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 80px;
+  background-color: #0a0a0a;
+  border-bottom: 1px solid var(--border-light);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 40px;
+  z-index: 100;
+  gap: 30px;
+  background-image: radial-gradient(circle at bottom right, rgba(255, 230, 0, 0.02) 0%, transparent 40%);
+}
+
+/* Navbar Logo - Left Side */
+.navbar-logo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+  flex-shrink: 0;
+}
+
+.navbar-logo .logo-icon {
+  display: flex;
+  gap: 3px;
+}
+
+.navbar-logo .logo-bar {
+  width: 4px;
+  background-color: var(--primary-yellow);
+  transform: skewX(-15deg);
+}
+
+.navbar-logo .logo-bar:nth-child(1) { height: 16px; }
+.navbar-logo .logo-bar:nth-child(2) { height: 20px; }
+.navbar-logo .logo-bar:nth-child(3) { height: 24px; }
+
+.navbar-logo .logo-text {
+  font-family: var(--font-title);
+  font-weight: 700;
+  font-style: italic;
+  font-size: 1.3rem;
+  color: var(--text-white);
+  letter-spacing: 1px;
+}
+
+/* Navbar Navigation - Center */
+.navbar-nav {
+  display: flex;
+  gap: 5px;
+  flex: 1;
+  justify-content: center;
+}
+
+.nav-link {
+  text-decoration: none;
+  color: var(--text-gray);
+  padding: 8px 20px;
+  border-radius: 6px;
+  font-weight: 500;
+  font-size: 0.95rem;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+  position: relative;
+}
+
+.nav-link:hover {
+  color: var(--text-white);
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.nav-link.active {
+  color: var(--primary-yellow);
+  background: rgba(255, 230, 0, 0.1);
+}
+
+.nav-link.active::after {
+  content: '';
+  position: absolute;
+  bottom: -8px;
+  left: 20px;
+  right: 20px;
+  height: 3px;
+  background-color: var(--primary-yellow);
+  border-radius: 2px 2px 0 0;
+}
+
+/* Navbar Logout - Right Side */
+.navbar-logout-btn {
+  color: #ff4d5a;
+  padding: 8px 20px;
+  border-radius: 6px;
+  font-weight: 500;
+  font-size: 0.95rem;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  background: none;
+  border: none;
+  text-align: center;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.navbar-logout-btn:hover {
+  background-color: rgba(255, 77, 90, 0.15);
+  color: #ff6b75;
 }
 
 .sidebar-logo {
@@ -126,7 +233,6 @@ body {
 /* Main Content */
 .dashboard-content {
   flex: 1;
-  margin-left: 260px; /* offset for sidebar */
   padding: 40px 60px;
   background-image: radial-gradient(circle at top right, rgba(255, 230, 0, 0.03) 0%, transparent 40%);
 }
@@ -368,39 +474,51 @@ body {
 }
 
 @media (max-width: 768px) {
-  .dashboard-layout {
-    flex-direction: column;
-  }
-  
-  .dashboard-sidebar {
-    width: 100%;
+  .dashboard-navbar {
+    flex-wrap: wrap;
+    padding: 12px 20px;
+    min-height: auto;
     height: auto;
-    position: relative;
-    padding: 20px;
-    border-right: none;
-    border-bottom: 1px solid var(--border-light);
+    gap: 15px;
   }
   
-  .sidebar-logo {
-    margin-bottom: 20px;
+  .navbar-logo {
+    order: 1;
+    flex: 0 0 auto;
   }
   
-  .sidebar-nav {
+  .navbar-nav {
+    order: 3;
+    flex: 0 0 100%;
     flex-direction: row;
+    gap: 8px;
     overflow-x: auto;
-    padding-bottom: 10px;
+    padding: 10px 0;
   }
   
-  .sidebar-nav a {
+  .nav-link {
     white-space: nowrap;
+    font-size: 0.85rem;
+    padding: 6px 14px;
   }
   
-  .logout-btn {
-    margin-top: 10px;
+  .nav-link.active::after {
+    bottom: -12px;
+    left: 14px;
+    right: 14px;
+  }
+  
+  .navbar-logout-btn {
+    order: 2;
+    font-size: 0.85rem;
+    padding: 6px 14px;
+  }
+  
+  .dashboard-layout {
+    padding-top: auto;
   }
   
   .dashboard-content {
-    margin-left: 0;
     padding: 30px 20px;
   }
   
