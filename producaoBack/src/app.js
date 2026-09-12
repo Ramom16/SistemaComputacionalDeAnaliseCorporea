@@ -3,44 +3,45 @@ import express from "express";
 import cors from "cors";
 import helmet from "helmet";
 import rateLimit from "express-rate-limit";
-import { autenticarToken } from "./middlewares/autenticarToken.js";
+import { fileURLToPath } from "url";
+import path from "path";
+
 import router from "./routes/router.js";
+import { autenticarToken } from "./middlewares/autenticarToken.js";
 
 dotenv.config();
 
 const app = express();
 
 // 1. CABEÇALHOS DE SEGURANÇA (HELMET)
-app.use(helmet({
-  crossOriginResourcePolicy: { policy: "cross-origin" }
-}));
+app.use(helmet({ crossOriginResourcePolicy: { policy: "cross-origin" } }));
 
 // 2. LIMITADOR DE REQUISIÇÕES (RATE LIMITING)
-const limitadorGeral = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutos
-  max: 300, // limite de 300 requisições por janela
-  standardHeaders: true,
-  legacyHeaders: false,
-  message: { erro: "Muitas requisições originadas deste IP. Tente novamente mais tarde." }
-});
+const limitadorGeral = rateLimit(
+  {
+    windowMs: 15 * 60 * 1000, // 15 minutos
+    max: 300, // limite de 300 requisições por janela
+    standardHeaders: true,
+    legacyHeaders: false,
+    message: { erro: "Muitas requisições originadas deste IP. Tente novamente mais tarde." }
+  }
+);
 
-const limitadorAuth = rateLimit({
+const limitadorAuth = rateLimit(
+  {
   windowMs: 15 * 60 * 1000, // 15 minutos
   max: 30, // limite de 30 tentativas em auth
   standardHeaders: true,
   legacyHeaders: false,
   message: { erro: "Limite de tentativas excedido para autenticação. Tente novamente em 15 minutos." }
-});
+}
+);
 
 app.use(limitadorGeral);
 app.use("/auth", limitadorAuth);
 
 // 3. CORS
-const origensPermitidas = [
-  "http://localhost:5173",
-  "http://127.0.0.1:5173",
-  process.env.FRONT_URL
-].filter(Boolean);
+const origensPermitidas = ["http://localhost:5173", "http://127.0.0.1:5173", process.env.FRONT_URL ].filter(Boolean);
 
 app.use(cors({
   origin: (origin, callback) => {
@@ -54,8 +55,18 @@ app.use(cors({
 }));
 
 // 4. PARSER COM LIMITES DE TAMANHO SEGUROS
-app.use(express.json({ limit: "2mb" }));
-app.use(express.urlencoded({ extended: true, limit: "2mb" }));
+app.use(express.json({ limit: "10mb" }));
+app.use(express.urlencoded({ extended: true, limit: "10mb" }));
+
+
+// Pega o caminho completo do arquivo atual (server.js)
+const __filename = fileURLToPath(import.meta.url);
+// Pega apenas a pasta onde o arquivo está localizado
+const __dirname = path.dirname(__filename);
+
+// Define uma rota pública para arquivos estáticos
+// Tudo dentro de src/uploads poderá ser acessado pelo navegador usando /uploads
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 // 5. ROTAS
 app.use("/", router);

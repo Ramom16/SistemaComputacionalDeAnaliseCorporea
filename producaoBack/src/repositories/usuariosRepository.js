@@ -215,8 +215,8 @@ const usuariosRepository = {
           }
         }
       }
-    })
-  }
+    });
+  },
 };
 
 export default usuariosRepository;
