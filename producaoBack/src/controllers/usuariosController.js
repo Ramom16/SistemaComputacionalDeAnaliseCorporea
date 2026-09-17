@@ -96,6 +96,46 @@ const usuariosController = {
     } catch (error) {
       return res.status(400).json({ erro: error.message });
     }
+  },
+
+  /**
+   * Funcionalidade: Atualiza a foto de perfil do usuário autenticado.
+   * @param {Request} req 
+   * @param {Response} res 
+   * @returns Response com a mensagem de sucesso e os dados do usuário atualizado, incluindo a nova foto de perfil.
+   * utiliza do id de usuário autenticado para atualizar a foto de perfil no banco de dados.
+   * foto deve ser enviada no corpo da requisição (req.body.fotoPerfil).
+   * 
+   * Atualiza a foto de perfil do usuário autenticado.
+   */
+  atualizarFotoPerfil: async (req, res) => {
+    try {
+      const usuarioId = req.usuario?.id;
+
+
+      const baseUrl = `${req.protocol}://${req.get("host")}`;
+      const fotoPerfil = req.file ? `${baseUrl}/uploads/images/${req.file.filename}` : null;
+
+      if (!usuarioId)
+        return res.status(401).json({ erro: "Usuário não autenticado" });
+
+      if (!fotoPerfil)
+        return res.status(400).json({ erro: "A foto de perfil é obrigatória." });
+
+      const usuarioAtualizado = await usuariosRepository.atualizarFotoPerfil(usuarioId, fotoPerfil);
+
+      return res.status(200).json({
+        mensagem: "Foto de perfil atualizada com sucesso.",
+        usuario: anexarIdsCriptografados({
+          id: usuarioAtualizado.id,
+          nome: usuarioAtualizado.nome,
+          email: usuarioAtualizado.email,
+          fotoPerfil: usuarioAtualizado.perfil?.fotoPerfil
+        })
+      });
+    } catch (error) {
+      return res.status(400).json({ erro: error.message });
+    }
   }
 };
 
