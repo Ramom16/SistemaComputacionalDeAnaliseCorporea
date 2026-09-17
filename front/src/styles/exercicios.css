@@ -1,0 +1,449 @@
+/* Exercícios - Página Principal */
+.exercicios-container {
+  flex: 1;
+  padding: 40px 60px;
+  max-width: 1400px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.exercicios-header {
+  margin-bottom: 40px;
+}
+
+.exercicios-header h1 {
+  font-family: var(--font-title);
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: var(--text-white);
+  margin: 0 0 10px 0;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+.exercicios-subtitle {
+  font-family: var(--font-body);
+  font-size: 1rem;
+  color: var(--text-gray);
+  margin: 0;
+  font-weight: 400;
+}
+
+/* Controles - Filtros e Busca */
+.exercicios-controls {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 40px;
+  flex-wrap: wrap;
+  align-items: flex-end;
+}
+
+/* Campo de Busca */
+.busca-wrapper {
+  flex: 1;
+  min-width: 250px;
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.input-busca {
+  width: 100%;
+  padding: 12px 40px 12px 16px;
+  background-color: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border-light);
+  border-radius: 8px;
+  color: var(--text-white);
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  transition: all 0.3s ease;
+  box-sizing: border-box;
+}
+
+.input-busca::placeholder {
+  color: var(--text-gray);
+  opacity: 0.7;
+}
+
+.input-busca:focus {
+  outline: none;
+  background-color: rgba(255, 255, 255, 0.08);
+  border-color: var(--primary-yellow);
+  box-shadow: 0 0 12px rgba(255, 230, 0, 0.15);
+}
+
+.search-icon {
+  position: absolute;
+  right: 14px;
+  color: var(--text-gray);
+  font-size: 1.1rem;
+  pointer-events: none;
+}
+
+/* Filtro por Grupo Muscular */
+.filtro-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 220px;
+}
+
+.filtro-label {
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-gray);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.filtro-select {
+  padding: 10px 14px;
+  background-color: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border-light);
+  border-radius: 8px;
+  color: var(--text-white);
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%23b0b0b0' d='M1 1l5 5 5-5'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-right: 36px;
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.filtro-select:hover {
+  background-color: rgba(255, 255, 255, 0.08);
+}
+
+.filtro-select:focus {
+  outline: none;
+  border-color: var(--primary-yellow);
+  box-shadow: 0 0 12px rgba(255, 230, 0, 0.15);
+}
+
+.filtro-select option {
+  background-color: #1a1a1a;
+  color: var(--text-white);
+  padding: 8px;
+}
+
+/* Estados de Carregamento e Erro */
+.exercicios-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  min-height: 400px;
+  color: var(--text-gray);
+}
+
+.spinner {
+  width: 50px;
+  height: 50px;
+  border: 3px solid rgba(255, 230, 0, 0.2);
+  border-top-color: var(--primary-yellow);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.exercicios-loading p {
+  font-family: var(--font-body);
+  font-size: 1.05rem;
+}
+
+.exercicios-erro {
+  padding: 20px;
+  background-color: rgba(255, 100, 100, 0.1);
+  border: 1px solid rgba(255, 100, 100, 0.3);
+  border-radius: 8px;
+  margin-bottom: 30px;
+}
+
+.exercicios-erro p {
+  color: #ff6464;
+  font-family: var(--font-body);
+  margin: 0;
+  font-weight: 500;
+}
+
+.exercicios-vazio {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 300px;
+  text-align: center;
+}
+
+.exercicios-vazio p {
+  color: var(--text-gray);
+  font-family: var(--font-body);
+  font-size: 1.1rem;
+  margin: 0;
+}
+
+/* Grid de Cards */
+.exercicios-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 24px;
+  margin-bottom: 40px;
+}
+
+/* Card de Exercício */
+.exercicio-card {
+  position: relative;
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-light);
+  border-radius: 12px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  transition: all 0.3s ease;
+  overflow: hidden;
+  height: 100%;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.exercicio-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(circle at top right, rgba(255, 230, 0, 0.03) 0%, transparent 50%);
+  pointer-events: none;
+}
+
+.exercicio-card:hover {
+  border-color: var(--primary-yellow);
+  box-shadow: 0 8px 24px rgba(255, 230, 0, 0.1);
+  transform: translateY(-4px);
+}
+
+/* Badge do Grupo Muscular */
+.card-badge {
+  display: inline-block;
+  align-self: flex-start;
+  padding: 6px 12px;
+  background: linear-gradient(135deg, var(--primary-yellow) 0%, #ffdb4d 100%);
+  color: #000;
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  border-radius: 20px;
+  z-index: 1;
+  box-shadow: 0 2px 8px rgba(255, 230, 0, 0.2);
+}
+
+/* Conteúdo do Card */
+.card-content {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  flex: 1;
+  z-index: 1;
+}
+
+.card-titulo {
+  font-family: var(--font-title);
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--text-white);
+  margin: 0;
+  line-height: 1.3;
+  word-break: break-word;
+}
+
+.card-descricao {
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  color: var(--text-gray);
+  margin: 0;
+  line-height: 1.5;
+  flex: 1;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Botão de Vídeo */
+.card-video-btn {
+  align-self: flex-start;
+  padding: 10px 16px;
+  background: linear-gradient(135deg, var(--primary-yellow) 0%, #ffdb4d 100%);
+  color: #000;
+  border: none;
+  border-radius: 6px;
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(255, 230, 0, 0.2);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.card-video-btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 16px rgba(255, 230, 0, 0.3);
+}
+
+.card-video-btn:active {
+  transform: scale(0.98);
+}
+
+/* Mensagem quando não há vídeo */
+.card-sem-video {
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  color: var(--text-gray);
+  margin: 0;
+  font-style: italic;
+  opacity: 0.7;
+}
+
+/* Footer com Contagem de Resultados */
+.exercicios-footer {
+  display: flex;
+  justify-content: center;
+  padding: 20px;
+  border-top: 1px solid var(--border-light);
+  margin-top: 30px;
+}
+
+.exercicios-footer p {
+  font-family: var(--font-body);
+  color: var(--text-gray);
+  font-size: 0.95rem;
+  margin: 0;
+}
+
+.exercicios-footer strong {
+  color: var(--primary-yellow);
+  font-weight: 600;
+}
+
+/* Responsividade */
+@media (max-width: 1024px) {
+  .exercicios-container {
+    padding: 30px 40px;
+  }
+
+  .exercicios-header h1 {
+    font-size: 2rem;
+  }
+
+  .exercicios-grid {
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 18px;
+  }
+
+  .exercicios-controls {
+    gap: 15px;
+  }
+}
+
+@media (max-width: 768px) {
+  .exercicios-container {
+    padding: 20px;
+  }
+
+  .exercicios-header {
+    margin-bottom: 30px;
+  }
+
+  .exercicios-header h1 {
+    font-size: 1.7rem;
+  }
+
+  .exercicios-header p {
+    font-size: 0.9rem;
+  }
+
+  .exercicios-controls {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .busca-wrapper {
+    min-width: 100%;
+  }
+
+  .filtro-wrapper {
+    width: 100%;
+  }
+
+  .filtro-select {
+    width: 100%;
+  }
+
+  .exercicios-grid {
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 14px;
+  }
+
+  .exercicio-card {
+    padding: 16px;
+  }
+
+  .card-titulo {
+    font-size: 1.1rem;
+  }
+
+  .card-descricao {
+    font-size: 0.85rem;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+  }
+
+  .card-badge {
+    font-size: 0.7rem;
+    padding: 5px 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  .exercicios-container {
+    padding: 16px;
+  }
+
+  .exercicios-header h1 {
+    font-size: 1.5rem;
+  }
+
+  .exercicios-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .exercicio-card {
+    padding: 14px;
+  }
+
+  .card-titulo {
+    font-size: 1rem;
+  }
+
+  .card-video-btn {
+    width: 100%;
+    text-align: center;
+  }
+}

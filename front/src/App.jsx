@@ -8,6 +8,7 @@ import Dashboard from './pages/Dashboard';
 import MeusTreinos from './pages/MeusTreinos';
 import DetalhesTreinos from './pages/DetalhesTreinos';
 import Evolucao from './pages/Evolucao';
+import Exercicios from './pages/Exercicios';
 import CriarTreino from './pages/CriarTreino';
 import Configuracoes from './pages/Configuracoes';
 import RedefinirSenha from './pages/RedefinirSenha';
@@ -43,6 +44,7 @@ function App() {
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/meus-treinos" element={<MeusTreinos />} />
           <Route path="/treino/:id" element={<DetalhesTreinos />} />
+          <Route path="/exercicios" element={<Exercicios />} />
           <Route path="/evolucao" element={<Evolucao />} />
           <Route 
             path="/admin/criar-treino" 
