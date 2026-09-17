@@ -32,19 +32,21 @@ const exerciciosService = {
     },
 
     async atualizar(idExercicio, dados) {
-        await this.buscarPorId(idExercicio);
+        const exercicioExistente = await this.buscarPorId(idExercicio);
 
         const exercicio = Exercicio.editar({
             idExercicio: String(idExercicio),
-            nome: dados.nome,
-            descricao: dados.descricao,
-            caminho_video: dados.caminho_video
+            nome: dados.nome !== undefined ? dados.nome : exercicioExistente.nome,
+            grupo_muscular: dados.grupo_muscular !== undefined ? dados.grupo_muscular : exercicioExistente.grupo_muscular,
+            descricao: dados.descricao !== undefined ? dados.descricao : exercicioExistente.descricao,
+            caminho_video: dados.caminho_video !== undefined ? dados.caminho_video : exercicioExistente.caminho_video
         });
 
         return await exerciciosRepository.atualizar(
             exercicio.idExercicio,
             {
                 nome: exercicio.nome,
+                grupo_muscular: exercicio.grupo_muscular,
                 descricao: exercicio.descricao,
                 caminho_video: exercicio.caminho_video
             }
