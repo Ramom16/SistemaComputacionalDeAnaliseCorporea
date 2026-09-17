@@ -1,28 +1,42 @@
 import { validarUUID } from "../utils/cryptoUtils.js";
 
+const GRUPOS_MUSCULARES_VALIDOS = [
+    "Peito",
+    "Costa",
+    "Ombro",
+    "Braço",
+    "Antebraço",
+    "Coxa",
+    "Perna",
+    "Glúteos",
+    "Abdomen",
+    "Cardio"
+];
+
 export class Exercicio {
 
     #idExercicio;
     #nome;
+    #grupo_muscular;
     #descricao;
     #caminho_video;
-    #grupo_musculo
 
     constructor(
         nome,
+        grupo_muscular,
         descricao = null,
         caminho_video = null,
         idExercicio = null
     ) {
-
         this.idExercicio = idExercicio;
         this.nome = nome;
+        this.grupo_muscular = grupo_muscular;
         this.descricao = descricao;
         this.caminho_video = caminho_video;
     }
 
     // =========================
-    // GETTERS
+    // GETTERS (Acesso aos valores)
     // =========================
 
     get idExercicio() {
@@ -31,6 +45,10 @@ export class Exercicio {
 
     get nome() {
         return this.#nome;
+    }
+
+    get grupo_muscular() {
+        return this.#grupo_muscular;
     }
 
     get descricao() {
@@ -42,15 +60,11 @@ export class Exercicio {
     }
 
     // =========================
-    // SETTERS
+    // SETTERS (Validações e Atribuições)
     // =========================
 
     set idExercicio(value) {
-
-        if (
-            value !== null &&
-            value !== undefined
-        ) {
+        if (value !== null && value !== undefined) {
             if (typeof value !== "string" || !validarUUID(value)) {
                 throw new Error("ID do exercício deve ser um UUID válido");
             }
@@ -61,7 +75,6 @@ export class Exercicio {
     }
 
     set nome(value) {
-
         if (
             typeof value !== "string" ||
             value.trim().length < 2 ||
@@ -75,8 +88,17 @@ export class Exercicio {
         this.#nome = value.trim();
     }
 
-    set descricao(value) {
+    set grupo_muscular(value) {
+        if (typeof value !== "string" || !GRUPOS_MUSCULARES_VALIDOS.includes(value)) {
+            throw new Error(
+                `Grupo muscular inválido. Deve ser um dos seguintes: ${GRUPOS_MUSCULARES_VALIDOS.join(", ")}`
+            );
+        }
 
+        this.#grupo_muscular = value;
+    }
+
+    set descricao(value) {
         if (
             value !== null &&
             value !== undefined &&
@@ -85,9 +107,7 @@ export class Exercicio {
                 value.trim().length > 255
             )
         ) {
-            throw new Error(
-                "Descrição do exercício inválida"
-            );
+            throw new Error("Descrição do exercício inválida");
         }
 
         this.#descricao =
@@ -97,7 +117,6 @@ export class Exercicio {
     }
 
     set caminho_video(value) {
-
         if (
             value !== null &&
             value !== undefined &&
@@ -106,9 +125,7 @@ export class Exercicio {
                 value.trim().length > 255
             )
         ) {
-            throw new Error(
-                "Caminho do vídeo inválido"
-            );
+            throw new Error("Caminho do vídeo inválido");
         }
 
         this.#caminho_video =
@@ -118,17 +135,18 @@ export class Exercicio {
     }
 
     // =========================
-    // FACTORY
+    // FACTORY (Métodos de Criação)
     // =========================
 
     static criar({
         nome,
+        grupo_muscular,
         descricao = null,
         caminho_video = null
     }) {
-
         return new Exercicio(
             nome,
+            grupo_muscular,
             descricao,
             caminho_video
         );
@@ -137,18 +155,17 @@ export class Exercicio {
     static editar({
         idExercicio,
         nome,
+        grupo_muscular,
         descricao = null,
         caminho_video = null
     }) {
-
         if (!idExercicio) {
-            throw new Error(
-                "ID do exercício é obrigatório"
-            );
+            throw new Error("ID do exercício é obrigatório");
         }
 
         return new Exercicio(
             nome,
+            grupo_muscular,
             descricao,
             caminho_video,
             String(idExercicio)

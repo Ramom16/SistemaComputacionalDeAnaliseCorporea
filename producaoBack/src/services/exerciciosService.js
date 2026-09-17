@@ -9,7 +9,8 @@ const exerciciosService = {
         return await exerciciosRepository.criar({
             nome: exercicio.nome,
             descricao: exercicio.descricao,
-            caminho_video: exercicio.caminho_video
+            caminho_video: exercicio.caminho_video,
+            grupo_muscular: exercicio.grupo_muscular
         });
     },
 
