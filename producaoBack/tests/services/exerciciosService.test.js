@@ -108,6 +108,7 @@ describe("exerciciosService - atualizar", () => {
 
     const resultado = await exerciciosService.atualizar(UUID_EXERCICIO, {
       nome: "Supino Inclinado",
+      grupo_muscular: "Peito",
       descricao: null,
       caminho_video: null
     });
@@ -119,7 +120,12 @@ describe("exerciciosService - atualizar", () => {
   it("deve lançar erro se o exercício não existir para atualizar", async () => {
     exerciciosRepository.buscarPorId.mockResolvedValue(null);
     await expect(
-      exerciciosService.atualizar(UUID_EXERCICIO, { nome: "Flexão", descricao: null, caminho_video: null })
+      exerciciosService.atualizar(UUID_EXERCICIO, {
+        nome: "Flexão",
+        grupo_muscular: "Abdomen",
+        descricao: null,
+        caminho_video: null
+      })
     ).rejects.toThrow("Exercício não encontrado.");
     expect(exerciciosRepository.atualizar).not.toHaveBeenCalled();
   });
