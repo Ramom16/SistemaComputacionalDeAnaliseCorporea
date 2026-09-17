@@ -144,6 +144,7 @@ A matriz abaixo detalha como os requisitos propostos se conectam à estrutura de
 | **Acompanhamento de Evolução** | `dados_corporais`, `calculos`, `historico_corporal` | Consultas cronológicas extraindo gráficos de evolução de Peso, IMC e NDC. Cada alteração de dados cria um snapshot em `historico_corporal`. |
 | **Exibição de Exercícios** | `exercicios`, `treinos_exercicios` | Front-end renderiza a lista de exercícios do treino atual, carregando o campo `caminho_video` para um media player. |
 | **Desativação de Conta** | `usuarios` | Soft-delete (`ativo = false`). Após desativação pelo próprio usuário ou por um ADMIN, o sistema envia e-mail de aviso via `enviarEmaildeContaDesativada()` preservando os dados históricos. |
+| **Reativação de Conta (ADMIN)** | `usuarios` | ADMIN pode reativar contas desativadas via `PATCH /:id/reativar`. Após reativação, o sistema envia e-mail de boas-vindas via `enviarEmaildeContaReativada()`. Verifica se conta já está ativa antes de prosseguir. |
 | **Gestão de Perfis (ADMIN)** | `usuarios` | ADMIN pode listar todos os usuários, alterar `role` (USER/ADMIN) e desativar contas de terceiros. Proteção IDOR aplicada para usuários comuns. |
 | **Foto de Perfil** | `perfil` | Upload de imagem via Multer, salvo em `uploads/images/` e URL absoluta armazenada em `perfil.fotoPerfil`. |
 
@@ -158,6 +159,7 @@ O sistema usa **Nodemailer** com SMTP do Gmail (porta 465, SSL). Todas as creden
 | `enviarEmailVerificacao(email, link)` | "Verifique sua conta - IRONFIT" | Após o cadastro do usuário, antes de ativar a conta. |
 | `enviarEmailRecuperacaoSenha(email, link)` | "Recuperação de Senha - IRONFIT" | Quando o usuário solicita redefinição de senha. |
 | `enviarEmaildeContaDesativada(email, nome)` | "Aviso de Desativação de Conta - IRONFIT" | Imediatamente após `desativarConta` (auto) ou `desativarUsuarioPorId` (ADMIN). |
+| `enviarEmaildeContaReativada(email, nome)` | "Sua conta foi reativada - IRONFIT" | Imediatamente após `reativarUsuarioPorId` (ADMIN). Box verde de sucesso no template. |
 
 > **Padrão visual dos e-mails:** fundo escuro (`#050505`), card com imagem de academia em overlay, logo IRONFIT em amarelo (`#ffe600`), botão CTA amarelo com sombra dourada. Templates HTML responsivos com media query para mobile (≤ 600px).
 

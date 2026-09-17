@@ -1,6 +1,6 @@
 import usuariosRepository from "../repositories/usuariosRepository.js";
 import { anexarIdsCriptografados } from "../middlewares/tratarIdsCriptografados.js";
-import { enviarEmaildeContaDesativada } from "../services/emailService.js";
+import { enviarEmaildeContaDesativada, enviarEmaildeContaReativada } from "../services/emailService.js";
 
 const usuariosController = {
   selecionarUsuario: async (req, res) => {
@@ -169,6 +169,37 @@ usuariosController.desativarUsuarioPorId = async (req, res) => {
     }
 
     return res.status(200).json({ msg: 'Usuário desativado com sucesso.' });
+  } catch (error) {
+    return res.status(500).json({ erro: error.message });
+  }
+};
+
+// Admin: reativar usuário por id
+usuariosController.reativarUsuarioPorId = async (req, res) => {
+  try {
+    const idAlvo = req.params.id;
+    const isAdm = req.usuario?.role === 'ADMIN';
+    if (!isAdm) return res.status(403).json({ erro: 'Permissão negada.' });
+
+    const usuarioExiste = await usuariosRepository.buscarPorId(String(idAlvo));
+    if (!usuarioExiste) return res.status(404).json({ erro: 'Usuário não encontrado.' });
+
+    if (usuarioExiste.ativo) {
+      return res.status(400).json({ erro: 'A conta deste usuário já está ativa.' });
+    }
+
+    const usuarioReativado = await usuariosRepository.ativar(String(idAlvo));
+
+    // Dispara e-mail de confirmação de reativação
+    if (usuarioReativado?.email) {
+      try {
+        await enviarEmaildeContaReativada(usuarioReativado.email, usuarioReativado.nome);
+      } catch (emailError) {
+        console.error("Erro ao enviar e-mail de reativação (Admin):", emailError);
+      }
+    }
+
+    return res.status(200).json({ msg: 'Usuário reativado com sucesso.' });
   } catch (error) {
     return res.status(500).json({ erro: error.message });
   }
