@@ -12,6 +12,7 @@ export default function Exercicios() {
   const [grupoSelecionado, setGrupoSelecionado] = useState('Todos');
   const [modalAberto, setModalAberto] = useState(false);
   const [salvando, setSalvando] = useState(false);
+  const [remover, setRemover] = useState(false);
   const [novoExercicio, setNovoExercicio] = useState({ nome: '', grupo_muscular: 'Peito', descricao: '', caminho_video: '' });
   const usuario = (() => {
     try { return JSON.parse(localStorage.getItem('usuario') || 'null'); } catch { return null; }
@@ -108,6 +109,18 @@ export default function Exercicios() {
     }
   };
 
+  const removerExercicio = async (id) => {
+    if (!window.confirm('Tem certeza que deseja remover este exercício?')) return;
+    try {
+      await api.delete(`/exercicios/${id}`);
+      window.alert('Exercício removido com sucesso.');
+      const response = await api.get('/exercicios');
+      setExercicios(response.data?.data || response.data || []);
+    } catch (err) {
+      window.alert(err.response?.data?.erro || err.response?.data?.error || err.response?.data?.message || 'Não foi possível remover o exercício.');
+    }
+  };
+
   return (
     <div className="dashboard-layout">
       <DashboardNavbar />
@@ -201,20 +214,48 @@ export default function Exercicios() {
                     </p>
                   )}
 
-                  {/* Botão de Vídeo */}
-                  {exercicio.caminho_video && (
-                    <button
-                      className="card-video-btn"
-                      onClick={() => abrirVideo(exercicio.caminho_video)}
-                      title="Abrir vídeo demonstrativo"
-                    >
-                      ▶ Assista a Demonstração
-                    </button>
-                  )}
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '16px' }}>
+                    {/* Botão de Vídeo */}
+                    {exercicio.caminho_video ? (
+                      <button
+                        className="card-video-btn"
+                        onClick={() => abrirVideo(exercicio.caminho_video)}
+                        title="Abrir vídeo demonstrativo"
+                        style={{ width: '100%' }}
+                      >
+                        ▶ Assista a Demonstração
+                      </button>
+                    ) : (
+                      <p className="card-sem-video" style={{ textAlign: 'center', padding: '10px', margin: '0' }}>Sem vídeo disponível</p>
+                    )}
 
-                  {!exercicio.caminho_video && (
-                    <p className="card-sem-video">Sem vídeo disponível</p>
-                  )}
+                    {/* Botão de Remover */}
+                    {eAdmin && (
+                      <button
+                        onClick={() => removerExercicio(exercicio.id || exercicio.idExercicio)}
+                        title="Remover exercício"
+                        style={{ 
+                          width: '100%', 
+                          padding: '10px 16px', 
+                          backgroundColor: '#ff4d4f', 
+                          color: '#fff', 
+                          border: 'none', 
+                          borderRadius: '8px', 
+                          fontWeight: 'bold', 
+                          cursor: 'pointer',
+                          transition: 'background-color 0.2s',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          gap: '8px'
+                        }}
+                        onMouseEnter={(e) => e.target.style.backgroundColor = '#ff7875'}
+                        onMouseLeave={(e) => e.target.style.backgroundColor = '#ff4d4f'}
+                      >
+                        🗑️ Remover
+                      </button>
+                    )}
+                  </div>
                 </div>
               </div>
             ))}
