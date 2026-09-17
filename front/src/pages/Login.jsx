@@ -97,12 +97,6 @@ export default function Login() {
 
             {loginData && (
               <div className="retorno" id="retorno" style={{ display: 'block' }}>
-                <div className="retorno-info">
-                  <p><strong>Token de Acesso:</strong></p>
-                  <p id="token" style={{ wordBreak: 'break-all', fontSize: '12px', marginTop: '4px', color: 'var(--primary-yellow)' }}>
-                    {loginData.token}
-                  </p>
-                </div>
                 <div className="retorno-info" style={{ marginTop: '10px' }}>
                   <p id="retornoUsuario">Bem-vindo, {loginData.nome}!</p>
                 </div>
