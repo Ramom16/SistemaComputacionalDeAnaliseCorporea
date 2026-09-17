@@ -15,6 +15,9 @@ router.get("/:id", usuariosController.selecionarUsuario);
 // Rota administrativa para alterar role de usuário (USER <-> ADMIN)
 router.patch("/:id/role", eAdmin, usuariosController.alterarRole);
 
+// Rota administrativa para desativar outro usuário
+router.delete("/:id/desativar", eAdmin, usuariosController.desativarUsuarioPorId);
+
 // Rota para desativar a conta do usuário
 router.delete("/desativar-conta", usuariosController.desativarConta);
 

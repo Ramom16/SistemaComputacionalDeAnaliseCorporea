@@ -9,6 +9,7 @@ import MeusTreinos from './pages/MeusTreinos';
 import DetalhesTreinos from './pages/DetalhesTreinos';
 import Evolucao from './pages/Evolucao';
 import CriarTreino from './pages/CriarTreino';
+import Configuracoes from './pages/Configuracoes';
 import RedefinirSenha from './pages/RedefinirSenha';
 import ProtectedRoute from './components/ProtectedRoute';
 
@@ -51,6 +52,7 @@ function App() {
               </AdminRoute>
             } 
           />
+          <Route path="/configuracoes" element={<Configuracoes />} />
         </Route>
       </Routes>
     </BrowserRouter>

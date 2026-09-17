@@ -47,8 +47,8 @@ export default function DashboardNavbar({ onLogout }) {
           Evolução
         </Link>
         <Link 
-          to="#" 
-          className="nav-link"
+          to="/configuracoes" 
+          className={`nav-link ${isActive('/configuracoes')}`}
         >
           Configurações
         </Link>

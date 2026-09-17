@@ -99,4 +99,19 @@ const usuariosController = {
   }
 };
 
+// Admin: desativar usuário por id
+usuariosController.desativarUsuarioPorId = async (req, res) => {
+  try {
+    const idAlvo = req.params.id;
+    const isAdm = req.usuario?.role === 'ADMIN';
+    if (!isAdm) return res.status(403).json({ erro: 'Permissão negada.' });
+    const usuarioExiste = await usuariosRepository.buscarPorId(String(idAlvo));
+    if (!usuarioExiste) return res.status(404).json({ erro: 'Usuário não encontrado.' });
+    await usuariosRepository.desativar(String(idAlvo));
+    return res.status(200).json({ msg: 'Usuário desativado com sucesso.' });
+  } catch (error) {
+    return res.status(500).json({ erro: error.message });
+  }
+};
+
 export default usuariosController;
