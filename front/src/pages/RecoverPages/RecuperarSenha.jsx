@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import api from '../services/api'; // Importação do Axios (Ajuste o caminho se necessário)
+import api from '../../services/api'; // Importação do Axios (Ajuste o caminho se necessário)
 
 export default function RecuperarSenha() {
   const [email, setEmail] = useState('');

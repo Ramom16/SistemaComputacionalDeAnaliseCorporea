@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import DashboardNavbar from '../components/DashboardNavbar';
-import api from '../services/api';
-import '../styles/dashboard.css';
-import '../styles/meustreinos.css';
+import DashboardNavbar from '../../components/DashboardNavbar';
+import api from '../../services/api';
+import '../../styles/dashboard.css';
+import '../../styles/meustreinos.css';
 
 export default function CriarTreino() {
   const navigate = useNavigate();
