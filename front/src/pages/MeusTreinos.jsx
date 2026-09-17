@@ -63,6 +63,17 @@ export default function MeusTreinos() {
     (t) => filtroObjetivo === "Todos" || t.objetivo === filtroObjetivo
   );
 
+  const removerTreino = async (id) => {
+    if (!window.confirm("Tem certeza que deseja remover este treino?")) return;
+    try {
+      await api.delete(`/treinos/${id}`);
+      window.alert("Treino removido com sucesso.");
+      setTreinos(prev => prev.filter(t => (t.idTreino || t.id) !== id));
+    } catch (err) {
+      window.alert(err.response?.data?.erro || err.response?.data?.error || err.response?.data?.message || "Não foi possível remover o treino.");
+    }
+  };
+
   return (
     <>
       <DashboardNavbar onLogout={handleLogout} />
@@ -101,9 +112,13 @@ export default function MeusTreinos() {
                 transition: 'all 0.3s',
                 boxShadow: '0 4px 15px rgba(255, 230, 0, 0.2)'
               }}
-              onMouseHover={{
-                transform: 'translateY(-2px)',
-                boxShadow: '0 8px 25px rgba(255, 230, 0, 0.4)'
+              onMouseEnter={(e) => {
+                e.target.style.transform = 'translateY(-2px)';
+                e.target.style.boxShadow = '0 8px 25px rgba(255, 230, 0, 0.4)';
+              }}
+              onMouseLeave={(e) => {
+                e.target.style.transform = 'translateY(0)';
+                e.target.style.boxShadow = '0 4px 15px rgba(255, 230, 0, 0.2)';
               }}
             >
               + Criar Treino Global
@@ -140,6 +155,8 @@ export default function MeusTreinos() {
                 key={treino.idTreino || treino.id}
                 treino={treino}
                 onClick={() => navigate(`/treino/${treino.idTreino || treino.id}`)}
+                onRemove={removerTreino}
+                eAdmin={usuarioData?.role === 'ADMIN'}
               />
             ))}
           </div>
@@ -150,7 +167,7 @@ export default function MeusTreinos() {
   );
 }
 
-function TreinoCard({ treino, onClick }) {
+function TreinoCard({ treino, onClick, onRemove, eAdmin }) {
   // Mapeia cores por objetivo para melhor visualização
   const coresPorObjetivo = {
     "Hipertrofia": "#FF6B6B",
@@ -187,8 +204,35 @@ function TreinoCard({ treino, onClick }) {
         <span>👤 {treino.nivel || "Iniciante"}</span>
       </div>
 
-      <div className="treino-card-footer">
+      <div className="treino-card-footer" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <span className="ver-treino">Ver treino e exercícios →</span>
+        {eAdmin && (
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onRemove(treino.idTreino || treino.id);
+            }}
+            title="Remover treino"
+            style={{
+              padding: '6px 12px',
+              backgroundColor: '#ff4d4f',
+              color: '#fff',
+              border: 'none',
+              borderRadius: '6px',
+              fontWeight: 'bold',
+              cursor: 'pointer',
+              transition: 'background-color 0.2s',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '4px',
+              fontSize: '0.85rem'
+            }}
+            onMouseEnter={(e) => e.target.style.backgroundColor = '#ff7875'}
+            onMouseLeave={(e) => e.target.style.backgroundColor = '#ff4d4f'}
+          >
+            🗑️ Remover
+          </button>
+        )}
       </div>
     </div>
   );
