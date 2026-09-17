@@ -149,7 +149,7 @@ model Exercicio {
 
   nome String @db.VarChar(150)
 
-  grupo_muscular String? @db.VarChar(100)
+  grupo_muscular grupo_muscular 
   descricao String? @db.VarChar(255)
   caminho_video String? @db.VarChar(255)
 
@@ -171,7 +171,7 @@ model TreinoExercicio {
   descanso_segundos Int
   repeticoes       Int
 
-  grupo_muscular String @db.VarChar(250)
+  grupo_muscular grupo_muscular
 
   tipo TipoExercicio
 
