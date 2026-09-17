@@ -1,5 +1,5 @@
 import React, { createContext, useState, useEffect, useContext } from 'react';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import storage from '../utils/storage';
 import {
   api,
   setAuthToken,
@@ -23,8 +23,8 @@ export function AuthProvider({ children }) {
     async function restaurarSessao() {
       try {
         const [tokenArmazenado, usuarioArmazenado] = await Promise.all([
-          AsyncStorage.getItem(STORAGE_KEY_TOKEN),
-          AsyncStorage.getItem(STORAGE_KEY_USER),
+          storage.getItem(STORAGE_KEY_TOKEN),
+          storage.getItem(STORAGE_KEY_USER),
         ]);
 
         if (tokenArmazenado) {
@@ -47,7 +47,7 @@ export function AuthProvider({ children }) {
             const meResponse = await api.getMe();
             if (meResponse?.usuario) {
               setUser(meResponse.usuario);
-              await AsyncStorage.setItem(STORAGE_KEY_USER, JSON.stringify(meResponse.usuario));
+              await storage.setItem(STORAGE_KEY_USER, JSON.stringify(meResponse.usuario));
               carregarDadosCorporais(meResponse.usuario.id);
             }
           } catch (meError) {
@@ -124,8 +124,8 @@ export function AuthProvider({ children }) {
         setUser(usuario);
         setAuthToken(response.token);
 
-        await AsyncStorage.setItem(STORAGE_KEY_TOKEN, response.token);
-        await AsyncStorage.setItem(STORAGE_KEY_USER, JSON.stringify(usuario));
+        await storage.setItem(STORAGE_KEY_TOKEN, response.token);
+        await storage.setItem(STORAGE_KEY_USER, JSON.stringify(usuario));
 
         // Carrega dados corporais do usuário
         carregarDadosCorporais(usuario.id);
@@ -173,8 +173,8 @@ export function AuthProvider({ children }) {
     setAuthToken(null);
 
     try {
-      await AsyncStorage.removeItem(STORAGE_KEY_TOKEN);
-      await AsyncStorage.removeItem(STORAGE_KEY_USER);
+      await storage.removeItem(STORAGE_KEY_TOKEN);
+      await storage.removeItem(STORAGE_KEY_USER);
     } catch (e) {
       console.warn('Erro ao limpar armazenamento:', e);
     }
