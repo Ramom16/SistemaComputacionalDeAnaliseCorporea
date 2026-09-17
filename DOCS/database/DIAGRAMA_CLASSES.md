@@ -1,6 +1,6 @@
 # Diagrama de Classes Utilizadas - IRONFIT
 
-Este documento apresenta o modelo orientado a objetos do backend do sistema IRONFIT, representando as classes de domínio (`src/models/`), seus atributos privados, métodos de encapsulamento e relações associativas.
+Este documento apresenta o modelo orientado a objetos do backend do sistema IRONFIT, representando as classes de domínio (`src/models/`), o serviço de e-mail (`src/services/`) e suas relações associativas.
 
 ---
 
@@ -150,8 +150,20 @@ classDiagram
         +static editar(Object dados) Exercicio
     }
 
+    class EmailService {
+        <<service>>
+        -String smtpHost
+        -Number smtpPort
+        -String emailUser
+        -String emailPass
+        +enviarEmailVerificacao(String email, String link) Promise~void~
+        +enviarEmailRecuperacaoSenha(String email, String link) Promise~void~
+        +enviarEmaildeContaDesativada(String email, String nome) Promise~void~
+    }
+
     Usuario "1" --> "1" DadosCorporais : possui dados corporais
     Usuario "1" --> "0..*" Treino : pode possuir treinos
+    Usuario "1" ..> EmailService : notificado por
     DadosCorporais "1" --> "1..*" Calculo : gera cálculos metabólicos
     Calculo "1" --> "0..*" Treino : embasa treinos pessoais
     Treino "1" --> "1..*" Exercicio : associa exercícios
@@ -166,3 +178,5 @@ classDiagram
 3. **`Calculo`**: Armazena as métricas metabólicas calculadas (Índice de Massa Corporal - IMC, Taxa Metabólica Basal - TMB e Necessidade Diária de Calorias - NDC).
 4. **`Treino`**: Gerencia as fichas de treino, suportando tanto fichas personalizadas atreladas a um cálculo e usuário quanto fichas oficiais globais geradas por administradores (`is_oficial = true`).
 5. **`Exercicio`**: Catálogo de exercícios físicos categorizados por `grupo_muscular` obrigatório (`Peito`, `Costa`, `Ombro`, etc.), links explicativos e descrições técnicas de execução.
+6. **`EmailService`** *(Serviço)*: Responsável pelo envio de e-mails transacionais via Nodemailer/SMTP Gmail. Expõe três funções assíncronas para verificação de conta, recuperação de senha e notificação de desativação de conta. É invocado por `authController` e `usuariosController` de forma independente (falha no envio não impede a operação principal).
+
