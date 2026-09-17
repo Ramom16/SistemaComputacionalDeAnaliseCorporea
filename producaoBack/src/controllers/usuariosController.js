@@ -1,5 +1,6 @@
 import usuariosRepository from "../repositories/usuariosRepository.js";
 import { anexarIdsCriptografados } from "../middlewares/tratarIdsCriptografados.js";
+import { enviarEmaildeContaDesativada } from "../services/emailService.js";
 
 const usuariosController = {
   selecionarUsuario: async (req, res) => {
@@ -47,7 +48,16 @@ const usuariosController = {
       }
 
       // Desativa o usuário no banco de dados
-      await usuariosRepository.desativar(usuarioId);
+      const usuarioDesativado = await usuariosRepository.desativar(usuarioId);
+
+      // Dispara envio de e-mail de confirmação de desativação
+      if (usuarioDesativado?.email) {
+        try {
+          await enviarEmaildeContaDesativada(usuarioDesativado.email, usuarioDesativado.nome);
+        } catch (emailError) {
+          console.error("Erro ao enviar e-mail de desativação de conta:", emailError);
+        }
+      }
 
       return res.status(200).json({
         msg: "Conta desativada com sucesso. Você será desconectado.",
@@ -147,7 +157,17 @@ usuariosController.desativarUsuarioPorId = async (req, res) => {
     if (!isAdm) return res.status(403).json({ erro: 'Permissão negada.' });
     const usuarioExiste = await usuariosRepository.buscarPorId(String(idAlvo));
     if (!usuarioExiste) return res.status(404).json({ erro: 'Usuário não encontrado.' });
-    await usuariosRepository.desativar(String(idAlvo));
+    
+    const usuarioDesativado = await usuariosRepository.desativar(String(idAlvo));
+
+    if (usuarioDesativado?.email) {
+      try {
+        await enviarEmaildeContaDesativada(usuarioDesativado.email, usuarioDesativado.nome);
+      } catch (emailError) {
+        console.error("Erro ao enviar e-mail de desativação (Admin):", emailError);
+      }
+    }
+
     return res.status(200).json({ msg: 'Usuário desativado com sucesso.' });
   } catch (error) {
     return res.status(500).json({ erro: error.message });
