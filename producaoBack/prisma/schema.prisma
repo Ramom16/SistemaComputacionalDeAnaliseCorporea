@@ -304,3 +304,16 @@ enum TipoExercicio {
   Alongamento
   Mobilidade
 }
+
+enum grupo_muscular {
+  Peito
+  Costa
+  Ombro
+  Braço
+  Antebraço
+  Coxa
+  Perna
+  Glúteos
+  Abdomen
+  Cardio
+}

@@ -6,6 +6,7 @@ export class Exercicio {
     #nome;
     #descricao;
     #caminho_video;
+    #grupo_musculo
 
     constructor(
         nome,
