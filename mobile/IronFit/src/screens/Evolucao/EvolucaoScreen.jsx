@@ -11,13 +11,21 @@ import {
 import { useAuth } from '../../context/AuthContext';
 import { api } from '../../services/api';
 
+function generateUUID() {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+    const r = (Math.random() * 16) | 0;
+    const v = c === 'x' ? r : (r & 0x3) | 0x8;
+    return v.toString(16);
+  });
+}
+
 export default function EvolucaoScreen() {
   const { user, dadosCorporais } = useAuth();
 
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [historicoBanco, setHistoricoBanco] = useState([]);
-  const [metric, setMetric] = useState('peso_kg'); // 'peso_kg', 'imc', 'tmb'
+  const [metric, setMetric] = useState('peso_kg');
   const [estatisticas, setEstatisticas] = useState({
     cards: {
       totalTreinos: 0,
@@ -41,8 +49,8 @@ export default function EvolucaoScreen() {
 
     try {
       const [histData, statsData] = await Promise.all([
-        api.getHistorico(user.id),
-        api.getEstatisticas(user.id),
+        api.getHistorico(String(user.id)),
+        api.getEstatisticas(String(user.id)),
       ]);
 
       if (histData) {
@@ -51,13 +59,13 @@ export default function EvolucaoScreen() {
         const tmb = histData.tmb?.dados || [];
         const ndc = histData.ndc?.dados || [];
 
-        const listaMapeada = peso.map((item, index) => ({
-          idDados: index + 1,
+        const listaMapeada = peso.map((item) => ({
+          idDados: String(item.idDados || item.id || generateUUID()),
           data_registro: item.data,
           peso_kg: Number(item.valor || 0),
-          imc: Number(Number(imc[index]?.valor || 0).toFixed(1)),
-          tmb: Math.round(Number(tmb[index]?.valor || 0)),
-          ndc: Math.round(Number(ndc[index]?.valor || 0)),
+          imc: Number(Number(imc[0]?.valor || 0).toFixed(1)),
+          tmb: Math.round(Number(tmb[0]?.valor || 0)),
+          ndc: Math.round(Number(ndc[0]?.valor || 0)),
         }));
 
         setHistoricoBanco(listaMapeada);
@@ -88,7 +96,6 @@ export default function EvolucaoScreen() {
 
   const registros = historicoBanco.length > 0 ? historicoBanco : (dadosCorporais || []);
 
-  // Ordena os registros do mais antigo para o mais recente para o gráfico
   const registrosGrafico = [...registros].reverse();
   const valoresMetrica = registrosGrafico.map(r => Number(r[metric]) || 0);
   const maxValor = Math.max(...valoresMetrica, 1);
@@ -113,7 +120,6 @@ export default function EvolucaoScreen() {
         Acompanhe sua trajetória física e histórico de avaliações corporais salvas.
       </Text>
 
-      {/* Cards de Métricas de Treino */}
       <View style={styles.statsGrid}>
         <View style={styles.statCard}>
           <Text style={styles.statCardValue}>{estatisticas.cards.totalTreinos || 0}</Text>
@@ -131,7 +137,6 @@ export default function EvolucaoScreen() {
         </View>
       </View>
 
-      {/* Resumo de Progresso Corporal */}
       <View style={styles.summaryCard}>
         <Text style={styles.summaryTitle}>RESUMO CORPORAL</Text>
         <View style={styles.summaryRow}>
@@ -156,7 +161,6 @@ export default function EvolucaoScreen() {
         </View>
       </View>
 
-      {/* Gráfico Visual do Histórico */}
       {registrosGrafico.length > 0 && (
         <View style={styles.chartCard}>
           <Text style={styles.chartTitle}>GRÁFICO DE EVOLUÇÃO</Text>
@@ -193,7 +197,7 @@ export default function EvolucaoScreen() {
                 : `#${idx + 1}`;
 
               return (
-                <View key={idx} style={styles.barWrapper}>
+                <View key={item.idDados || idx} style={styles.barWrapper}>
                   <Text style={styles.barVal}>{valor}</Text>
                   <View style={styles.barTrack}>
                     <View style={[styles.barFill, { height: `${alturaPorcentagem}%` }]} />
@@ -264,7 +268,6 @@ export default function EvolucaoScreen() {
     </ScrollView>
   );
 }
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,

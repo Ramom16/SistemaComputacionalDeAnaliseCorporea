@@ -47,14 +47,6 @@ export default function LoginScreen({ navigation }) {
     }
   }
 
-  function handleDemoLogin() {
-    setEmail('atleta@ironfit.com');
-    setSenha('123456');
-    setErro('');
-    setStatusErro(null);
-    login('atleta@ironfit.com', '123456');
-  }
-
   async function handleEnviarRecuperacao() {
     if (!emailRecuperacao.trim()) {
       Alert.alert('Atenção', 'Informe seu e-mail para receber o link de recuperação.');
@@ -202,10 +194,6 @@ export default function LoginScreen({ navigation }) {
               )}
             </Pressable>
 
-            {/* Botão Demo / Acesso Rápido */}
-            <Pressable style={styles.demoButton} onPress={handleDemoLogin}>
-              <Text style={styles.demoButtonText}>⚡ Acesso Rápido (Modo Demo)</Text>
-            </Pressable>
           </View>
 
           {/* Rodapé / Link para Cadastro */}
@@ -409,20 +397,6 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: '900',
     letterSpacing: 1,
-  },
-  demoButton: {
-    borderWidth: 1,
-    borderColor: '#333333',
-    borderRadius: 8,
-    paddingVertical: 14,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#111111',
-  },
-  demoButtonText: {
-    color: '#CCCCCC',
-    fontSize: 14,
-    fontWeight: '700',
   },
   footer: {
     flexDirection: 'row',

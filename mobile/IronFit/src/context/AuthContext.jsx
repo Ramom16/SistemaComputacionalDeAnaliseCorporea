@@ -6,6 +6,14 @@ import {
   calcularMetabolismo,
 } from '../services/api';
 
+function generateUUID() {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+    const r = (Math.random() * 16) | 0;
+    const v = c === 'x' ? r : (r & 0x3) | 0x8;
+    return v.toString(16);
+  });
+}
+
 const AuthContext = createContext({});
 
 const STORAGE_KEY_TOKEN = '@ironfit:token';
@@ -18,7 +26,6 @@ export function AuthProvider({ children }) {
   const [initializing, setInitializing] = useState(true);
   const [dadosCorporais, setDadosCorporais] = useState([]);
 
-  // Restaura a sessão do AsyncStorage ao inicializar o app
   useEffect(() => {
     async function restaurarSessao() {
       try {
@@ -34,24 +41,26 @@ export function AuthProvider({ children }) {
           if (usuarioArmazenado) {
             try {
               const u = JSON.parse(usuarioArmazenado);
-              setUser(u);
-              // Busca os dados corporais do usuário silenciosamente
-              carregarDadosCorporais(u.id);
+              const usuarioFormatado = { ...u, id: String(u.id) };
+              setUser(usuarioFormatado);
+              carregarDadosCorporais(usuarioFormatado.id);
             } catch {
               // Ignore parse error
             }
           }
 
-          // Valida o token com o backend para garantir que não expirou
           try {
             const meResponse = await api.getMe();
             if (meResponse?.usuario) {
-              setUser(meResponse.usuario);
-              await storage.setItem(STORAGE_KEY_USER, JSON.stringify(meResponse.usuario));
-              carregarDadosCorporais(meResponse.usuario.id);
+              const u = {
+                ...meResponse.usuario,
+                id: String(meResponse.usuario.id),
+              };
+              setUser(u);
+              await storage.setItem(STORAGE_KEY_USER, JSON.stringify(u));
+              carregarDadosCorporais(u.id);
             }
           } catch (meError) {
-            // Se o token estiver expirado (401/403), remove do armazenamento
             if (meError.status === 401 || meError.status === 403) {
               console.log('Sessão expirada, deslogando usuário...');
               await logout();
@@ -68,22 +77,25 @@ export function AuthProvider({ children }) {
     restaurarSessao();
   }, []);
 
-  // Busca dados corporais do banco de dados
-  async function carregarDadosCorporais(usuarioId) {
-    const id = usuarioId || user?.id;
-    if (!id) return;
+  async function carregarDadosCorporais(idUsuarioParam) {
+    const idUsuario = idUsuarioParam ? String(idUsuarioParam) : (user?.id ? String(user.id) : null);
+    if (!idUsuario) return;
 
     try {
-      const response = await api.getDadosCorporais(id);
+      const response = await api.getDadosCorporais(idUsuario);
       if (!response) return;
 
-      // O backend pode retornar um array ou um objeto { calculos: [...] }
       let lista = [];
       if (Array.isArray(response)) {
-        lista = response;
+        lista = response.map((item) => ({
+          ...item,
+          idDados: String(item.idDados || item.id || generateUUID()),
+          idUsuario: String(item.idUsuario || idUsuario),
+        }));
       } else if (response.calculos) {
-        lista = response.calculos.map((calc, idx) => ({
-          idDados: calc.idCalculo || idx + 1,
+        lista = response.calculos.map((calc) => ({
+          idDados: String(calc.idCalculo || calc.idDados || generateUUID()),
+          idUsuario,
           peso_kg: response.peso_kg,
           altura_cm: response.altura_cm,
           genero: response.genero,
@@ -96,7 +108,11 @@ export function AuthProvider({ children }) {
           data_registro: calc.data_calculo || new Date().toISOString(),
         }));
       } else if (response.dados) {
-        lista = [response.dados];
+        lista = [{
+          ...response.dados,
+          idDados: String(response.dados.idDados || generateUUID()),
+          idUsuario: String(response.dados.idUsuario || idUsuario),
+        }];
       }
 
       if (lista.length > 0) {
@@ -107,18 +123,19 @@ export function AuthProvider({ children }) {
     }
   }
 
-  // 1. Login
   async function login(email, senha) {
     setLoading(true);
     try {
       const response = await api.login(email, senha);
 
       if (response && response.token) {
-        const usuario = response.usuario || {
-          id: response.id || 'usr-1',
-          email,
-          nome: email.split('@')[0],
-        };
+        const usuario = response.usuario
+          ? { ...response.usuario, id: String(response.usuario.id) }
+          : {
+              id: response.id ? String(response.id) : generateUUID(),
+              email,
+              nome: email.split('@')[0],
+            };
 
         setToken(response.token);
         setUser(usuario);
@@ -127,7 +144,6 @@ export function AuthProvider({ children }) {
         await storage.setItem(STORAGE_KEY_TOKEN, response.token);
         await storage.setItem(STORAGE_KEY_USER, JSON.stringify(usuario));
 
-        // Carrega dados corporais do usuário
         carregarDadosCorporais(usuario.id);
 
         return { success: true };
@@ -146,7 +162,6 @@ export function AuthProvider({ children }) {
     }
   }
 
-  // 2. Cadastro
   async function register(dados) {
     setLoading(true);
     try {
@@ -165,7 +180,6 @@ export function AuthProvider({ children }) {
     }
   }
 
-  // 3. Logout
   async function logout() {
     setUser(null);
     setToken(null);
@@ -180,11 +194,9 @@ export function AuthProvider({ children }) {
     }
   }
 
-  // 4. Salvar Avaliação Corporal
   async function adicionarAvaliacao(novaAvaliacao) {
     setLoading(true);
     try {
-      // Cálculo local preliminar
       const calculados = calcularMetabolismo({
         peso: novaAvaliacao.peso_kg,
         altura: novaAvaliacao.altura_cm,
@@ -193,27 +205,28 @@ export function AuthProvider({ children }) {
         nivelAtividade: novaAvaliacao.nivel_atividade,
       });
 
-      const registroLocal = {
-        idDados: Date.now(),
-        ...novaAvaliacao,
-        ...calculados,
-        data_registro: new Date().toISOString(),
+      const tempIdDados = generateUUID();
+      const idUsuario = user?.id ? String(user.id) : null;
+
+      const payload = {
+        idUsuario,
+        peso_kg: Number(novaAvaliacao.peso_kg),
+        altura_cm: Number(novaAvaliacao.altura_cm),
+        idade: Number(novaAvaliacao.idade),
+        genero: novaAvaliacao.genero,
+        nivel_atividade: novaAvaliacao.nivel_atividade,
       };
 
       try {
-        // Envia para o backend
-        const resp = await api.salvarDadosCorporais(novaAvaliacao, user?.id);
+        const resp = await api.salvarDadosCorporais(payload);
 
-        // Se o backend retornou os dados completos salvos
-        if (resp?.dados) {
-          const calculoBackend = resp.dados.calculos?.[0] || resp.dados.calculos || {};
+        if (resp?.dados || resp?.idDados) {
+          const dadosResp = resp.dados || resp;
           const itemAtualizado = {
-            idDados: resp.dados.idDados || Date.now(),
-            ...resp.dados,
-            imc: calculoBackend.imc || calculados?.imc,
-            tmb: calculoBackend.tmb || calculados?.tmb,
-            ndc: calculoBackend.ndc || calculados?.ndc,
-            classificacaoImc: calculados?.classificacaoImc,
+            idDados: String(dadosResp.idDados || tempIdDados),
+            idUsuario: String(dadosResp.idUsuario || idUsuario),
+            ...dadosResp,
+            ...calculados,
             data_registro: new Date().toISOString(),
           };
           setDadosCorporais((prev) => [itemAtualizado, ...prev]);
@@ -223,7 +236,14 @@ export function AuthProvider({ children }) {
         console.warn('Backend indisponível para salvar avaliação, mantendo em memória:', apiErr.message);
       }
 
-      // Fallback em memória
+      const registroLocal = {
+        idDados: tempIdDados,
+        idUsuario,
+        ...payload,
+        ...calculados,
+        data_registro: new Date().toISOString(),
+      };
+
       setDadosCorporais((prev) => [registroLocal, ...prev]);
       return { success: true, registro: registroLocal };
     } catch (error) {
@@ -233,7 +253,6 @@ export function AuthProvider({ children }) {
     }
   }
 
-  // 5. Alterar Senha
   async function alterarSenha(senhaAtual, novaSenha) {
     try {
       const response = await api.alterarSenha(senhaAtual, novaSenha);
@@ -243,7 +262,6 @@ export function AuthProvider({ children }) {
     }
   }
 
-  // 6. Solicitar Recuperação de Senha
   async function solicitarRecuperacao(email) {
     try {
       const response = await api.solicitarRecuperacaoSenha(email);
@@ -252,8 +270,7 @@ export function AuthProvider({ children }) {
       return { success: false, error: error.message };
     }
   }
-
-  // 7. Reenviar Link de Verificação
+  
   async function reenviarEmail(email) {
     try {
       const response = await api.reenviarEmailVerificacao(email);

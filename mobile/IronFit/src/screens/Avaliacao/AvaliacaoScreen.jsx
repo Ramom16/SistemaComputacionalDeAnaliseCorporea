@@ -7,33 +7,30 @@ import {
   Pressable,
   ScrollView,
   Alert,
-  ActivityIndicator,
 } from 'react-native';
 import { useAuth } from '../../context/AuthContext';
 import { calcularMetabolismo } from '../../services/api';
 
-export default function AvaliacaoScreen({ navigation }) {
-  const { user, ultimaAvaliacao, adicionarAvaliacao, loading } = useAuth();
+export default function AvaliacaoScreen() {
+  const { ultimaAvaliacao, adicionarAvaliacao, loading } = useAuth();
 
   const [peso, setPeso] = useState('78.5');
   const [altura, setAltura] = useState('175');
   const [idade, setIdade] = useState('28');
-  const [genero, setGenero] = useState('masculino');
-  const [nivelAtividade, setNivelAtividade] = useState('moderado');
+  const [genero, setGenero] = useState('Masculino'); // Alinhado aos Enums do Prisma
+  const [nivelAtividade, setNivelAtividade] = useState('Moderado'); // Alinhado aos Enums do Prisma
   const [sucesso, setSucesso] = useState(false);
 
-  // Inicializa com dados da última avaliação, se existirem
   useEffect(() => {
     if (ultimaAvaliacao) {
       if (ultimaAvaliacao.peso_kg) setPeso(String(ultimaAvaliacao.peso_kg));
       if (ultimaAvaliacao.altura_cm) setAltura(String(ultimaAvaliacao.altura_cm));
       if (ultimaAvaliacao.idade) setIdade(String(ultimaAvaliacao.idade));
-      if (ultimaAvaliacao.genero) setGenero(ultimaAvaliacao.genero.toLowerCase());
-      if (ultimaAvaliacao.nivel_atividade) setNivelAtividade(ultimaAvaliacao.nivel_atividade.toLowerCase());
+      if (ultimaAvaliacao.genero) setGenero(ultimaAvaliacao.genero);
+      if (ultimaAvaliacao.nivel_atividade) setNivelAtividade(ultimaAvaliacao.nivel_atividade);
     }
   }, [ultimaAvaliacao]);
 
-  // Cálculo em tempo real para pré-visualização instantânea
   const resultado = calcularMetabolismo({
     peso,
     altura,
@@ -73,12 +70,13 @@ export default function AvaliacaoScreen({ navigation }) {
     }
   }
 
+  // Chaves batendo estritamente com os Enums do Prisma
   const niveis = [
-    { key: 'sedentario', label: 'Sedentário', sub: 'Pouco ou nenhum exercício' },
-    { key: 'leve', label: 'Levemente Ativo', sub: 'Exercício leve 1-3 dias/semana' },
-    { key: 'moderado', label: 'Moderadamente Ativo', sub: 'Exercício moderado 3-5 dias/semana' },
-    { key: 'intenso', label: 'Altamente Ativo', sub: 'Exercício pesado 6-7 dias/semana' },
-    { key: 'muito_intenso', label: 'Extremamente Ativo', sub: 'Treino de atleta / trabalho físico' },
+    { key: 'Sedentario', label: 'Sedentário', sub: 'Pouco ou nenhum exercício' },
+    { key: 'Leve', label: 'Levemente Ativo', sub: 'Exercício leve 1-3 dias/semana' },
+    { key: 'Moderado', label: 'Moderadamente Ativo', sub: 'Exercício moderado 3-5 dias/semana' },
+    { key: 'Intenso', label: 'Altamente Ativo', sub: 'Exercício pesado 6-7 dias/semana' },
+    { key: 'MuitoIntenso', label: 'Extremamente Ativo', sub: 'Treino de atleta / trabalho físico' },
   ];
 
   return (
@@ -94,7 +92,6 @@ export default function AvaliacaoScreen({ navigation }) {
         </View>
       )}
 
-      {/* Formulário */}
       <View style={styles.formSection}>
         <View style={styles.row}>
           <View style={[styles.inputGroup, { flex: 1 }]}>
@@ -134,31 +131,29 @@ export default function AvaliacaoScreen({ navigation }) {
           </View>
         </View>
 
-        {/* Seletor Gênero */}
         <View style={styles.inputGroup}>
           <Text style={styles.label}>GÊNERO BIOLÓGICO</Text>
           <View style={styles.genderRow}>
             <Pressable
-              style={[styles.genderBtn, genero === 'masculino' && styles.genderBtnActive]}
-              onPress={() => setGenero('masculino')}
+              style={[styles.genderBtn, genero === 'Masculino' && styles.genderBtnActive]}
+              onPress={() => setGenero('Masculino')}
             >
-              <Text style={[styles.genderBtnText, genero === 'masculino' && styles.genderBtnTextActive]}>
+              <Text style={[styles.genderBtnText, genero === 'Masculino' && styles.genderBtnTextActive]}>
                 ♂ Masculino
               </Text>
             </Pressable>
 
             <Pressable
-              style={[styles.genderBtn, genero === 'feminino' && styles.genderBtnActive]}
-              onPress={() => setGenero('feminino')}
+              style={[styles.genderBtn, genero === 'Feminino' && styles.genderBtnActive]}
+              onPress={() => setGenero('Feminino')}
             >
-              <Text style={[styles.genderBtnText, genero === 'feminino' && styles.genderBtnTextActive]}>
+              <Text style={[styles.genderBtnText, genero === 'Feminino' && styles.genderBtnTextActive]}>
                 ♀ Feminino
               </Text>
             </Pressable>
           </View>
         </View>
 
-        {/* Nível de Atividade */}
         <View style={styles.inputGroup}>
           <Text style={styles.label}>NÍVEL DE ATIVIDADE FÍSICA</Text>
           {niveis.map((item) => (
@@ -181,7 +176,6 @@ export default function AvaliacaoScreen({ navigation }) {
         </View>
       </View>
 
-      {/* Card de Pré-visualização do Resultado */}
       {resultado && (
         <View style={styles.resultCard}>
           <Text style={styles.resultCardTitle}>RESULTADO CALCULADO</Text>
@@ -214,17 +208,12 @@ export default function AvaliacaoScreen({ navigation }) {
         </View>
       )}
 
-      {/* Botão Salvar */}
       <Pressable
         style={[styles.saveButton, loading && { opacity: 0.7 }]}
         onPress={handleSalvar}
         disabled={loading}
       >
-        {loading ? (
-          <ActivityIndicator color="#000000" />
-        ) : (
-          <Text style={styles.saveButtonText}>SALVAR AVALIAÇÃO NO HISTÓRICO</Text>
-        )}
+        <Text style={styles.saveButtonText}>SALVAR AVALIAÇÃO NO HISTÓRICO</Text>
       </Pressable>
     </ScrollView>
   );

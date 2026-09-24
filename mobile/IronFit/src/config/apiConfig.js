@@ -1,10 +1,6 @@
 import { Platform } from 'react-native';
 
 // CONFIGURAÇÃO DE REDE DA API IRONFIT
-// - Emulador Android: utiliza 10.0.2.2 (alias do Android para o localhost do host).
-// - iOS Simulator / Web: utiliza localhost:3000.
-// - Dispositivo físico (Expo Go via Wi-Fi): preencha MANUAL_API_URL com o IP local da sua máquina.
-
 export const MANUAL_API_URL = ''; 
 
 function getBaseUrl() {
@@ -13,11 +9,11 @@ function getBaseUrl() {
   }
 
   if (Platform.OS === 'android') {
-    return 'http://10.0.2.2:3000';
+    return 'http://localhost:3000';
   }
 
   return 'http://localhost:3000';
-} // <- Ajuste: fechamento da função getBaseUrl
+}
 
 export const API_BASE_URL = getBaseUrl();
 
@@ -70,17 +66,21 @@ export function calcularMetabolismo({ peso, altura, idade, genero, nivelAtividad
     classificacaoImc = 'Obesidade';
 
   let tmbVal = 10 * p + 6.25 * a - 5 * i;
-  tmbVal = genero === 'feminino' ? tmbVal - 161 : tmbVal + 5;
+  const genLower = String(genero || '').toLowerCase();
+  tmbVal = genLower === 'feminino' ? tmbVal - 161 : tmbVal + 5;
   const tmb = Math.round(tmbVal);
+
   const fatores = {
     sedentario: 1.2,
     leve: 1.375,
     moderado: 1.55,
     intenso: 1.725,
+    muitointenso: 1.9,
     muito_intenso: 1.9,
   };
 
-  const fator = fatores[nivelAtividade] || 1.2;
+  const nivKey = String(nivelAtividade || '').toLowerCase().replace('_', '');
+  const fator = fatores[nivKey] || 1.2;
   const ndc = Math.round(tmbVal * fator);
   return { imc: parseFloat(imc), tmb, ndc, classificacaoImc };
 }
@@ -98,7 +98,13 @@ export const api = {
 
   reenviarEmailVerificacao: (email) => request('/auth/reenviar-verificacao', { method: 'POST', body: JSON.stringify({ email }) }),
 
-  getDadosCorporais: (usuarioId) => request(`/avaliacao/historico/${usuarioId}`),
+  getDadosCorporais: (idUsuario) => request(`/avaliacao/historico/${String(idUsuario)}`),
 
-  salvarDadosCorporais: (dados, usuarioId) => request('/avaliacao', { method: 'POST', body: JSON.stringify({ ...dados, usuarioId }) }),
+  salvarDadosCorporais: (dados) => request('/avaliacao', { method: 'POST', body: JSON.stringify(dados) }),
+
+  getTreinos: () => request('/treinos'),
+
+  getHistorico: (idUsuario) => request(`/avaliacao/historico/${String(idUsuario)}`),
+
+  getEstatisticas: (idUsuario) => request(`/estatisticas/${String(idUsuario)}`),
 };
