@@ -5,6 +5,7 @@ import {
   setAuthToken,
   calcularMetabolismo,
 } from '../services/api';
+import { registrarParaPushNotificationsAsync } from '../notifications/notificationService';
 
 const AuthContext = createContext({});
 
@@ -37,6 +38,7 @@ export function AuthProvider({ children }) {
               setUser(u);
               // Busca os dados corporais do usuário silenciosamente
               carregarDadosCorporais(u.id);
+              sincronizarPushTokens();
             } catch {
               // Ignore parse error
             }
@@ -49,6 +51,7 @@ export function AuthProvider({ children }) {
               setUser(meResponse.usuario);
               await storage.setItem(STORAGE_KEY_USER, JSON.stringify(meResponse.usuario));
               carregarDadosCorporais(meResponse.usuario.id);
+              sincronizarPushTokens();
             }
           } catch (meError) {
             // Se o token estiver expirado (401/403), remove do armazenamento
@@ -67,6 +70,19 @@ export function AuthProvider({ children }) {
 
     restaurarSessao();
   }, []);
+
+  // Sincroniza tokens de push e FCM com a conta no backend
+  async function sincronizarPushTokens() {
+    try {
+      const { expoPushToken, fcmDeviceToken } = await registrarParaPushNotificationsAsync();
+      if (expoPushToken || fcmDeviceToken) {
+        await api.salvarPushToken(expoPushToken, fcmDeviceToken);
+        console.log('✅ Tokens de notificação sincronizados com a conta no backend.');
+      }
+    } catch (err) {
+      console.warn('Não foi possível sincronizar tokens de push:', err.message);
+    }
+  }
 
   // Busca dados corporais do banco de dados
   async function carregarDadosCorporais(usuarioId) {
@@ -130,6 +146,9 @@ export function AuthProvider({ children }) {
         // Carrega dados corporais do usuário
         carregarDadosCorporais(usuario.id);
 
+        // Sincroniza tokens de push e FCM do dispositivo com a conta do usuário
+        sincronizarPushTokens();
+
         return { success: true };
       }
 
@@ -167,6 +186,13 @@ export function AuthProvider({ children }) {
 
   // 3. Logout
   async function logout() {
+    try {
+      // Tenta desvincular o token da conta no backend antes de sair
+      await api.salvarPushToken(null, null);
+    } catch {
+      // Ignora erro caso o usuário já esteja desconectado ou sem rede
+    }
+
     setUser(null);
     setToken(null);
     setDadosCorporais([]);

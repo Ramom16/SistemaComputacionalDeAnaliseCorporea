@@ -1,22 +1,22 @@
-import messaging from "@react-native-firebase/messaging";
+import * as Notifications from 'expo-notifications';
 
+/**
+ * Solicita permissão de notificações usando expo-notifications
+ */
 export async function solicitarPermissaoFirebase() {
-
-    const authorizationStatus =
-        await messaging().requestPermission();
-
-    return authorizationStatus;
+  const { status } = await Notifications.requestPermissionsAsync();
+  return status;
 }
 
+/**
+ * Obtém o Device Push Token nativo do Firebase FCM (se disponível)
+ */
 export async function obterTokenFCM() {
-
-    await messaging().registerDeviceForRemoteMessages();
-
-    const token = await messaging().getToken();
-
-    return token;
+  try {
+    const tokenData = await Notifications.getDevicePushTokenAsync();
+    return tokenData.data;
+  } catch (error) {
+    console.warn('FCM Token nativo só fica disponível em builds com google-services.json compilado:', error.message);
+    return null;
+  }
 }
-
-const token = await obterTokenFCM();
-
-console.log("FCM TOKEN:", token);
