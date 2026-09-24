@@ -15,6 +15,12 @@ router.get("/", usuariosController.selecionarUsuario);
 // Rota para o usuário autenticar desativar a própria conta
 router.delete("/desativar-conta", usuariosController.desativarConta);
 
+// Rota para salvar/atualizar os tokens de push do usuário autenticado
+router.put("/push-token", usuariosController.salvarPushToken);
+
+// Rota para disparar notificação de teste para a conta logada
+router.post("/testar-notificacao", usuariosController.testarNotificacao);
+
 // ─── Rotas DINÂMICAS (com parâmetro :id) ─────────────────────────────────────
 
 router.use(tratarIdsCriptografados(["id"]));
