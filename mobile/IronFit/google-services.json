@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "858372011434",
+    "project_id": "app-notifications-tmb",
+    "storage_bucket": "app-notifications-tmb.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:858372011434:android:b6cf25a2332103a6e0a7d3",
+        "android_client_info": {
+          "package_name": "com.dcs1lv4steam.IronFit"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDSKh1cZGcKJuoJ885weJtDWOwtcHdEaKE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
