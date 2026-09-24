@@ -171,88 +171,19 @@ export function calcularMetabolismo({ peso, altura, idade, genero, nivelAtividad
   return { imc, classificacaoImc, tmb, ndc };
 }
 
-// Fallbacks de demonstração para quando o backend estiver inacessível
-const mockUser = {
-  id: 'mock-user-1',
-  nome: 'Usuário IronFit',
-  email: 'usuario@ironfit.com',
-  data_nascimento: '1995-05-15',
-  genero: 'masculino',
-};
-
-const mockTreinos = [
-  {
-    idTreino: 1,
-    nome: 'Treino A - Peito e Tríceps',
-    foco: 'Hipertrofia',
-    nivel: 'Intermediário',
-    exercicios: [
-      { idExercicio: 1, nome: 'Supino Reto com Barra', series: 4, repeticoes: '10-12', descanso: '60s', grupo: 'Peito' },
-      { idExercicio: 2, nome: 'Supino Inclinado com Halteres', series: 3, repeticoes: '12', descanso: '60s', grupo: 'Peito' },
-      { idExercicio: 3, nome: 'Crossover na Polia', series: 3, repeticoes: '15', descanso: '45s', grupo: 'Peito' },
-      { idExercicio: 4, nome: 'Tríceps Testa com Barra W', series: 4, repeticoes: '10', descanso: '60s', grupo: 'Tríceps' },
-      { idExercicio: 5, nome: 'Tríceps Pulley na Corda', series: 3, repeticoes: '12-15', descanso: '45s', grupo: 'Tríceps' },
-    ],
-  },
-  {
-    idTreino: 2,
-    nome: 'Treino B - Costas e Bíceps',
-    foco: 'Hipertrofia',
-    nivel: 'Intermediário',
-    exercicios: [
-      { idExercicio: 6, nome: 'Puxada Frontal no Pulley', series: 4, repeticoes: '10-12', descanso: '60s', grupo: 'Costas' },
-      { idExercicio: 7, nome: 'Remada Curvada com Barra', series: 4, repeticoes: '10', descanso: '60s', grupo: 'Costas' },
-      { idExercicio: 8, nome: 'Remada Unilateral (Serrote)', series: 3, repeticoes: '12', descanso: '45s', grupo: 'Costas' },
-      { idExercicio: 9, nome: 'Rosca Direta com Barra W', series: 4, repeticoes: '10', descanso: '60s', grupo: 'Bíceps' },
-      { idExercicio: 10, nome: 'Rosca Martelo com Halteres', series: 3, repeticoes: '12', descanso: '45s', grupo: 'Bíceps' },
-    ],
-  },
-  {
-    idTreino: 3,
-    nome: 'Treino C - Pernas e Ombros',
-    foco: 'Hipertrofia',
-    nivel: 'Intermediário',
-    exercicios: [
-      { idExercicio: 11, nome: 'Agachamento Livre com Barra', series: 4, repeticoes: '8-10', descanso: '90s', grupo: 'Pernas' },
-      { idExercicio: 12, nome: 'Leg Press 45°', series: 4, repeticoes: '12', descanso: '60s', grupo: 'Pernas' },
-      { idExercicio: 13, nome: 'Cadeira Extensora', series: 3, repeticoes: '15', descanso: '45s', grupo: 'Pernas' },
-      { idExercicio: 14, nome: 'Desenvolvimento com Halteres', series: 4, repeticoes: '10', descanso: '60s', grupo: 'Ombros' },
-      { idExercicio: 15, nome: 'Elevação Lateral', series: 4, repeticoes: '12-15', descanso: '45s', grupo: 'Ombros' },
-    ],
-  },
-];
-
 export const api = {
   // 1. Autenticação
   async login(email, senha) {
-    try {
-      const response = await request('/auth/login', {
-        method: 'POST',
-        body: JSON.stringify({ email: email.trim().toLowerCase(), senha }),
-      });
+    const response = await request('/auth/login', {
+      method: 'POST',
+      body: JSON.stringify({ email: email.trim().toLowerCase(), senha }),
+    });
 
-      if (response?.token) {
-        setAuthToken(response.token);
-      }
-
-      return response;
-    } catch (error) {
-      console.warn('Falha no login com a API:', error.message);
-      // Se for erro de status (ex: 401, 403, 429), propaga para o formulário
-      if (error.status) {
-        throw error;
-      }
-      // Se for erro de rede offline e senha demo
-      if (email && senha && senha === '123456') {
-        const mockResp = {
-          token: 'mock-jwt-token-ironfit',
-          usuario: { ...mockUser, email },
-        };
-        setAuthToken(mockResp.token);
-        return mockResp;
-      }
-      throw error;
+    if (response?.token) {
+      setAuthToken(response.token);
     }
+
+    return response;
   },
 
   async register(dados) {
@@ -298,13 +229,7 @@ export const api = {
 
   // 2. Dados Corporais
   async getDadosCorporais(usuarioId) {
-    try {
-      const response = await request(`/dadosCorporais/usuario/${usuarioId}`);
-      return response;
-    } catch (error) {
-      console.warn('Não foi possível carregar dados corporais da API:', error.message);
-      return null;
-    }
+    return await request(`/dadosCorporais/usuario/${usuarioId}`);
   },
 
   async salvarDadosCorporais(dados, usuarioId) {
@@ -324,7 +249,7 @@ export const api = {
         body: JSON.stringify(payload),
       });
     } catch (postError) {
-      // 2. Se já existir registro, atualiza via PUT (mesma lógica do front Dashboard.jsx)
+      // 2. Se já existir registro, atualiza via PUT
       const msgErro = postError.data?.erro || postError.message || '';
       if (
         postError.status === 400 &&
@@ -341,35 +266,16 @@ export const api = {
 
   // 3. Treinos
   async getTreinos() {
-    try {
-      const response = await request('/treinos');
-      const lista = response?.data || response || [];
-      if (Array.isArray(lista) && lista.length > 0) {
-        return lista;
-      }
-      return mockTreinos;
-    } catch (error) {
-      console.warn('Utilizando treinos do modo offline/mock:', error.message);
-      return mockTreinos;
-    }
+    const response = await request('/treinos');
+    return Array.isArray(response) ? response : (response?.data || response?.treinos || []);
   },
 
   // 4. Evolução e Histórico
   async getHistorico(usuarioId) {
-    try {
-      return await request(`/historico/usuario/${usuarioId}`);
-    } catch (error) {
-      console.warn('Erro ao carregar histórico:', error.message);
-      return null;
-    }
+    return await request(`/historico/usuario/${usuarioId}`);
   },
 
   async getEstatisticas(usuarioId) {
-    try {
-      return await request(`/evolucao/estatisticas/${usuarioId}`);
-    } catch (error) {
-      console.warn('Erro ao carregar estatísticas:', error.message);
-      return null;
-    }
+    return await request(`/evolucao/estatisticas/${usuarioId}`);
   },
 };

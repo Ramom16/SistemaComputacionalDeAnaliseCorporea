@@ -41,6 +41,12 @@ export default function DashboardNavbar({ onLogout }) {
           Meus Treinos
         </Link>
         <Link 
+          to="/exercicios" 
+          className={`nav-link ${isActive('/exercicios')}`}
+        >
+          Exercícios
+        </Link>
+        <Link 
           to="/evolucao" 
           className={`nav-link ${isActive('/evolucao')}`}
         >

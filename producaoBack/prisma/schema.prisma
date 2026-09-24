@@ -24,11 +24,11 @@ model Usuario {
 
   role Role @default(USER)
 
-  ultimo_login     DateTime? @default(now()) @db.DateTime(3)
-  criado_em        DateTime  @default(now())  @db.DateTime(3)
+  ultimo_login     DateTime? @default(now()) 
+  criado_em        DateTime  @default(now())  
 
   tentativas_login Int       @default(0)
-  bloqueado_ate    DateTime? @default(now()) @db.DateTime(3)
+  bloqueado_ate    DateTime? @default(now()) 
 
   dadosCorporais DadosCorporais?
   perfil Perfil?
@@ -73,8 +73,8 @@ model DadosCorporais {
   idade           Int
   nivel_atividade NivelAtividade
 
-  data_registro_Inicial  DateTime @default(now())  @db.DateTime(3)
-  data_atualizacao_dados DateTime @updatedAt @db.DateTime(3)
+  data_registro_Inicial  DateTime @default(now())  
+  data_atualizacao_dados DateTime @updatedAt 
 
   usuario Usuario @relation(fields: [idUsuario], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
@@ -98,8 +98,8 @@ model Calculo {
   tmb Decimal @db.Decimal(10, 2)
   ndc Decimal @db.Decimal(10, 2)
 
-  data_calculo             DateTime @default(now())  @db.DateTime(3)
-  data_atualizacao_calculo DateTime @updatedAt @db.DateTime(3)
+  data_calculo             DateTime @default(now())  
+  data_atualizacao_calculo DateTime @updatedAt 
 
   dados DadosCorporais @relation(fields: [idDados], references: [idDados], onDelete: Cascade, onUpdate: Cascade)
 
@@ -127,7 +127,7 @@ model Treino {
 
   is_oficial Boolean @default(false)
 
-  data_criacao DateTime @default(now())  @db.DateTime(3)
+  data_criacao DateTime @default(now())  
 
   calculo Calculo? @relation(fields: [idCalculo], references: [idCalculo], onDelete: Cascade, onUpdate: Cascade)
   usuario Usuario? @relation(fields: [idUsuario], references: [id], onDelete: Cascade, onUpdate: Cascade)
@@ -149,7 +149,7 @@ model Exercicio {
 
   nome String @db.VarChar(150)
 
-  grupo_muscular String? @db.VarChar(100)
+  grupo_muscular grupo_muscular 
   descricao String? @db.VarChar(255)
   caminho_video String? @db.VarChar(255)
 
@@ -171,7 +171,7 @@ model TreinoExercicio {
   descanso_segundos Int
   repeticoes       Int
 
-  grupo_muscular String @db.VarChar(250)
+  grupo_muscular grupo_muscular
 
   tipo TipoExercicio
 
@@ -195,10 +195,10 @@ model EmailVerificationToken {
 
   usuarioId String
 
-  expira_em DateTime  @default(now()) @db.DateTime(3)
-  usado_em  DateTime? @default(now()) @db.DateTime(3)
+  expira_em DateTime  @default(now()) 
+  usado_em  DateTime? @default(now()) 
 
-  criado_em DateTime @default(now())  @db.DateTime(3)
+  criado_em DateTime @default(now())  
 
   usuario Usuario @relation(fields: [usuarioId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
@@ -219,10 +219,10 @@ model PasswordResetToken {
 
   usuarioId String
 
-  expira_em DateTime   @default(now()) @db.DateTime(3)
-  usado_em  DateTime?  @default(now()) @db.DateTime(3)
+  expira_em DateTime   @default(now()) 
+  usado_em  DateTime?  @default(now()) 
 
-  criado_em DateTime @default(now())  @db.DateTime(3)
+  criado_em DateTime @default(now())  
 
   usuario Usuario @relation(fields: [usuarioId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
@@ -252,7 +252,7 @@ model HistoricoCorporal {
   tmb Decimal @db.Decimal(10, 2)
   ndc Decimal @db.Decimal(10, 2)
 
-  criado_em DateTime @default(now())  @db.DateTime(3)
+  criado_em DateTime @default(now())  
 
   dados DadosCorporais @relation(fields: [idDados], references: [idDados], onDelete: Cascade, onUpdate: Cascade)
 
@@ -303,4 +303,17 @@ enum TipoExercicio {
   Cardio
   Alongamento
   Mobilidade
+}
+
+enum grupo_muscular {
+  Peito
+  Costa
+  Ombro
+  Braço
+  Antebraço
+  Coxa
+  Perna
+  Glúteos
+  Abdomen
+  Cardio
 }

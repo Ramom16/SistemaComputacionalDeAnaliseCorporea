@@ -74,6 +74,17 @@ export default function Configuracoes() {
     }
   };
 
+  const reativarOutroUsuario = async (userId) => {
+    if (!window.confirm('Reativar esta conta? O usuário será desbloqueado.')) return;
+    try {
+      await api.patch(`/usuarios/${userId}/reativar`);
+      setUsuariosList(prev => prev.filter(u => u.id !== userId));
+    } catch (err) {
+      console.error(err);
+      setErro('Erro ao reativar usuário.');
+    }
+  };  
+
   return (
     <>
       <DashboardNavbar onLogout={handleLogout} />
@@ -135,12 +146,19 @@ export default function Configuracoes() {
                           <td style={{ padding: '10px 8px' }}>{u.email}</td>
                           <td style={{ padding: '10px 8px' }}>{u.role}</td>
                           <td style={{ padding: '10px 8px' }}>
-                            <button onClick={() => alterarRole(u.id, u.role === 'ADMIN' ? 'USER' : 'ADMIN')} style={{ marginRight: 8 }}>
+                            <button onClick={() => alterarRole(u.id, u.role === 'ADMIN' ? 'USER' : 'ADMIN')} className="btn btn-cancel" style={{ marginRight: 8 }}>
                               {u.role === 'ADMIN' ? 'Tornar Aluno' : 'Tornar Admin'}
                             </button>
-                            <button onClick={() => desativarOutroUsuario(u.id)} style={{ background: 'rgba(255,77,90,0.06)', color: '#ff4d5a' }}>
-                              Desativar
-                            </button>
+                            {u.ativo === true && (
+                              <button onClick={() => desativarOutroUsuario(u.id)} className="btn btn-danger" style={{ marginRight: 8 }}>
+                                Desativar
+                              </button>
+                            )}
+                            {u.ativo === false && (
+                              <button onClick={() => reativarOutroUsuario(u.id)} className="btn btn-success" style={{ marginRight: 8 }}>
+                                Reativar
+                              </button>
+                            )}
                           </td>
                         </tr>
                       ))}

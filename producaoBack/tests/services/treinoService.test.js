@@ -79,7 +79,7 @@ describe("treinoService - criar", () => {
     await expect(treinoService.criar(UUID_USUARIO, {
       objetivo: "hipertrofia"
       // idCalculo e nivel ausentes
-    })).rejects.toThrow("idCalculo, objetivo e nivel são obrigatórios.");
+    })).rejects.toThrow("objetivo e nivel são obrigatórios.");
 
     expect(prisma.calculo.findFirst).not.toHaveBeenCalled();
   });
@@ -88,7 +88,14 @@ describe("treinoService - criar", () => {
     await expect(treinoService.criar(UUID_USUARIO, {
       idCalculo: UUID_CALCULO,
       nivel: "Iniciante"
-    })).rejects.toThrow("idCalculo, objetivo e nivel são obrigatórios.");
+    })).rejects.toThrow("objetivo e nivel são obrigatórios.");
+  });
+
+  it("deve lançar erro se idCalculo estiver faltando para treino pessoal", async () => {
+    await expect(treinoService.criar(UUID_USUARIO, {
+      objetivo: "hipertrofia",
+      nivel: "Iniciante"
+    })).rejects.toThrow("idCalculo é obrigatório para treinos pessoais.");
   });
 });
 
