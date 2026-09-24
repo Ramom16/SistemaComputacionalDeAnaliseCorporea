@@ -1,29 +1,75 @@
 import dotenv from "dotenv";
 import express from "express";
 import cors from "cors";
-import { autenticarToken } from "./middlewares/autenticarToken.js";
-import router from "./routes/router.js";
+import helmet from "helmet";
+import rateLimit from "express-rate-limit";
+import { fileURLToPath } from "url";
+import path from "path";
 
+import router from "./routes/router.js";
+import { autenticarToken } from "./middlewares/autenticarToken.js";
 
 dotenv.config();
 
 const app = express();
 
-// MIDDLEWARES GLOBAIS
-const corsOptions = {
-  origin: [
-    "http://localhost:5173",
-    "http://127.0.0.1:5173",
-    
-    process.env.FRONT_URL,
-  ],
-  credentials: true
-};
-app.use(cors(corsOptions));
-app.use(express.json());
+// 1. CABEÇALHOS DE SEGURANÇA (HELMET)
+app.use(helmet({ crossOriginResourcePolicy: { policy: "cross-origin" } }));
 
-// ROTAS PÚBLICAS
-app.use('/', router)
+// 2. LIMITADOR DE REQUISIÇÕES (RATE LIMITING)
+const limitadorGeral = rateLimit(
+  {
+    windowMs: 15 * 60 * 1000, // 15 minutos
+    max: 300, // limite de 300 requisições por janela
+    standardHeaders: true,
+    legacyHeaders: false,
+    message: { erro: "Muitas requisições originadas deste IP. Tente novamente mais tarde." }
+  }
+);
+
+const limitadorAuth = rateLimit(
+  {
+  windowMs: 15 * 60 * 1000, // 15 minutos
+  max: 30, // limite de 30 tentativas em auth
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { erro: "Limite de tentativas excedido para autenticação. Tente novamente em 15 minutos." }
+}
+);
+
+app.use(limitadorGeral);
+app.use("/auth", limitadorAuth);
+
+// 3. CORS
+const origensPermitidas = ["http://localhost:5173", "http://127.0.0.1:5173", process.env.FRONT_URL ].filter(Boolean);
+
+app.use(cors({
+  origin: (origin, callback) => {
+    if (!origin || origensPermitidas.includes(origin)) {
+      return callback(null, true);
+    }
+    return callback(new Error("Origem não permitida pela política CORS"));
+  },
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"]
+}));
+
+// 4. PARSER COM LIMITES DE TAMANHO SEGUROS
+app.use(express.json({ limit: "10mb" }));
+app.use(express.urlencoded({ extended: true, limit: "10mb" }));
+
+
+// Pega o caminho completo do arquivo atual (server.js)
+const __filename = fileURLToPath(import.meta.url);
+// Pega apenas a pasta onde o arquivo está localizado
+const __dirname = path.dirname(__filename);
+
+// Define uma rota pública para arquivos estáticos
+// Tudo dentro de src/uploads poderá ser acessado pelo navegador usando /uploads
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+
+// 5. ROTAS
+app.use("/", router);
 
 // ROTA PROTEGIDA DE TESTE
 app.get("/perfil", autenticarToken, (req, res) => {
@@ -33,19 +79,20 @@ app.get("/perfil", autenticarToken, (req, res) => {
   });
 });
 
-// ROTA TESTE
+// ROTA TESTE DE SAÚDE
 app.get("/", (req, res) => {
   return res.status(200).json({
-    msg: "API rodando com sucesso"
+    msg: "API rodando com sucesso e blindada com segurança máxima"
   });
 });
 
-// TRATAMENTO DE ERROS (fallback)
+// TRATAMENTO DE ERROS (FALLBACK SEGURO)
 app.use((err, req, res, next) => {
-  console.error("Erro interno:", err);
+  console.error("Erro interno capturado:", err);
 
-  return res.status(500).json({
-    erro: "Erro interno no servidor"
+  const status = err.status || 500;
+  return res.status(status).json({
+    erro: status === 500 ? "Erro interno no servidor" : err.message
   });
 });
 

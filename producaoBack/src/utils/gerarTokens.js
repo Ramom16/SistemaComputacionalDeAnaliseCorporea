@@ -18,7 +18,7 @@ export const gerarTokenLogin = (usuario) => {
       id: usuario.id,
       email: usuario.email,
       nome: usuario.nome,
-      role: usuario.role
+      role: usuario.role || "USER"
     },
     process.env.JWT_SECRET,
     { expiresIn: "24h" }

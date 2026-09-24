@@ -4,7 +4,7 @@ const passwordResetTokenRepository = {
   criar: async (usuarioId, token_hash, expira_em) => {
     return await prisma.passwordResetToken.create({
       data: {
-        usuarioId,
+        usuarioId: String(usuarioId),
         token_hash,
         expira_em
       }
@@ -22,7 +22,7 @@ const passwordResetTokenRepository = {
 
   marcarComoUsado: async (id) => {
     return await prisma.passwordResetToken.update({
-      where: { id },
+      where: { id: String(id) },
       data: {
         usado_em: new Date()
       }
@@ -31,13 +31,13 @@ const passwordResetTokenRepository = {
 
   deletar: async (id) => {
     return await prisma.passwordResetToken.delete({
-      where: { id }
+      where: { id: String(id) }
     });
   },
 
   deletarPorUsuario: async (usuarioId) => {
     return await prisma.passwordResetToken.deleteMany({
-      where: { usuarioId }
+      where: { usuarioId: String(usuarioId) }
     });
   }
 };

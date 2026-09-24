@@ -2,66 +2,107 @@ import prisma from "../database/prismaClient.js";
 import treinoRepository from "../repositories/treinoRepository.js";
 
 const treinoService = {
-    async criar(idUsuario, dados) {
-        const { idCalculo, objetivo, nivel, titulo, is_oficial } = dados;
+    async criar(idUsuario, dados, userRole = "USER") {
 
+        const { idCalculo, objetivo, nivel, is_oficial, titulo, descricao } = dados;
+
+        // Validar objetivo e nivel (obrigatórios)
         if (!objetivo || !nivel) {
-            throw new Error("Objetivo e nível são obrigatórios.");
+            throw new Error(
+                "objetivo e nivel são obrigatórios."
+            );
         }
 
-        // Se informou cálculo, valida se pertence ao usuário
-        if (idCalculo) {
-            const calculo = await prisma.calculo.findFirst({
-                where: {
-                    idCalculo: Number(idCalculo),
-                    dados: { idUsuario }
-                }
-            });
+        // Se for treino global (oficial), apenas ADMIN pode criar
+        if (is_oficial && userRole !== "ADMIN") {
+            throw new Error(
+                "Apenas ADMINs podem criar treinos globais."
+            );
+        }
 
-            if (!calculo) {
-                throw new Error("O cálculo informado não pertence ao usuário.");
+        // Se for treino global, não precisa de idCalculo
+        if (is_oficial) {
+            return await treinoRepository.criar({
+                objetivo,
+                nivel,
+                is_oficial: true,
+                titulo: titulo || "Novo Treino Global",
+                descricao: descricao || null,
+                idCalculo: null,
+                idUsuario: null
+            });
+        }
+
+        // Se for treino pessoal, requer idCalculo
+        if (!idCalculo) {
+            throw new Error(
+                "idCalculo é obrigatório para treinos pessoais."
+            );
+        }
+
+        // Verifica se o cálculo pertence ao usuário autenticado (proteção contra IDOR)
+        const calculo = await prisma.calculo.findFirst({
+            where: {
+                idCalculo: String(idCalculo),
+                dados: {
+                    idUsuario: String(idUsuario)
+                }
             }
+        });
+
+        if (!calculo) {
+            throw new Error(
+                "O cálculo informado não foi encontrado ou não pertence ao usuário."
+            );
         }
 
         return await treinoRepository.criar({
-            idUsuario,
-            idCalculo: idCalculo ? Number(idCalculo) : null,
-            titulo: titulo || "Novo Treino",
+            idCalculo: String(idCalculo),
             objetivo,
             nivel,
-            is_oficial: Boolean(is_oficial)
+            is_oficial: false,
+            titulo: titulo || "Novo Treino",
+            descricao: descricao || null,
+            idUsuario: String(idUsuario)
         });
     },
 
     async listarPorUsuario(idUsuario) {
-        return await treinoRepository.listarPorUsuario(idUsuario);
+        return await treinoRepository.listarPorUsuario(
+            String(idUsuario)
+        );
     },
 
-    async buscarPorId(idUsuario, idTreino) {
-        const treino = await treinoRepository.buscarPorId(idTreino);
-
+    async buscarPorId(idUsuario, idTreino, role = "USER") {
+        const treino = await treinoRepository.buscarPorId(
+            String(idTreino)
+        );
         if (!treino) {
             throw new Error("Treino não encontrado.");
         }
 
-        const donoDoTreino = treino.idUsuario === idUsuario || treino.calculo?.dados?.idUsuario === idUsuario;
-        const eOficial = treino.is_oficial;
+        const donoDoTreino =
+            treino.calculo?.dados?.usuario?.id === String(idUsuario);
 
-        if (!donoDoTreino && !eOficial) {
-            throw new Error("Você não possui acesso a este treino.");
+        if (!donoDoTreino && role !== "ADMIN") {
+            throw new Error(
+                "Você não possui permissão para acessar este treino."
+            );
         }
-
         return treino;
     },
 
     async atualizar(idUsuario, idTreino, dados) {
         await this.buscarPorId(idUsuario, idTreino);
-        return await treinoRepository.atualizar(idTreino, dados);
+        return await treinoRepository.atualizar(
+            String(idTreino),
+            dados
+        );
     },
 
     async deletar(idUsuario, idTreino) {
         await this.buscarPorId(idUsuario, idTreino);
-        return await treinoRepository.deletar(idTreino);
+        return await treinoRepository.deletar(String(idTreino));
     }
 };
 

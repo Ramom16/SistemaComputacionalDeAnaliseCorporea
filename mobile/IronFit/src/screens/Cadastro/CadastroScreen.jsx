@@ -9,6 +9,7 @@ import {
   KeyboardAvoidingView,
   Platform,
   ScrollView,
+  Alert,
 } from 'react-native';
 import { z } from 'zod';
 import { useAuth } from '../../context/AuthContext';
@@ -62,9 +63,24 @@ export default function CadastroScreen({ navigation }) {
       genero,
     });
 
+<<<<<<< HEAD
     if (!result.success) {
       const primeiraMensagem = result.error.issues[0].message;
       setErro(primeiraMensagem);
+=======
+    if (!dataNascimento.trim()) {
+      setErro('Informe sua data de nascimento.');
+      return;
+    }
+
+    if (senha !== confirmarSenha) {
+      setErro('As senhas digitadas não coincidem.');
+      return;
+    }
+
+    if (senha.length < 6) {
+      setErro('A senha deve conter no mínimo 6 caracteres.');
+>>>>>>> Dev
       return;
     }
 
@@ -73,12 +89,21 @@ export default function CadastroScreen({ navigation }) {
       nome: nome.trim(),
       email: email.trim(),
       senha,
-      dataNascimento,
+      dataNascimento: dataNascimento.trim(),
       genero,
     });
 
     if (res.success) {
-      // Cadastro efetuado com sucesso!
+      Alert.alert(
+        'Conta Criada com Sucesso!',
+        res.message || 'Verifique seu e-mail para ativar sua conta antes de realizar o login.',
+        [
+          {
+            text: 'Ir para o Login',
+            onPress: () => navigation.navigate('Login'),
+          },
+        ]
+      );
     } else {
       setErro(res.error || 'Erro ao realizar o cadastro. Tente novamente.');
     }
@@ -109,7 +134,7 @@ export default function CadastroScreen({ navigation }) {
           <View style={styles.content}>
             <Text style={styles.title}>CRIE SUA CONTA</Text>
             <Text style={styles.subtitle}>
-              Preencha os dados abaixo para iniciar seu acompanhamento corporamento.
+              Preencha os dados abaixo para iniciar seu acompanhamento corporal.
             </Text>
 
             {erro ? (
@@ -147,20 +172,20 @@ export default function CadastroScreen({ navigation }) {
 
             {/* Data de Nascimento */}
             <View style={styles.inputGroup}>
-              <Text style={styles.label}>DATA DE NASCIMENTO (DD/MM/AAAA)</Text>
+              <Text style={styles.label}>DATA DE NASCIMENTO (DD/MM/AAAA) *</Text>
               <TextInput
                 style={styles.input}
                 placeholder="15/05/1998"
                 placeholderTextColor="#666666"
                 value={dataNascimento}
-                onChangeText={setDataNascimento}
+                onChangeText={(txt) => { setDataNascimento(txt); setErro(''); }}
                 keyboardType="numeric"
               />
             </View>
 
             {/* Gênero */}
             <View style={styles.inputGroup}>
-              <Text style={styles.label}>GÊNERO</Text>
+              <Text style={styles.label}>GÊNERO BIOLÓGICO</Text>
               <View style={styles.genderContainer}>
                 <Pressable
                   style={[styles.genderOption, genero === 'masculino' && styles.genderActive]}

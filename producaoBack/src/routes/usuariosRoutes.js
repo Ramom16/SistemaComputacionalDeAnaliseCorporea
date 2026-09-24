@@ -1,10 +1,24 @@
 import express from "express";
 import usuariosController from "../controllers/usuariosController.js";
 import { autenticarToken, eAdmin } from "../middlewares/autenticarToken.js";
+import { tratarIdsCriptografados } from "../middlewares/tratarIdsCriptografados.js";
 
 const router = express.Router();
 
-// Apenas administradores podem listar/buscar outros usuários
-router.get("/", autenticarToken, eAdmin, usuariosController.selecionarUsuario);
+router.use(autenticarToken);
+router.use(tratarIdsCriptografados(["id"]));
+
+// Rota para buscar dados do usuário autenticado ou lista/aluno se ADMIN
+router.get("/", usuariosController.selecionarUsuario);
+router.get("/:id", usuariosController.selecionarUsuario);
+
+// Rota administrativa para alterar role de usuário (USER <-> ADMIN)
+router.patch("/:id/role", eAdmin, usuariosController.alterarRole);
+
+// Rota administrativa para desativar outro usuário
+router.delete("/:id/desativar", eAdmin, usuariosController.desativarUsuarioPorId);
+
+// Rota para desativar a conta do usuário
+router.delete("/desativar-conta", usuariosController.desativarConta);
 
 export default router;

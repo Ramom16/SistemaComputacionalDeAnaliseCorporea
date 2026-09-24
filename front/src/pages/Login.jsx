@@ -39,7 +39,16 @@ export default function Login() {
 
     } catch (error) {
       const mensagemErro = error.response?.data?.erro || 'Erro: API não respondeu';
-      setMsg({ text: mensagemErro, type: 'erro' });
+      
+      // Verificar se a conta está desativada
+      if (error.response?.status === 403 && mensagemErro.includes("desativada")) {
+        setMsg({ 
+          text: "Sua conta está desativada. Contate o suporte para reativar. Email: sistema.verificacao.login@gmail.com", 
+          type: 'erro' 
+        });
+      } else {
+        setMsg({ text: mensagemErro, type: 'erro' });
+      }
     } finally {
       setLoading(false);
     }

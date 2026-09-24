@@ -13,7 +13,7 @@ datasource db {
 // ============================================================
 
 model Usuario {
-  id               Int       @id @default(autoincrement())
+  id               String    @id @default(uuid()) @db.VarChar(36)
   nome             String    @db.VarChar(250)
   email            String    @unique @db.VarChar(255)
   senha_hash       String    @db.VarChar(255)
@@ -24,14 +24,14 @@ model Usuario {
 
   role Role @default(USER)
 
-  ultimo_login     DateTime? @db.Timestamp(0)
-  criado_em        DateTime  @default(now()) @db.Timestamp(0)
+  ultimo_login     DateTime? @default(now()) @db.DateTime(3)
+  criado_em        DateTime  @default(now())  @db.DateTime(3)
 
   tentativas_login Int       @default(0)
-  bloqueado_ate    DateTime? @db.Timestamp(0)
+  bloqueado_ate    DateTime? @default(now()) @db.DateTime(3)
 
   dadosCorporais DadosCorporais?
-  usuariosPerfil UsuariosPerfil[]
+  perfil Perfil?
 
   emailTokens EmailVerificationToken[]
   resetTokens PasswordResetToken[]
@@ -47,29 +47,13 @@ model Usuario {
 // ============================================================
 
 model Perfil {
-  idPerfil Int    @id @default(autoincrement())
-  nome     String @db.VarChar(100)
+  idPerfil     String @id @default(uuid()) @db.VarChar(36)
+  idUsuario String @unique @db.VarChar(36)
+  fotoPerfil  String? @db.VarChar(255)
 
-  usuariosPerfil UsuariosPerfil[]
+  usuario Usuario @relation( fields: [idUsuario], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
   @@map("perfil")
-}
-
-
-// ============================================================
-// USUÁRIO ↔ PERFIL
-// ============================================================
-
-model UsuariosPerfil {
-  idUsuario Int
-  idPerfil  Int
-
-  usuario Usuario @relation(fields: [idUsuario], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  perfil  Perfil  @relation(fields: [idPerfil], references: [idPerfil], onDelete: Cascade, onUpdate: Cascade)
-
-  @@id([idUsuario, idPerfil])
-  @@index([idPerfil])
-  @@map("usuarios_perfil")
 }
 
 
@@ -78,9 +62,9 @@ model UsuariosPerfil {
 // ============================================================
 
 model DadosCorporais {
-  idDados Int @id @default(autoincrement())
+  idDados  String @id @default(uuid()) @db.VarChar(36)
 
-  idUsuario Int @unique
+  idUsuario String @unique
 
   peso_kg   Decimal @db.Decimal(10, 2)
   altura_cm Decimal @db.Decimal(5, 2)
@@ -89,8 +73,8 @@ model DadosCorporais {
   idade           Int
   nivel_atividade NivelAtividade
 
-  data_registro_Inicial  DateTime @default(now()) @db.Timestamp(0)
-  data_atualizacao_dados DateTime @updatedAt
+  data_registro_Inicial  DateTime @default(now())  @db.DateTime(3)
+  data_atualizacao_dados DateTime @updatedAt @db.DateTime(3)
 
   usuario Usuario @relation(fields: [idUsuario], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
@@ -106,16 +90,16 @@ model DadosCorporais {
 // ============================================================
 
 model Calculo {
-  idCalculo Int @id @default(autoincrement())
+  idCalculo  String @id @default(uuid()) @db.VarChar(36)
 
-  idDados Int
+  idDados String
 
   imc Decimal @db.Decimal(10, 2)
   tmb Decimal @db.Decimal(10, 2)
   ndc Decimal @db.Decimal(10, 2)
 
-  data_calculo             DateTime @default(now()) @db.Timestamp(0)
-  data_atualizacao_calculo DateTime @updatedAt
+  data_calculo             DateTime @default(now())  @db.DateTime(3)
+  data_atualizacao_calculo DateTime @updatedAt @db.DateTime(3)
 
   dados DadosCorporais @relation(fields: [idDados], references: [idDados], onDelete: Cascade, onUpdate: Cascade)
 
@@ -131,19 +115,19 @@ model Calculo {
 // ============================================================
 
 model Treino {
-  idTreino Int @id @default(autoincrement())
+  idTreino  String @id @default(uuid()) @db.VarChar(36)
 
   titulo String @default("Novo Treino") @db.VarChar(150)
 
-  idCalculo Int?
-  idUsuario Int?
+  idCalculo String?
+  idUsuario String?
 
   objetivo ObjetivoTreino
   nivel    NivelTreino
 
   is_oficial Boolean @default(false)
 
-  data_criacao DateTime @default(now()) @db.Timestamp(0)
+  data_criacao DateTime @default(now())  @db.DateTime(3)
 
   calculo Calculo? @relation(fields: [idCalculo], references: [idCalculo], onDelete: Cascade, onUpdate: Cascade)
   usuario Usuario? @relation(fields: [idUsuario], references: [id], onDelete: Cascade, onUpdate: Cascade)
@@ -161,7 +145,7 @@ model Treino {
 // ============================================================
 
 model Exercicio {
-  idExercicio Int @id @default(autoincrement())
+  idExercicio  String @id @default(uuid()) @db.VarChar(36)
 
   nome String @db.VarChar(150)
 
@@ -180,8 +164,8 @@ model Exercicio {
 // ============================================================
 
 model TreinoExercicio {
-  idTreino    Int
-  idExercicio Int
+  idTreino    String
+  idExercicio String
 
   series            Int
   descanso_segundos Int
@@ -205,16 +189,16 @@ model TreinoExercicio {
 // ============================================================
 
 model EmailVerificationToken {
-  id Int @id @default(autoincrement())
+  id  String @id @default(uuid()) @db.VarChar(36)
 
   token_hash String @unique @db.VarChar(64)
 
-  usuarioId Int
+  usuarioId String
 
-  expira_em DateTime  @db.Timestamp(0)
-  usado_em  DateTime? @db.Timestamp(0)
+  expira_em DateTime  @default(now()) @db.DateTime(3)
+  usado_em  DateTime? @default(now()) @db.DateTime(3)
 
-  criado_em DateTime @default(now()) @db.Timestamp(0)
+  criado_em DateTime @default(now())  @db.DateTime(3)
 
   usuario Usuario @relation(fields: [usuarioId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
@@ -229,16 +213,16 @@ model EmailVerificationToken {
 // ============================================================
 
 model PasswordResetToken {
-  id Int @id @default(autoincrement())
+  id  String @id @default(uuid()) @db.VarChar(36)
 
   token_hash String @unique @db.VarChar(64)
 
-  usuarioId Int
+  usuarioId String
 
-  expira_em DateTime  @db.Timestamp(0)
-  usado_em  DateTime? @db.Timestamp(0)
+  expira_em DateTime   @default(now()) @db.DateTime(3)
+  usado_em  DateTime?  @default(now()) @db.DateTime(3)
 
-  criado_em DateTime @default(now()) @db.Timestamp(0)
+  criado_em DateTime @default(now())  @db.DateTime(3)
 
   usuario Usuario @relation(fields: [usuarioId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
@@ -253,9 +237,9 @@ model PasswordResetToken {
 // ============================================================
 
 model HistoricoCorporal {
-  idHistorico Int @id @default(autoincrement())
+  idHistorico  String @id @default(uuid()) @db.VarChar(36)
 
-  idDados Int
+  idDados String
 
   peso_kg   Decimal @db.Decimal(10, 2)
   altura_cm Decimal @db.Decimal(5, 2)
@@ -268,7 +252,7 @@ model HistoricoCorporal {
   tmb Decimal @db.Decimal(10, 2)
   ndc Decimal @db.Decimal(10, 2)
 
-  criado_em DateTime @default(now()) @db.Timestamp(0)
+  criado_em DateTime @default(now())  @db.DateTime(3)
 
   dados DadosCorporais @relation(fields: [idDados], references: [idDados], onDelete: Cascade, onUpdate: Cascade)
 

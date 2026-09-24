@@ -9,8 +9,7 @@ const exerciciosService = {
         return await exerciciosRepository.criar({
             nome: exercicio.nome,
             descricao: exercicio.descricao,
-            caminho_video: exercicio.caminho_video,
-            grupo_muscular: dados.grupo_muscular || null
+            caminho_video: exercicio.caminho_video
         });
     },
 
@@ -21,7 +20,7 @@ const exerciciosService = {
     async buscarPorId(idExercicio) {
         const exercicio =
             await exerciciosRepository.buscarPorId(
-                Number(idExercicio)
+                String(idExercicio)
             );
 
         if (!exercicio) {
@@ -35,7 +34,7 @@ const exerciciosService = {
         await this.buscarPorId(idExercicio);
 
         const exercicio = Exercicio.editar({
-            idExercicio: Number(idExercicio),
+            idExercicio: String(idExercicio),
             nome: dados.nome,
             descricao: dados.descricao,
             caminho_video: dados.caminho_video
@@ -46,8 +45,7 @@ const exerciciosService = {
             {
                 nome: exercicio.nome,
                 descricao: exercicio.descricao,
-                caminho_video: exercicio.caminho_video,
-                grupo_muscular: dados.grupo_muscular || null
+                caminho_video: exercicio.caminho_video
             }
         );
     },
@@ -55,7 +53,7 @@ const exerciciosService = {
     async deletar(idExercicio) {
         await this.buscarPorId(idExercicio);
         return await exerciciosRepository.deletar(
-            Number(idExercicio)
+            String(idExercicio)
         );
     }
 };

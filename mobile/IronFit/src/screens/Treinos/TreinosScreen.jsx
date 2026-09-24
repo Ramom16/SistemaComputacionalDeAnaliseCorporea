@@ -6,27 +6,61 @@ import {
   ScrollView,
   Pressable,
   ActivityIndicator,
+  RefreshControl,
 } from 'react-native';
 import { api } from '../../services/api';
+
+function normalizarTreino(t, idx) {
+  const nome = t.nome || t.titulo || `Treino ${String.fromCharCode(65 + idx)} - ${t.objetivo || 'Foco Geral'}`;
+  const foco = t.foco || t.objetivo || 'Hipertrofia';
+  const nivel = t.nivel || 'Intermediário';
+  const rawExercicios = t.exercicios || t.treinoExercicios || [];
+
+  const exercicios = rawExercicios.map((ex, i) => ({
+    idExercicio: ex.idExercicio || ex.id || i + 1,
+    nome: ex.nome || ex.exercicio?.nome || 'Exercício sem nome',
+    grupo: ex.grupo || ex.grupo_muscular || 'Geral',
+    series: ex.series || 3,
+    repeticoes: ex.repeticoes || '10-12',
+    descanso: ex.descanso || (ex.descanso_segundos ? `${ex.descanso_segundos}s` : '60s'),
+  }));
+
+  return {
+    idTreino: t.idTreino || t.id || idx + 1,
+    nome,
+    foco,
+    nivel,
+    exercicios,
+  };
+}
 
 export default function TreinosScreen() {
   const [treinos, setTreinos] = useState([]);
   const [treinoAtivoIndex, setTreinoAtivoIndex] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+
+  async function carregarTreinos() {
+    try {
+      const data = await api.getTreinos();
+      const lista = Array.isArray(data) ? data : [];
+      setTreinos(lista.map(normalizarTreino));
+    } catch (e) {
+      console.warn('Erro ao carregar treinos:', e.message);
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
+  }
 
   useEffect(() => {
-    async function carregarTreinos() {
-      try {
-        const data = await api.getTreinos();
-        setTreinos(data || []);
-      } catch (e) {
-        console.log(e);
-      } finally {
-        setLoading(false);
-      }
-    }
     carregarTreinos();
   }, []);
+
+  function onRefresh() {
+    setRefreshing(true);
+    carregarTreinos();
+  }
 
   if (loading) {
     return (
@@ -40,13 +74,17 @@ export default function TreinosScreen() {
   const treinoAtual = treinos[treinoAtivoIndex] || treinos[0];
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
+    <ScrollView
+      style={styles.container}
+      contentContainerStyle={styles.contentContainer}
+      refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#FFD400" />}
+    >
       <Text style={styles.title}>FICHA DE TREINOS</Text>
       <Text style={styles.subtitle}>
         Selecione uma divisão para visualizar a lista completa de exercícios e prescrições.
       </Text>
 
-      {/* Tabs de Divisão (Treino A, B, C) */}
+      {/* Tabs de Divisão (Treino A, B, C...) */}
       <View style={styles.tabRow}>
         {treinos.map((t, idx) => (
           <Pressable
@@ -72,46 +110,53 @@ export default function TreinosScreen() {
           </View>
 
           <Text style={styles.workoutSub}>
-            Objetivo: <Text style={{ color: '#FFD400', fontWeight: '800' }}>{treinoAtual.foco}</Text> • {treinoAtual.exercicios?.length || 0} Exercícios
+            Objetivo: <Text style={{ color: '#FFD400', fontWeight: '800' }}>{treinoAtual.foco}</Text> •{' '}
+            {treinoAtual.exercicios?.length || 0} Exercícios
           </Text>
         </View>
       )}
 
       {/* Lista de Exercícios */}
       <View style={styles.exerciseList}>
-        {treinoAtual?.exercicios?.map((ex, idx) => (
-          <View key={ex.idExercicio || idx} style={styles.exerciseCard}>
-            <View style={styles.exerciseNumberContainer}>
-              <Text style={styles.exerciseNumber}>{String(idx + 1).padStart(2, '0')}</Text>
-            </View>
+        {treinoAtual?.exercicios?.length === 0 ? (
+          <View style={styles.emptyCard}>
+            <Text style={styles.emptyText}>Nenhum exercício registrado nesta ficha.</Text>
+          </View>
+        ) : (
+          treinoAtual?.exercicios?.map((ex, idx) => (
+            <View key={ex.idExercicio || idx} style={styles.exerciseCard}>
+              <View style={styles.exerciseNumberContainer}>
+                <Text style={styles.exerciseNumber}>{String(idx + 1).padStart(2, '0')}</Text>
+              </View>
 
-            <View style={styles.exerciseInfo}>
-              <Text style={styles.exerciseGroup}>{ex.grupo?.toUpperCase()}</Text>
-              <Text style={styles.exerciseName}>{ex.nome}</Text>
+              <View style={styles.exerciseInfo}>
+                <Text style={styles.exerciseGroup}>{ex.grupo?.toUpperCase()}</Text>
+                <Text style={styles.exerciseName}>{ex.nome}</Text>
 
-              <View style={styles.exerciseMetricsRow}>
-                <View style={styles.exMetric}>
-                  <Text style={styles.exMetricVal}>{ex.series}</Text>
-                  <Text style={styles.exMetricLab}>Séries</Text>
-                </View>
+                <View style={styles.exerciseMetricsRow}>
+                  <View style={styles.exMetric}>
+                    <Text style={styles.exMetricVal}>{ex.series}</Text>
+                    <Text style={styles.exMetricLab}>Séries</Text>
+                  </View>
 
-                <View style={styles.exMetricDot} />
+                  <View style={styles.exMetricDot} />
 
-                <View style={styles.exMetric}>
-                  <Text style={styles.exMetricVal}>{ex.repeticoes}</Text>
-                  <Text style={styles.exMetricLab}>Reps</Text>
-                </View>
+                  <View style={styles.exMetric}>
+                    <Text style={styles.exMetricVal}>{ex.repeticoes}</Text>
+                    <Text style={styles.exMetricLab}>Reps</Text>
+                  </View>
 
-                <View style={styles.exMetricDot} />
+                  <View style={styles.exMetricDot} />
 
-                <View style={styles.exMetric}>
-                  <Text style={styles.exMetricVal}>{ex.descanso}</Text>
-                  <Text style={styles.exMetricLab}>Descanso</Text>
+                  <View style={styles.exMetric}>
+                    <Text style={styles.exMetricVal}>{ex.descanso}</Text>
+                    <Text style={styles.exMetricLab}>Descanso</Text>
+                  </View>
                 </View>
               </View>
             </View>
-          </View>
-        ))}
+          ))
+        )}
       </View>
     </ScrollView>
   );
@@ -190,7 +235,7 @@ const styles = StyleSheet.create({
   },
   workoutName: {
     color: '#FFFFFF',
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: '900',
     flex: 1,
   },
@@ -211,6 +256,16 @@ const styles = StyleSheet.create({
   },
   exerciseList: {
     gap: 14,
+  },
+  emptyCard: {
+    backgroundColor: '#121212',
+    padding: 24,
+    borderRadius: 12,
+    alignItems: 'center',
+  },
+  emptyText: {
+    color: '#777777',
+    fontSize: 14,
   },
   exerciseCard: {
     flexDirection: 'row',

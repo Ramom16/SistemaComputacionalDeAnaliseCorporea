@@ -1,3 +1,5 @@
+import { validarUUID } from "../utils/cryptoUtils.js";
+
 export class Calculo {
 
     #idCalculo;
@@ -76,33 +78,24 @@ export class Calculo {
 
         if (
             value !== null &&
-            value !== undefined &&
-            (!Number.isInteger(Number(value)) ||
-             Number(value) <= 0)
+            value !== undefined
         ) {
-            throw new Error(
-                "ID do cálculo inválido"
-            );
+            if (typeof value !== "string" || !validarUUID(value)) {
+                throw new Error("ID do cálculo deve ser um UUID válido");
+            }
+            this.#idCalculo = value.trim();
+        } else {
+            this.#idCalculo = null;
         }
-
-        this.#idCalculo =
-            value === null || value === undefined
-                ? null
-                : Number(value);
     }
 
     set idDados(value) {
 
-        if (
-            !Number.isInteger(Number(value)) ||
-            Number(value) <= 0
-        ) {
-            throw new Error(
-                "ID dos dados corporais inválido"
-            );
+        if (!value || typeof value !== "string" || !validarUUID(value)) {
+            throw new Error("ID dos dados corporais deve ser um UUID válido");
         }
 
-        this.#idDados = Number(value);
+        this.#idDados = value.trim();
     }
 
     set imc(value) {
@@ -207,7 +200,7 @@ export class Calculo {
     }) {
 
         if (
-            idDados === undefined ||
+            !idDados ||
             imc === undefined ||
             tmb === undefined ||
             ndc === undefined
@@ -218,7 +211,7 @@ export class Calculo {
         }
 
         return new Calculo(
-            Number(idDados),
+            String(idDados),
             Number(imc),
             Number(tmb),
             Number(ndc),
@@ -244,12 +237,12 @@ export class Calculo {
         }
 
         return new Calculo(
-            Number(idDados),
+            String(idDados),
             Number(imc),
             Number(tmb),
             Number(ndc),
             treinos,
-            Number(idCalculo),
+            String(idCalculo),
             dataCalculo,
             dataAtualizacaoCalculo
         );

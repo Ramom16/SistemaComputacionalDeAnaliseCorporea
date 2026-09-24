@@ -1,4 +1,5 @@
 import React from 'react';
+import { View, ActivityIndicator } from 'react-native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { useAuth } from '../context/AuthContext';
 
@@ -10,7 +11,15 @@ import TabNavigator from './TabNavigator';
 const Stack = createNativeStackNavigator();
 
 export default function AppNavigator() {
-  const { signed } = useAuth();
+  const { signed, initializing } = useAuth();
+
+  if (initializing) {
+    return (
+      <View style={{ flex: 1, backgroundColor: '#080808', justifyContent: 'center', alignItems: 'center' }}>
+        <ActivityIndicator size="large" color="#FFD400" />
+      </View>
+    );
+  }
 
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>

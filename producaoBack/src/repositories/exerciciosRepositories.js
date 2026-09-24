@@ -2,13 +2,12 @@ import prisma from "../database/prismaClient.js";
 
 const exerciciosRepository = {
 
-    async criar({ nome, descricao, caminho_video, grupo_muscular }) {
+    async criar({ nome, descricao, caminho_video }) {
         return await prisma.exercicio.create({
             data: {
                 nome,
                 descricao,
-                caminho_video,
-                grupo_muscular: grupo_muscular || null
+                caminho_video
             }
         });
     },
@@ -16,7 +15,7 @@ const exerciciosRepository = {
     async buscarPorId(idExercicio) {
         return await prisma.exercicio.findUnique({
             where: {
-                idExercicio: Number(idExercicio)
+                idExercicio: String(idExercicio)
             }
         });
     },
@@ -32,7 +31,7 @@ const exerciciosRepository = {
     async atualizar(idExercicio, dados) {
         return await prisma.exercicio.update({
             where: {
-                idExercicio: Number(idExercicio)
+                idExercicio: String(idExercicio)
             },
             data: dados
         });
@@ -41,7 +40,7 @@ const exerciciosRepository = {
     async deletar(idExercicio) {
         return await prisma.exercicio.delete({
             where: {
-                idExercicio: Number(idExercicio)
+                idExercicio: String(idExercicio)
             }
         });
     },

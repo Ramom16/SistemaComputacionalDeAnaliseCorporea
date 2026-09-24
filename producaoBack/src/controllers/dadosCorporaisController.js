@@ -1,16 +1,31 @@
 import { DadosCorporais } from "../models/DadosCorporais.js";
 import DadosCorporaisService from "../services/dadosCorporaisService.js";
 import DadosCorporaisRepository from "../repositories/dadosCorporaisRepository.js";
+import { anexarIdsCriptografados } from "../middlewares/tratarIdsCriptografados.js";
 
 const DadosCorporaisController = {
 
+    // CREATE
     criar: async (req, res) => {
         try {
-            const idUsuario = req.usuario?.id || Number(req.body.idUsuario);
-            const { peso_kg, altura_cm, genero, idade, nivel_atividade } = req.body;
+            // Prioriza o usuário autenticado no JWT
+            const idUsuario = req.usuario?.id || req.body.idUsuario;
 
+            if (!idUsuario) {
+                return res.status(401).json({ erro: "Usuário não autenticado." });
+            }
+
+            const {
+                peso_kg,
+                altura_cm,
+                genero,
+                idade,
+                nivel_atividade
+            } = req.body;
+
+            // Validação da model com UUID
             DadosCorporais.criar({
-                idUsuario: Number(idUsuario),
+                idUsuario: String(idUsuario),
                 peso_kg: Number(peso_kg),
                 altura_cm: Number(altura_cm),
                 genero,
@@ -19,7 +34,7 @@ const DadosCorporaisController = {
             });
 
             const dadosCorporais = {
-                idUsuario: Number(idUsuario),
+                idUsuario: String(idUsuario),
                 peso_kg: Number(peso_kg),
                 altura_cm: Number(altura_cm),
                 genero,
@@ -31,68 +46,115 @@ const DadosCorporaisController = {
 
             return res.status(201).json({
                 mensagem: "Dados corporais cadastrados com sucesso",
-                dados: resultado
+                dados: anexarIdsCriptografados(resultado)
             });
         } catch (error) {
-            return res.status(400).json({ erro: error.message });
+            return res.status(400).json({
+                erro: error.message
+            });
         }
     },
 
-    listar: async (_, res) => {
+    // LISTAR (Apenas dados corporais do usuário autenticado ou lista geral se aplicável)
+    listar: async (req, res) => {
         try {
+            if (req.usuario?.role === "ADMIN") {
+                const dados = await DadosCorporaisRepository.findAll();
+                return res.status(200).json(anexarIdsCriptografados(dados));
+            }
+            if (req.usuario?.id) {
+                const dados = await DadosCorporaisRepository.findByUsuario(String(req.usuario.id));
+                return res.status(200).json(anexarIdsCriptografados(dados ? [dados] : []));
+            }
             const dados = await DadosCorporaisRepository.findAll();
-            return res.status(200).json(dados);
+            return res.status(200).json(anexarIdsCriptografados(dados));
         } catch (error) {
-            return res.status(500).json({ erro: error.message });
+            return res.status(500).json({
+                erro: error.message
+            });
         }
     },
 
+    // BUSCAR POR ID
     buscarPorId: async (req, res) => {
         try {
             const { id } = req.params;
-            const dados = await DadosCorporaisRepository.findById(Number(id));
-
+            const dados = await DadosCorporaisRepository.findById(String(id));
             if (!dados) {
-                return res.status(404).json({ erro: "Dados não encontrados" });
+                return res.status(404).json({
+                    erro: "Dados não encontrados"
+                });
             }
 
-            return res.status(200).json(dados);
+            // Proteção contra IDOR: verifica se o dado pertence ao usuário autenticado ou se é ADMIN
+            const usuarioAutenticadoId = String(req.usuario?.id ?? "");
+            const idUsuarioDados = String(dados.idUsuario ?? "");
+            if (req.usuario?.id && idUsuarioDados !== usuarioAutenticadoId && req.usuario.role !== "ADMIN") {
+                return res.status(403).json({
+                    erro: "Você não possui permissão para acessar estes dados."
+                });
+            }
+
+            return res.status(200).json(anexarIdsCriptografados(dados));
         } catch (error) {
-            return res.status(500).json({ erro: error.message });
+            return res.status(500).json({
+                erro: error.message
+            });
         }
     },
 
+    // BUSCAR POR USUÁRIO
     buscarPorUsuario: async (req, res) => {
         try {
-            const idUsuario = req.params.id ? Number(req.params.id) : req.usuario?.id;
-            const dados = await DadosCorporaisRepository.findByUsuario(Number(idUsuario));
+            const targetId = req.params.id || req.usuario?.id;
+            const usuarioAutenticadoId = String(req.usuario?.id ?? "");
+            const idAlvoNormalizado = String(targetId ?? "");
 
-            if (!dados) {
-                return res.status(404).json({ erro: "Dados não encontrados" });
+            // Proteção contra IDOR: permite acesso próprio ou por administrador
+            if (req.usuario?.id && idAlvoNormalizado !== usuarioAutenticadoId && req.usuario.role !== "ADMIN") {
+                return res.status(403).json({
+                    erro: "Você não possui permissão para acessar estes dados."
+                });
             }
 
-            return res.status(200).json(dados);
+            const dados = await DadosCorporaisRepository.findByUsuario(String(targetId));
+            if (!dados) {
+                return res.status(200).json({ calculos: [] });
+            }
+            return res.status(200).json(anexarIdsCriptografados(dados));
         } catch (error) {
-            return res.status(500).json({ erro: error.message });
+            return res.status(500).json({
+                erro: error.message
+            });
         }
     },
 
+    // UPDATE
     atualizar: async (req, res) => {
         try {
-            const idUsuario = req.params.idUsuario ? Number(req.params.idUsuario) : req.usuario?.id;
-            const { peso_kg, altura_cm, genero, idade, nivel_atividade } = req.body;
+            const idUsuario = req.usuario?.id || req.params.idUsuario;
 
-            DadosCorporais.editar({
-                idUsuario: Number(idUsuario),
-                peso_kg: Number(peso_kg),
-                altura_cm: Number(altura_cm),
+            const usuarioAutenticadoId = String(req.usuario?.id ?? "");
+            const idUsuarioParam = String(req.params.idUsuario ?? "");
+
+            // Proteção contra IDOR
+            if (req.usuario?.id && req.params.idUsuario && idUsuarioParam !== usuarioAutenticadoId) {
+                return res.status(403).json({
+                    erro: "Você não possui permissão para alterar dados deste usuário."
+                });
+            }
+
+            const {
+                peso_kg,
+                altura_cm,
                 genero,
-                idade: Number(idade),
+                idade,
                 nivel_atividade
-            });
+            } = req.body;
 
+            // Validação
             const dadosCorporais = {
-                idUsuario: Number(idUsuario),
+                idUsuario: String(idUsuario),
                 peso_kg: Number(peso_kg),
                 altura_cm: Number(altura_cm),
                 genero,
@@ -101,31 +163,41 @@ const DadosCorporaisController = {
             };
 
             const resultado = await DadosCorporaisService.atualizar(
-                Number(idUsuario),
+                String(idUsuario),
                 dadosCorporais
             );
 
             return res.status(200).json({
                 mensagem: "Dados atualizados com sucesso",
-                dados: resultado
+                dados: anexarIdsCriptografados(resultado)
             });
         } catch (error) {
-            return res.status(400).json({ erro: error.message });
+            return res.status(400).json({
+                erro: error.message
+            });
         }
     },
 
+    // DELETE
     deletar: async (req, res) => {
         try {
-            const idUsuario = req.params.idUsuario ? Number(req.params.idUsuario) : req.usuario?.id;
-            await DadosCorporaisRepository.delete(Number(idUsuario));
+            const idUsuario = req.usuario?.id || req.params.idUsuario || req.query.idUsuario;
 
+            if (!idUsuario) {
+                return res.status(400).json({ erro: "ID do usuário não especificado." });
+            }
+
+            await DadosCorporaisRepository.delete(String(idUsuario));
             return res.status(200).json({
                 mensagem: "Dados deletados com sucesso"
             });
         } catch (error) {
-            return res.status(500).json({ erro: error.message });
+            return res.status(500).json({
+                erro: error.message
+            });
         }
     }
 };
 
 export default DadosCorporaisController;
+

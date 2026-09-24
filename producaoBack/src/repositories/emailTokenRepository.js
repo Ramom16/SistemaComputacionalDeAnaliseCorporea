@@ -4,7 +4,7 @@ const emailTokenRepository = {
   criar: async (usuarioId, token_hash, expira_em) => {
     return await prisma.emailVerificationToken.create({
       data: {
-        usuarioId,
+        usuarioId: String(usuarioId),
         token_hash,
         expira_em
       }
@@ -19,7 +19,7 @@ const emailTokenRepository = {
 
   marcarComoUsado: async (id) => {
     return await prisma.emailVerificationToken.update({
-      where: { id },
+      where: { id: String(id) },
       data: {
         usado_em: new Date()
       }
@@ -28,13 +28,13 @@ const emailTokenRepository = {
 
   deletar: async (id) => {
     return await prisma.emailVerificationToken.delete({
-      where: { id }
+      where: { id: String(id) }
     });
   },
 
   deletarPorUsuario: async (usuarioId) => {
     return await prisma.emailVerificationToken.deleteMany({
-      where: { usuarioId }
+      where: { usuarioId: String(usuarioId) }
     });
   }
 };

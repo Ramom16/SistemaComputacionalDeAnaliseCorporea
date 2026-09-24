@@ -1,60 +1,76 @@
 import treinoService from "../services/treinoService.js";
+import { anexarIdsCriptografados } from "../middlewares/tratarIdsCriptografados.js";
 
 const treinoController = {
-  async criar(req, res) {
-    try {
-      const idUsuario = req.usuario.id;
-      const roleUsuario = req.usuario.role;
-      const { is_oficial, ...dadosTreino } = req.body;
 
-      // Impede que alunos criem treinos oficiais da plataforma
-      if (is_oficial && roleUsuario !== "ADMIN") {
-        return res.status(403).json({
-          error: "Apenas professores podem criar treinos oficiais para a plataforma."
-        });
-      }
+    async criar(req, res) {
 
-      const treino = await treinoService.criar(idUsuario, {
-        ...dadosTreino,
-        is_oficial: roleUsuario === "ADMIN" ? Boolean(is_oficial) : false
-      });
+        try {
 
-      return res.status(201).json({
-        message: "Treino criado com sucesso.",
-        data: treino
-      });
-    } catch (error) {
-      return res.status(400).json({ error: error.message });
-    }
-  },
+            const idUsuario = (req.usuario.role === "ADMIN" && req.body.idUsuario)
+                ? req.body.idUsuario
+                : req.usuario.id;
 
-  async listar(req, res) {
-    try {
-      const idUsuario = req.usuario.id;
-      // O service deve buscar treinos onde (idUsuario === idUsuario OR is_oficial === true)
-      const treinos = await treinoService.listarPorUsuario(idUsuario);
+            const treino = await treinoService.criar(
+                String(idUsuario),
+                req.body,
+                req.usuario.role
+            );
 
-      return res.status(200).json({ data: treinos });
-    } catch (error) {
-      return res.status(400).json({ error: error.message });
-    }
-  },
+            return res.status(201).json({
+                message: "Treino criado com sucesso.",
+                data: anexarIdsCriptografados(treino)
+            });
+
+        } catch (error) {
+
+            return res.status(400).json({
+                error: error.message
+            });
+        }
+    },
+
+    async listar(req, res) {
+
+        try {
+
+            const targetId = (req.usuario.role === "ADMIN" && (req.query.idUsuario || req.query.id))
+                ? (req.query.idUsuario || req.query.id)
+                : req.usuario.id;
+
+            const treinos =
+                await treinoService.listarPorUsuario(
+                    String(targetId)
+                );
+
+            return res.status(200).json({
+                data: anexarIdsCriptografados(treinos)
+            });
+
+        } catch (error) {
+
+            return res.status(400).json({
+                error: error.message
+            });
+        }
+    },
 
     async buscar(req, res) {
 
         try {
 
             const idUsuario = req.usuario.id;
-            const idTreino = Number(req.params.idTreino);
+            const idTreino = String(req.params.idTreino);
 
             const treino =
                 await treinoService.buscarPorId(
-                    idUsuario,
-                    idTreino
+                    String(idUsuario),
+                    idTreino,
+                    req.usuario.role
                 );
 
             return res.status(200).json({
-                data: treino
+                data: anexarIdsCriptografados(treino)
             });
 
         } catch (error) {
@@ -70,18 +86,18 @@ const treinoController = {
         try {
 
             const idUsuario = req.usuario.id;
-            const idTreino = Number(req.params.idTreino);
+            const idTreino = String(req.params.idTreino);
 
             const treino =
                 await treinoService.atualizar(
-                    idUsuario,
+                    String(idUsuario),
                     idTreino,
                     req.body
                 );
 
             return res.status(200).json({
                 message: "Treino atualizado com sucesso.",
-                data: treino
+                data: anexarIdsCriptografados(treino)
             });
 
         } catch (error) {
@@ -97,10 +113,10 @@ const treinoController = {
         try {
 
             const idUsuario = req.usuario.id;
-            const idTreino = Number(req.params.idTreino);
+            const idTreino = String(req.params.idTreino);
 
             await treinoService.deletar(
-                idUsuario,
+                String(idUsuario),
                 idTreino
             );
 

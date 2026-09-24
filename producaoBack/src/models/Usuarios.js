@@ -1,3 +1,5 @@
+import { validarUUID } from "../utils/cryptoUtils.js";
+
 export class Usuario {
 
     #id;
@@ -11,6 +13,7 @@ export class Usuario {
     #criado_em;
     #bloqueado_ate;
     #tentativas_login;
+    #role;
 
 
     constructor(
@@ -24,7 +27,8 @@ export class Usuario {
         criado_em = null,
         bloqueado_ate = null,
         tentativas_login = 0,
-        id = null
+        id = null,
+        role = "USER"
     ) {
 
         this.id = id;
@@ -42,6 +46,7 @@ export class Usuario {
 
         this.bloqueado_ate = bloqueado_ate;
         this.tentativas_login = tentativas_login;
+        this.role = role;
     }
 
 
@@ -93,6 +98,10 @@ export class Usuario {
         return this.#tentativas_login;
     }
 
+    get role() {
+        return this.#role;
+    }
+
 
     // =========================
     // SETTERS
@@ -105,16 +114,13 @@ export class Usuario {
             value !== undefined
         ) {
 
-            if (
-                !Number.isInteger(Number(value)) ||
-                Number(value) <= 0
-            ) {
+            if (typeof value !== "string" || !validarUUID(value)) {
                 throw new Error(
-                    "ID do usuário inválido"
+                    "ID do usuário deve ser um UUID válido"
                 );
             }
 
-            this.#id = Number(value);
+            this.#id = value.trim();
 
         } else {
 
@@ -317,6 +323,22 @@ export class Usuario {
     }
 
 
+    set role(value) {
+        if (!value) {
+            this.#role = "USER";
+            return;
+        }
+
+        const r = String(value).trim().toUpperCase();
+
+        if (r !== "USER" && r !== "ADMIN") {
+            throw new Error("Role inválida. Deve ser 'USER' ou 'ADMIN'");
+        }
+
+        this.#role = r;
+    }
+
+
     // =========================
     // FACTORY
     // =========================
@@ -325,7 +347,8 @@ export class Usuario {
         nome,
         email,
         senha_hash,
-        data_nascimento
+        data_nascimento,
+        role = "USER"
     }) {
 
         return new Usuario(
@@ -339,7 +362,8 @@ export class Usuario {
             null,
             null,
             0,
-            null
+            null,
+            role
         );
     }
 
@@ -353,7 +377,8 @@ export class Usuario {
         email_verificado,
         ultimo_login,
         bloqueado_ate,
-        tentativas_login
+        tentativas_login,
+        role = "USER"
     }, id) {
 
         return new Usuario(
@@ -375,7 +400,9 @@ export class Usuario {
 
             tentativas_login ?? 0,
 
-            id
+            id,
+
+            role ?? "USER"
         );
     }
 }

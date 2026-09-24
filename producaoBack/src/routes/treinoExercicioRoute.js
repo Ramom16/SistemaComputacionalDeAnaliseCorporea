@@ -1,13 +1,16 @@
-import treinoExercicioController from "../controllers/treinoExercicioController.js";
 import express from "express";
-import {autenticarToken as authMiddleware} from "../middlewares/autenticarToken.js";
+import treinoExercicioController from "../controllers/treinoExercicioController.js";
+import { autenticarToken as authMiddleware } from "../middlewares/autenticarToken.js";
+import { tratarIdsCriptografados } from "../middlewares/tratarIdsCriptografados.js";
 
 const router = express.Router();
-const treinoRoutes = router
 
-router.post("/:idTreino/exercicios",authMiddleware,treinoExercicioController.adicionar);
-router.get("/:idTreino/exercicios",authMiddleware,treinoExercicioController.listar);
-router.put("/:idTreino/exercicios/:idExercicio",authMiddleware,treinoExercicioController.atualizar);
-router.delete("/:idTreino/exercicios/:idExercicio",authMiddleware,treinoExercicioController.remover);
+router.use(authMiddleware);
+router.use(tratarIdsCriptografados(["idTreino", "idExercicio"]));
 
-export default treinoRoutes;
+router.post("/:idTreino/exercicios", treinoExercicioController.adicionar);
+router.get("/:idTreino/exercicios", treinoExercicioController.listar);
+router.put("/:idTreino/exercicios/:idExercicio", treinoExercicioController.atualizar);
+router.delete("/:idTreino/exercicios/:idExercicio", treinoExercicioController.remover);
+
+export default router;
