@@ -31,4 +31,10 @@ router.delete("/:id/desativar", eAdmin, usuariosController.desativarUsuarioPorId
 // Reativar conta de usuário desativado (ADMIN only)
 router.patch("/:id/reativar", eAdmin, usuariosController.reativarUsuarioPorId);
 
-export default router;
+// Rota para salvar/atualizar os tokens de push do usuário autenticado
+router.put("/push-token", usuariosController.salvarPushToken);
+
+// Rota para disparar notificação de teste para a conta logada
+router.post("/testar-notificacao", usuariosController.testarNotificacao);
+
+export default router;
