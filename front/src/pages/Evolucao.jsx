@@ -11,6 +11,7 @@ import GrupoMuscularGrafico from "../components/evolucao/GrupoMuscularGrafico";
 import Recordes from "../components/evolucao/Records";
 import CalendarioTreinos from "../components/evolucao/CalendarioTreinos";
 import HistoricoTabela from "../components/evolucao/HistoricoTabela";
+import CardsCompartilhamento from "../components/evolucao/CardsCompartilhamento";
 
 import "../styles/dashboard.css";
 import "../styles/evolucao.css";
@@ -33,6 +34,8 @@ export default function Evolucao() {
         localStorage.removeItem('usuario');
         navigate('/login');
     };
+
+    const usuario = JSON.parse(localStorage.getItem("usuario") || "{}");
 
     if (loading) {
         return (
@@ -59,6 +62,8 @@ export default function Evolucao() {
                 <Header />
 
                 <DashboardCards cards={cards} />
+
+                <CardsCompartilhamento historico={historico} cards={cards} nome={usuario.nome} />
 
                 <div className="graficos-grid">
                     <EvolucaoGrafico dados={historico} />
