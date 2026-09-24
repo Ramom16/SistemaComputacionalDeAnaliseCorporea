@@ -37,4 +37,4 @@ router.delete("/:id/desativar", eAdmin, usuariosController.desativarUsuarioPorId
 // Reativar conta de usuário desativado (ADMIN only)
 router.patch("/:id/reativar", eAdmin, usuariosController.reativarUsuarioPorId);
 
-export default router;
+export default router;
