@@ -1,6 +1,4 @@
-import React, { useRef, useState, useEffect } from 'react';
-import { obterTokenFCM } from '../../services/firebase/messagingService';
-
+import React, { useRef, useState } from 'react';
 import {
   Dimensions,
   FlatList,
@@ -11,11 +9,6 @@ import {
 } from 'react-native';
 
 const { width, height } = Dimensions.get('window');
-
-useEffect(() => {
-  const token = obterTokenFCM();
-  console.log(token)
-}, []);
 
 const slides = [
   {

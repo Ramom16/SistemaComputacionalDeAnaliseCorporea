@@ -1,10 +1,16 @@
-import notifee from "@notifee/react-native";
+import * as Notifications from 'expo-notifications';
 
-// função que serve só pra solicitar permissão ao usuário do uso de notificações
-
+/**
+ * Solicita permissão ao usuário para exibição de notificações
+ */
 export async function solicitarPermissaoNotificacao() {
+  const settings = await Notifications.requestPermissionsAsync({
+    ios: {
+      allowAlert: true,
+      allowBadge: true,
+      allowSound: true,
+    },
+  });
 
-    const settings = await notifee.requestPermission();
-
-    return settings;
+  return settings;
 }

@@ -63,24 +63,14 @@ export default function CadastroScreen({ navigation }) {
       genero,
     });
 
-<<<<<<< HEAD
     if (!result.success) {
-      const primeiraMensagem = result.error.issues[0].message;
+      const primeiraMensagem = result.error.issues[0]?.message || 'Verifique os dados informados.';
       setErro(primeiraMensagem);
-=======
+      return;
+    }
+
     if (!dataNascimento.trim()) {
       setErro('Informe sua data de nascimento.');
-      return;
-    }
-
-    if (senha !== confirmarSenha) {
-      setErro('As senhas digitadas não coincidem.');
-      return;
-    }
-
-    if (senha.length < 6) {
-      setErro('A senha deve conter no mínimo 6 caracteres.');
->>>>>>> Dev
       return;
     }
 

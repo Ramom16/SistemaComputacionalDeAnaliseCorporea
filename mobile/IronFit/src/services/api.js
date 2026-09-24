@@ -278,4 +278,12 @@ export const api = {
   async getEstatisticas(usuarioId) {
     return await request(`/evolucao/estatisticas/${usuarioId}`);
   },
+
+  // 5. Notificações Push
+  async salvarPushToken(pushToken, fcmToken) {
+    return await request('/usuarios/push-token', {
+      method: 'PUT',
+      body: JSON.stringify({ pushToken, fcmToken }),
+    });
+  },
 };

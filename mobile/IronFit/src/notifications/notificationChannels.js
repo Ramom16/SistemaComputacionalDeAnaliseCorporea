@@ -1,34 +1,28 @@
-import notifee, {
-    AndroidImportance,
-} from "@notifee/react-native";
+import * as Notifications from 'expo-notifications';
+import { Platform } from 'react-native';
 
 export async function criarCanais() {
-
-    await notifee.createChannel({
-        id: "treinos",
-        name: "Treinos",
-        importance: AndroidImportance.HIGH,
-        sound: "default",
+  if (Platform.OS === 'android') {
+    await Notifications.setNotificationChannelAsync('treinos', {
+      name: 'Treinos',
+      importance: Notifications.AndroidImportance.HIGH,
+      vibrationPattern: [0, 250, 250, 250],
+      lightColor: '#FF231F7C',
     });
 
-    await notifee.createChannel({
-        id: "lembretes",
-        name: "Lembretes",
-        importance: AndroidImportance.DEFAULT,
-        sound: "default",
+    await Notifications.setNotificationChannelAsync('lembretes', {
+      name: 'Lembretes',
+      importance: Notifications.AndroidImportance.DEFAULT,
     });
 
-    await notifee.createChannel({
-        id: "evolucao",
-        name: "Evolução",
-        importance: AndroidImportance.DEFAULT,
-        sound: "default",
+    await Notifications.setNotificationChannelAsync('evolucao', {
+      name: 'Evolução',
+      importance: Notifications.AndroidImportance.DEFAULT,
     });
 
-    await notifee.createChannel({
-        id: "agua",
-        name: "Hidratação",
-        importance: AndroidImportance.HIGH,
-        sound: "none",
-    })
+    await Notifications.setNotificationChannelAsync('agua', {
+      name: 'Hidratação',
+      importance: Notifications.AndroidImportance.HIGH,
+    });
+  }
 }
