@@ -11,8 +11,20 @@ const VAZIO = {
 
 const numero = (valor) => Number(valor) || 0;
 
+/** Aceita a série como array puro ou como { dados, media } devolvido pela API. */
+function serie(bruto) {
+  if (Array.isArray(bruto)) return bruto;
+  if (Array.isArray(bruto?.dados)) return bruto.dados;
+  return [];
+}
+
 /** Junta as 4 séries (peso/imc/tmb/ndc) em uma linha por medição, na ordem da API. */
-function paraHistorico({ peso = [], imc = [], tmb = [], ndc = [] }) {
+function paraHistorico(bruto) {
+  const peso = serie(bruto?.peso);
+  const imc = serie(bruto?.imc);
+  const tmb = serie(bruto?.tmb);
+  const ndc = serie(bruto?.ndc);
+
   return peso.map((item, i) => ({
     id: i + 1,
     data: item.data,
@@ -42,11 +54,11 @@ export function useEvolucao() {
     ])
       .then(([historicoRes, statsRes]) => {
         if (!ativo) return;
-        const { peso = [], imc = [], tmb = [], ndc = [] } = historicoRes.data ?? {};
+        const evolucao = historicoRes.data ?? {};
         setDados({
           ...VAZIO,
           ...statsRes.data,
-          historico: paraHistorico({ peso, imc, tmb, ndc }),
+          historico: paraHistorico(evolucao),
         });
       })
       .catch((err) => {
