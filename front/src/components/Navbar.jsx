@@ -1,4 +1,3 @@
-import React from 'react';
 import { Link } from 'react-router-dom';
 
 export default function Navbar({ children }) {
@@ -13,9 +12,7 @@ export default function Navbar({ children }) {
         <span className="logo-text">IRONFIT</span>
       </Link>
       <nav>
-        <ul className="nav-links">
-          {children}
-        </ul>
+        <ul className="nav-links">{children}</ul>
       </nav>
     </header>
   );

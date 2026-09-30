@@ -1,9 +1,24 @@
 import exerciciosService from "../services/exerciciosService.js";
 import { anexarIdsCriptografados } from "../middlewares/tratarIdsCriptografados.js";
 
+/** Mensagem padronizada para acesso negado a não-administradores */
+const ERRO_ACESSO_ADMIN = "Acesso negado. Apenas administradores podem realizar esta operação.";
+
+function bloquearSeNaoAdmin(req, res) {
+    const role = String(req.usuario?.role || "").toUpperCase();
+    if (role !== "ADMIN") {
+        res.status(403).json({ erro: ERRO_ACESSO_ADMIN });
+        return true;
+    }
+    return false;
+}
+
 const exerciciosController = {
 
     async criar(req, res) {
+
+        // Guard de role – defesa em profundidade (a rota já aplica eAdmin)
+        if (bloquearSeNaoAdmin(req, res)) return;
 
         try {
 
@@ -68,6 +83,9 @@ const exerciciosController = {
 
     async atualizar(req, res) {
 
+        // Guard de role – defesa em profundidade (a rota já aplica eAdmin)
+        if (bloquearSeNaoAdmin(req, res)) return;
+
         try {
 
             const idExercicio =
@@ -93,6 +111,9 @@ const exerciciosController = {
     },
 
     async deletar(req, res) {
+
+        // Guard de role – defesa em profundidade (a rota já aplica eAdmin)
+        if (bloquearSeNaoAdmin(req, res)) return;
 
         try {
 

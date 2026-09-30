@@ -173,6 +173,12 @@ const EvolucaoService = {
         const datasTreino = [...new Set(treinos.map((treino) => (
             new Date(treino.data_criacao).toISOString().slice(0, 10)
         )))];
+        const inicioSemana = new Date();
+        inicioSemana.setHours(0, 0, 0, 0);
+        inicioSemana.setDate(inicioSemana.getDate() - ((inicioSemana.getDay() + 6) % 7));
+        const treinosSemana = treinos.filter((treino) => (
+            new Date(treino.data_criacao) >= inicioSemana
+        )).length;
         let maiorSequencia = 0;
         let sequenciaAtual = 0;
         let dataAnterior = null;
@@ -198,7 +204,9 @@ const EvolucaoService = {
                 totalTreinos: treinos.length,
                 totalExercicios: totalSeries,
                 tempoTreinado: Number((tempoMinutos / 60).toFixed(1)),
-                calorias
+                calorias,
+                treinosSemana,
+                metaSemanal: 3
             },
             exercicios: [...exerciciosPorNome.entries()]
                 .map(([nome, vezes]) => ({ nome, vezes }))

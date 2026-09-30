@@ -82,6 +82,24 @@
   font-weight: 500;
 }
 
+/* Cards exportáveis para redes sociais */
+.compartilhamento-section { background: var(--bg-card); border: 1px solid var(--border-light); border-radius: 16px; padding: 28px; margin-bottom: 40px; box-shadow: 0 15px 35px rgba(0, 0, 0, .3); }
+.compartilhamento-header h2 { font-family: var(--font-title); margin: 0 0 4px; color: var(--text-white); text-transform: uppercase; font-size: 1.35rem; }
+.compartilhamento-header p, .compartilhamento-aviso { color: var(--text-gray); margin: 0; font-size: .9rem; }
+.compartilhamento-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; margin-top: 22px; }
+.card-conquista { position: relative; overflow: hidden; min-height: 260px; padding: 22px; border-radius: 14px; color: #fff; background: linear-gradient(135deg, #222 0%, #090909 75%); border: 1px solid rgba(255, 230, 0, .25); display: flex; flex-direction: column; }
+.card-conquista::after { content: ''; position: absolute; width: 190px; height: 190px; border-radius: 50%; background: rgba(255, 230, 0, .08); top: -105px; right: -65px; }
+.card-conquista-marca { color: var(--primary-yellow); font-weight: 800; letter-spacing: 1.2px; font-size: .72rem; }
+.card-conquista-icone { color: var(--primary-yellow); margin: 22px 0 14px; font-size: 1.4rem; }
+.card-conquista > span { color: var(--text-gray); font-size: .82rem; text-transform: uppercase; letter-spacing: .6px; }
+.card-conquista strong { color: var(--primary-yellow); font-family: var(--font-title); font-size: 2.3rem; line-height: 1.1; margin: 5px 0; }
+.card-conquista > p { margin: 0; font-size: .86rem; }
+.card-conquista-acoes { display: flex; gap: 8px; margin-top: auto; padding-top: 20px; }
+.card-conquista-acoes button { cursor: pointer; border-radius: 7px; border: 1px solid rgba(255,255,255,.18); background: transparent; color: #fff; padding: 8px 10px; font-weight: 600; font-size: .78rem; }
+.card-conquista-acoes button:hover { border-color: var(--primary-yellow); color: var(--primary-yellow); }
+.card-conquista-acoes .btn-compartilhar { background: var(--primary-yellow); border-color: var(--primary-yellow); color: #111; }
+.compartilhamento-aviso { margin-top: 16px; color: #4ade80; }
+
 /* Gráficos Grid */
 .graficos-grid {
   display: grid;
@@ -416,6 +434,10 @@
 
 /* Media Queries Responsivas */
 @media (max-width: 900px) {
+  .compartilhamento-grid {
+    grid-template-columns: 1fr;
+  }
+
   .graficos-grid {
     grid-template-columns: 1fr;
   }

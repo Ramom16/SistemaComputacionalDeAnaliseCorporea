@@ -114,10 +114,12 @@ const treinoController = {
 
             const idUsuario = req.usuario.id;
             const idTreino = String(req.params.idTreino);
+            const role = req.usuario.role || "USER";
 
             await treinoService.deletar(
                 String(idUsuario),
-                idTreino
+                idTreino,
+                role
             );
 
             return res.status(200).json({

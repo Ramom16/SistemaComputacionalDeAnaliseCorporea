@@ -27,6 +27,7 @@ describe("exerciciosService - criar", () => {
     const dadosRetorno = {
       idExercicio: UUID_EXERCICIO,
       nome: "Supino Reto",
+      grupo_muscular: "Peito",
       descricao: "Peitoral médio",
       caminho_video: null
     };
@@ -34,6 +35,7 @@ describe("exerciciosService - criar", () => {
 
     const resultado = await exerciciosService.criar({
       nome: "Supino Reto",
+      grupo_muscular: "Peito",
       descricao: "Peitoral médio",
       caminho_video: null
     });
@@ -45,11 +47,11 @@ describe("exerciciosService - criar", () => {
 
   it("deve propagar erro se o repositório falhar ao criar", async () => {
     exerciciosRepository.criar.mockRejectedValue(new Error("Erro no banco"));
-    await expect(exerciciosService.criar({ nome: "Leg Press" })).rejects.toThrow("Erro no banco");
+    await expect(exerciciosService.criar({ nome: "Leg Press", grupo_muscular: "Coxa" })).rejects.toThrow("Erro no banco");
   });
 
   it("deve lançar erro se o nome for inválido (menos de 2 chars)", async () => {
-    await expect(exerciciosService.criar({ nome: "X" })).rejects.toThrow(
+    await expect(exerciciosService.criar({ nome: "X", grupo_muscular: "Braço" })).rejects.toThrow(
       "Nome do exercício deve ter entre 2 e 150 caracteres"
     );
     expect(exerciciosRepository.criar).not.toHaveBeenCalled();
@@ -98,14 +100,15 @@ describe("exerciciosService - buscarPorId", () => {
 
 describe("exerciciosService - atualizar", () => {
   it("deve atualizar o exercício com dados válidos", async () => {
-    const exercicioExistente = { idExercicio: UUID_EXERCICIO, nome: "Supino" };
-    const exercicioAtualizado = { idExercicio: UUID_EXERCICIO, nome: "Supino Inclinado" };
+    const exercicioExistente = { idExercicio: UUID_EXERCICIO, nome: "Supino", grupo_muscular: "Peito" };
+    const exercicioAtualizado = { idExercicio: UUID_EXERCICIO, nome: "Supino Inclinado", grupo_muscular: "Peito" };
 
     exerciciosRepository.buscarPorId.mockResolvedValue(exercicioExistente);
     exerciciosRepository.atualizar.mockResolvedValue(exercicioAtualizado);
 
     const resultado = await exerciciosService.atualizar(UUID_EXERCICIO, {
       nome: "Supino Inclinado",
+      grupo_muscular: "Peito",
       descricao: null,
       caminho_video: null
     });
@@ -117,7 +120,12 @@ describe("exerciciosService - atualizar", () => {
   it("deve lançar erro se o exercício não existir para atualizar", async () => {
     exerciciosRepository.buscarPorId.mockResolvedValue(null);
     await expect(
-      exerciciosService.atualizar(UUID_EXERCICIO, { nome: "Flexão", descricao: null, caminho_video: null })
+      exerciciosService.atualizar(UUID_EXERCICIO, {
+        nome: "Flexão",
+        grupo_muscular: "Abdomen",
+        descricao: null,
+        caminho_video: null
+      })
     ).rejects.toThrow("Exercício não encontrado.");
     expect(exerciciosRepository.atualizar).not.toHaveBeenCalled();
   });

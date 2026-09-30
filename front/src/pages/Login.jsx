@@ -1,54 +1,39 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-import api from '../services/api'; // Importação do Axios (Ajuste o caminho se necessário)
-import '../styles/login.css';
+import { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import api, { getApiError } from '../services/api';
+import { salvarSessao } from '../services/auth';
 import Navbar from '../components/Navbar';
 import Input from '../components/Input';
 import AlertMessage from '../components/AlertMessage';
+import '../styles/login.css';
 
 export default function Login() {
+  const navigate = useNavigate();
+
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
   const [loading, setLoading] = useState(false);
-  const [msg, setMsg] = useState({ text: '', type: '' });
-  const [loginData, setLoginData] = useState(null);
+  const [msg, setMsg] = useState(null);
 
-  const handleLogin = async (e) => {
-    e.preventDefault();
+  const handleLogin = async (event) => {
+    event.preventDefault();
     setLoading(true);
-    setMsg({ text: '', type: '' });
-    setLoginData(null);
+    setMsg(null);
 
     try {
-      const response = await api.post('/auth/login', { email, senha });
-      const data = response.data;
-
-      setMsg({ text: data.msg, type: 'sucesso' });
-      setLoginData({
-        token: data.token,
-        nome: data.usuario?.nome || 'Usuário'
-      });
-      
-      // Salvar dados do usuário no localStorage para uso em outras páginas
-      localStorage.setItem('token', data.token);
-      localStorage.setItem('usuario', JSON.stringify(data.usuario));
-
-      setTimeout(() => {
-        window.location.href = '/dashboard';
-      }, 1500);
-
+      const { data } = await api.post('/auth/login', { email, senha });
+      salvarSessao({ token: data.token, usuario: data.usuario });
+      navigate('/dashboard', { replace: true });
     } catch (error) {
-      const mensagemErro = error.response?.data?.erro || 'Erro: API não respondeu';
-      
-      // Verificar se a conta está desativada
-      if (error.response?.status === 403 && mensagemErro.includes("desativada")) {
-        setMsg({ 
-          text: "Sua conta está desativada. Contate o suporte para reativar. Email: sistema.verificacao.login@gmail.com", 
-          type: 'erro' 
-        });
-      } else {
-        setMsg({ text: mensagemErro, type: 'erro' });
-      }
+      const erro = getApiError(error, 'Erro: API não respondeu');
+      const contaDesativada = error.response?.status === 403 && erro.includes('desativada');
+
+      setMsg({
+        texto: contaDesativada
+          ? 'Sua conta está desativada. Contate o suporte para reativar.'
+          : erro,
+        tipo: 'erro',
+      });
     } finally {
       setLoading(false);
     }
@@ -66,48 +51,34 @@ export default function Login() {
         <div className="login-wrapper">
           <div className="login-container">
             <div className="login-header">
-              <h2>Acesse sua<br />conta</h2>
+              <h2>Acesse sua conta</h2>
               <p>Entre para continuar sua jornada</p>
               <div className="accent-line"></div>
             </div>
 
-            <form id="formLogin" onSubmit={handleLogin}>
-              <Input 
-                label="E-mail" 
-                id="email" 
-                type="email" 
-                placeholder="seu@email.com" 
+            <form onSubmit={handleLogin}>
+              <Input
+                label="E-mail"
+                id="email"
+                type="email"
+                placeholder="seu@email.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
               />
-              <Input 
-                label="Senha" 
-                id="senha" 
-                type="password" 
-                placeholder="Sua senha" 
+              <Input
+                label="Senha"
+                id="senha"
+                type="password"
+                placeholder="Sua senha"
                 value={senha}
                 onChange={(e) => setSenha(e.target.value)}
               />
-              <button type="submit" id="btnLogin" className="btn-login" disabled={loading}>
+              <button type="submit" className="btn-login" disabled={loading}>
                 {loading ? 'Entrando...' : 'Entrar'}
               </button>
             </form>
 
             <AlertMessage msg={msg} />
-
-            {loginData && (
-              <div className="retorno" id="retorno" style={{ display: 'block' }}>
-                <div className="retorno-info">
-                  <p><strong>Token de Acesso:</strong></p>
-                  <p id="token" style={{ wordBreak: 'break-all', fontSize: '12px', marginTop: '4px', color: 'var(--primary-yellow)' }}>
-                    {loginData.token}
-                  </p>
-                </div>
-                <div className="retorno-info" style={{ marginTop: '10px' }}>
-                  <p id="retornoUsuario">Bem-vindo, {loginData.nome}!</p>
-                </div>
-              </div>
-            )}
 
             <div className="link-cadastro">
               <span>Não tem conta? </span>

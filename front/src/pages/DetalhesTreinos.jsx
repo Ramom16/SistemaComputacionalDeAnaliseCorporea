@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import { Link, useNavigate, useParams } from 'react-router-dom';
-import api from '../services/api';
+import { useEffect, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import api, { getApiError } from '../services/api';
 import DashboardNavbar from '../components/DashboardNavbar';
 import ExercicioItem from '../components/ExercicioItem';
 import '../styles/dashboard.css';
@@ -10,141 +10,105 @@ import '../styles/detalhestreinos.css';
 export default function DetalhesTreino() {
   const navigate = useNavigate();
   const { id } = useParams();
-  
+
   const [treino, setTreino] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [carregado, setCarregado] = useState(false);
   const [erro, setErro] = useState(false);
 
   useEffect(() => {
-    async function carregarDetalhesTreino() {
-      const token = localStorage.getItem('token');
-      if (!token) {
-        navigate('/login');
-        return;
-      }
+    let ativo = true;
 
-      try {
-        setLoading(true);
-        // Busca os dados do treino e seus exercícios direto do Back-end
-        const response = await api.get(`/treinos/${id}`);
-        setTreino(response.data.data || response.data);
-      } catch (err) {
-        console.error("Erro ao buscar detalhes do treino no banco:", err);
-        setErro(true);
-      } finally {
-        setLoading(false);
-      }
-    }
+    api.get(`/treinos/${id}`)
+      .then(({ data }) => { if (ativo) setTreino(data.data ?? data); })
+      .catch((err) => {
+        console.error('Erro ao buscar detalhes do treino:', getApiError(err));
+        if (ativo) setErro(true);
+      })
+      .finally(() => { if (ativo) setCarregado(true); });
 
-    carregarDetalhesTreino();
-  }, [id, navigate]);
+    return () => { ativo = false; };
+  }, [id]);
 
-  const handleLogout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('usuario');
-    navigate('/login');
-  };
+  const voltar = () => navigate('/meus-treinos');
 
-  if (loading) {
+  if (!carregado) {
     return (
-      <>
-        <DashboardNavbar onLogout={handleLogout} />
-        <div className="dashboard-layout">
-          <main className="dashboard-content" style={{ textAlign: 'center', paddingTop: '4rem' }}>
-            <h2>Carregando detalhes do treino...</h2>
-          </main>
-        </div>
-      </>
+      <div className="dashboard-layout">
+        <DashboardNavbar />
+        <main className="dashboard-content" style={{ textAlign: 'center', paddingTop: '4rem' }}>
+          <h2>Carregando detalhes do treino...</h2>
+        </main>
+      </div>
     );
   }
 
   if (erro || !treino) {
     return (
-      <>
-        <DashboardNavbar onLogout={handleLogout} />
-        <div className="dashboard-layout">
-          <main className="dashboard-content">
-            <div className="treino-nao-encontrado">
-              <h2>Treino não encontrado no banco de dados</h2>
-              <button className="btn-voltar" onClick={() => navigate('/meus-treinos')}>
-                ← Voltar para Meus Treinos
-              </button>
-            </div>
-          </main>
-        </div>
-      </>
+      <div className="dashboard-layout">
+        <DashboardNavbar />
+        <main className="dashboard-content">
+          <div className="treino-nao-encontrado">
+            <h2>Treino não encontrado no banco de dados</h2>
+            <button className="btn-voltar" onClick={voltar}>← Voltar para Meus Treinos</button>
+          </div>
+        </main>
+      </div>
     );
   }
 
-  // Identifica se os exercícios vêm como relação direta (treinoExercicios) ou em divisões (divisao)
-  const listaExercicios = treino.treinoExercicios || treino.exercicios || [];
-  const temDivisoes = Array.isArray(treino.divisao) && treino.divisao.length > 0;
+  // A API pode devolver a lista direta ou agrupada em divisoes (Treino A, Treino B, ...).
+  const listaExercicios = treino.treinoExercicios ?? treino.exercicios ?? [];
+  const divisoes = Array.isArray(treino.divisao) ? treino.divisao : [];
+  const grupos = divisoes.length > 0
+    ? divisoes.map((dia, i) => ({ chave: `${dia.nome}-${i}`, titulo: dia.nome, exercicios: dia.exercicios ?? [] }))
+    : [{ chave: 'unico', titulo: 'Exercícios do Treino', exercicios: listaExercicios }];
 
   return (
-    <>
-      <DashboardNavbar onLogout={handleLogout} />
-      <div className="dashboard-layout">
-        <main className="dashboard-content">
-          <button className="btn-voltar" onClick={() => navigate('/meus-treinos')}>
-            ← Voltar para Meus Treinos
-          </button>
+    <div className="dashboard-layout">
+      <DashboardNavbar />
+      <main className="dashboard-content">
+        <button className="btn-voltar" onClick={voltar}>← Voltar para Meus Treinos</button>
 
-        {/* Header do treino */}
         <div className="detalhe-header">
-          <span className="detalhe-objetivo">{treino.objetivo || 'Treino'} - Nível: {treino.nivel || 'Não especificado'}</span>
+          <span className="detalhe-objetivo">
+            {treino.objetivo || 'Treino'} - Nível: {treino.nivel || 'Não especificado'}
+          </span>
           <h1 className="welcome-title" style={{ marginBottom: '0.5rem' }}>
             {treino.titulo || `Treino ${treino.objetivo}`}
           </h1>
-          <p className="welcome-desc">{treino.descricao || 'Treino personalizado baseado em seu perfil'}</p>
+          <p className="welcome-desc">
+            {treino.descricao || 'Treino personalizado baseado em seu perfil'}
+          </p>
 
           <div className="detalhe-meta">
-            <span> Objetivo: {treino.objetivo}</span>
-            {treino.data_criacao && <span> Criado em: {new Date(treino.data_criacao).toLocaleDateString('pt-BR')}</span>}
-            <span> Total de Exercícios: {listaExercicios.length}</span>
+            <span>Objetivo: {treino.objetivo}</span>
+            {treino.data_criacao && (
+              <span>Criado em: {new Date(treino.data_criacao).toLocaleDateString('pt-BR')}</span>
+            )}
+            <span>Total de Exercícios: {listaExercicios.length}</span>
           </div>
         </div>
 
-        {/* Renderização com Divisão (ex: Treino A, Treino B) */}
-        {temDivisoes ? (
-          treino.divisao.map((dia, diaIdx) => (
-            <div key={diaIdx} className="detalhe-card">
-              <h3 className="detalhe-card-titulo">{dia.nome}</h3>
+        {grupos.map((grupo) => (
+          <div className="detalhe-card" key={grupo.chave}>
+            <h3 className="detalhe-card-titulo">{grupo.titulo}</h3>
+            {grupo.exercicios.length > 0 ? (
               <div className="exercicios-lista">
-                {dia.exercicios?.map((ex, exIdx) => (
-                  <ExercicioItem 
-                    key={ex.id || exIdx} 
-                    exercicio={ex} 
-                    numero={exIdx + 1} 
-                  />
-                ))}
-              </div>
-            </div>
-          ))
-        ) : (
-          /* Renderização Lista Direta de Exercícios da API */
-          <div className="detalhe-card">
-            <h3 className="detalhe-card-titulo">Exercícios do Treino</h3>
-            {listaExercicios.length > 0 ? (
-              <div className="exercicios-lista">
-                {listaExercicios.map((ex, exIdx) => (
-                  <ExercicioItem 
-                    key={ex.id || exIdx} 
-                    exercicio={ex} 
-                    numero={exIdx + 1} 
-                  />
+                {grupo.exercicios.map((exercicio, i) => (
+                  <ExercicioItem key={exercicio.id ?? i} exercicio={exercicio} numero={i + 1} />
                 ))}
               </div>
             ) : (
               <p className="texto-vazio">Nenhum exercício cadastrado para este treino.</p>
             )}
           </div>
-        )}
+        ))}
 
         <p className="aviso-legal">
-          ⚠️ Este treino é uma recomendação inicial baseada no seu perfil. Consulte um profissional de educação física para acompanhamento personalizado.
+          ⚠️ Este treino é uma recomendação inicial baseada no seu perfil. Consulte um profissional
+          de educação física para acompanhamento personalizado.
         </p>
-        </main>
-      </div>
-    </>
+      </main>
+    </div>
   );
 }

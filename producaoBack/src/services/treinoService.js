@@ -100,8 +100,8 @@ const treinoService = {
         );
     },
 
-    async deletar(idUsuario, idTreino) {
-        await this.buscarPorId(idUsuario, idTreino);
+    async deletar(idUsuario, idTreino, role = "USER") {
+        await this.buscarPorId(idUsuario, idTreino, role);
         return await treinoRepository.deletar(String(idTreino));
     }
 };

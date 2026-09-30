@@ -10,23 +10,31 @@ import {
 } from 'react-native';
 import { api } from '../../services/api';
 
+function generateUUID() {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+    const r = (Math.random() * 16) | 0;
+    const v = c === 'x' ? r : (r & 0x3) | 0x8;
+    return v.toString(16);
+  });
+}
+
 function normalizarTreino(t, idx) {
   const nome = t.nome || t.titulo || `Treino ${String.fromCharCode(65 + idx)} - ${t.objetivo || 'Foco Geral'}`;
   const foco = t.foco || t.objetivo || 'Hipertrofia';
-  const nivel = t.nivel || 'Intermediário';
+  const nivel = t.nivel || 'Intermediario';
   const rawExercicios = t.exercicios || t.treinoExercicios || [];
 
-  const exercicios = rawExercicios.map((ex, i) => ({
-    idExercicio: ex.idExercicio || ex.id || i + 1,
+  const exercicios = rawExercicios.map((ex) => ({
+    idExercicio: String(ex.idExercicio || ex.id || generateUUID()),
     nome: ex.nome || ex.exercicio?.nome || 'Exercício sem nome',
-    grupo: ex.grupo || ex.grupo_muscular || 'Geral',
+    grupo: ex.grupo || ex.grupo_muscular || ex.exercicio?.grupo_muscular || 'Peito',
     series: ex.series || 3,
     repeticoes: ex.repeticoes || '10-12',
     descanso: ex.descanso || (ex.descanso_segundos ? `${ex.descanso_segundos}s` : '60s'),
   }));
 
   return {
-    idTreino: t.idTreino || t.id || idx + 1,
+    idTreino: String(t.idTreino || t.id || generateUUID()),
     nome,
     foco,
     nivel,
@@ -84,7 +92,6 @@ export default function TreinosScreen() {
         Selecione uma divisão para visualizar a lista completa de exercícios e prescrições.
       </Text>
 
-      {/* Tabs de Divisão (Treino A, B, C...) */}
       <View style={styles.tabRow}>
         {treinos.map((t, idx) => (
           <Pressable
@@ -99,7 +106,6 @@ export default function TreinosScreen() {
         ))}
       </View>
 
-      {/* Header do Treino Selecionado */}
       {treinoAtual && (
         <View style={styles.workoutHeader}>
           <View style={styles.workoutHeaderTop}>
@@ -116,7 +122,6 @@ export default function TreinosScreen() {
         </View>
       )}
 
-      {/* Lista de Exercícios */}
       <View style={styles.exerciseList}>
         {treinoAtual?.exercicios?.length === 0 ? (
           <View style={styles.emptyCard}>
@@ -130,7 +135,7 @@ export default function TreinosScreen() {
               </View>
 
               <View style={styles.exerciseInfo}>
-                <Text style={styles.exerciseGroup}>{ex.grupo?.toUpperCase()}</Text>
+                <Text style={styles.exerciseGroup}>{String(ex.grupo).toUpperCase()}</Text>
                 <Text style={styles.exerciseName}>{ex.nome}</Text>
 
                 <View style={styles.exerciseMetricsRow}>

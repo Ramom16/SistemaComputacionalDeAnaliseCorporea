@@ -6,9 +6,18 @@ import {
   ScrollView,
   RefreshControl,
   ActivityIndicator,
+  Pressable,
 } from 'react-native';
 import { useAuth } from '../../context/AuthContext';
 import { api } from '../../services/api';
+
+function generateUUID() {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+    const r = (Math.random() * 16) | 0;
+    const v = c === 'x' ? r : (r & 0x3) | 0x8;
+    return v.toString(16);
+  });
+}
 
 export default function EvolucaoScreen() {
   const { user, dadosCorporais } = useAuth();
@@ -16,6 +25,7 @@ export default function EvolucaoScreen() {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [historicoBanco, setHistoricoBanco] = useState([]);
+  const [metric, setMetric] = useState('peso_kg');
   const [estatisticas, setEstatisticas] = useState({
     cards: {
       totalTreinos: 0,
@@ -39,8 +49,8 @@ export default function EvolucaoScreen() {
 
     try {
       const [histData, statsData] = await Promise.all([
-        api.getHistorico(user.id),
-        api.getEstatisticas(user.id),
+        api.getHistorico(String(user.id)),
+        api.getEstatisticas(String(user.id)),
       ]);
 
       if (histData) {
@@ -49,13 +59,13 @@ export default function EvolucaoScreen() {
         const tmb = histData.tmb?.dados || [];
         const ndc = histData.ndc?.dados || [];
 
-        const listaMapeada = peso.map((item, index) => ({
-          idDados: index + 1,
+        const listaMapeada = peso.map((item) => ({
+          idDados: String(item.idDados || item.id || generateUUID()),
           data_registro: item.data,
           peso_kg: Number(item.valor || 0),
-          imc: Number(Number(imc[index]?.valor || 0).toFixed(1)),
-          tmb: Math.round(Number(tmb[index]?.valor || 0)),
-          ndc: Math.round(Number(ndc[index]?.valor || 0)),
+          imc: Number(Number(imc[0]?.valor || 0).toFixed(1)),
+          tmb: Math.round(Number(tmb[0]?.valor || 0)),
+          ndc: Math.round(Number(ndc[0]?.valor || 0)),
         }));
 
         setHistoricoBanco(listaMapeada);
@@ -84,8 +94,11 @@ export default function EvolucaoScreen() {
     carregarDadosEvolucao();
   }
 
-  // Se o histórico do banco vier vazio mas existirem registros no contexto local, utiliza o local
   const registros = historicoBanco.length > 0 ? historicoBanco : (dadosCorporais || []);
+
+  const registrosGrafico = [...registros].reverse();
+  const valoresMetrica = registrosGrafico.map(r => Number(r[metric]) || 0);
+  const maxValor = Math.max(...valoresMetrica, 1);
 
   if (loading) {
     return (
@@ -107,7 +120,6 @@ export default function EvolucaoScreen() {
         Acompanhe sua trajetória física e histórico de avaliações corporais salvas.
       </Text>
 
-      {/* Cards de Métricas de Treino (vindas de /evolucao/estatisticas) */}
       <View style={styles.statsGrid}>
         <View style={styles.statCard}>
           <Text style={styles.statCardValue}>{estatisticas.cards.totalTreinos || 0}</Text>
@@ -125,7 +137,6 @@ export default function EvolucaoScreen() {
         </View>
       </View>
 
-      {/* Resumo de Progresso Corporal */}
       <View style={styles.summaryCard}>
         <Text style={styles.summaryTitle}>RESUMO CORPORAL</Text>
         <View style={styles.summaryRow}>
@@ -149,6 +160,55 @@ export default function EvolucaoScreen() {
           </View>
         </View>
       </View>
+
+      {registrosGrafico.length > 0 && (
+        <View style={styles.chartCard}>
+          <Text style={styles.chartTitle}>GRÁFICO DE EVOLUÇÃO</Text>
+
+          <View style={styles.tabContainer}>
+            <Pressable
+              style={[styles.tabButton, metric === 'peso_kg' && styles.tabButtonActive]}
+              onPress={() => setMetric('peso_kg')}
+            >
+              <Text style={[styles.tabText, metric === 'peso_kg' && styles.tabTextActive]}>Peso</Text>
+            </Pressable>
+
+            <Pressable
+              style={[styles.tabButton, metric === 'imc' && styles.tabButtonActive]}
+              onPress={() => setMetric('imc')}
+            >
+              <Text style={[styles.tabText, metric === 'imc' && styles.tabTextActive]}>IMC</Text>
+            </Pressable>
+
+            <Pressable
+              style={[styles.tabButton, metric === 'tmb' && styles.tabButtonActive]}
+              onPress={() => setMetric('tmb')}
+            >
+              <Text style={[styles.tabText, metric === 'tmb' && styles.tabTextActive]}>TMB</Text>
+            </Pressable>
+          </View>
+
+          <View style={styles.chartContainer}>
+            {registrosGrafico.map((item, idx) => {
+              const valor = Number(item[metric]) || 0;
+              const alturaPorcentagem = (valor / maxValor) * 100;
+              const dataFormatada = item.data_registro
+                ? item.data_registro.slice(0, 5)
+                : `#${idx + 1}`;
+
+              return (
+                <View key={item.idDados || idx} style={styles.barWrapper}>
+                  <Text style={styles.barVal}>{valor}</Text>
+                  <View style={styles.barTrack}>
+                    <View style={[styles.barFill, { height: `${alturaPorcentagem}%` }]} />
+                  </View>
+                  <Text style={styles.barLabel}>{dataFormatada}</Text>
+                </View>
+              );
+            })}
+          </View>
+        </View>
+      )}
 
       <Text style={styles.sectionTitle}>HISTÓRICO REGISTRADO</Text>
 
@@ -208,7 +268,6 @@ export default function EvolucaoScreen() {
     </ScrollView>
   );
 }
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -305,6 +364,81 @@ const styles = StyleSheet.create({
     width: 1,
     height: 35,
     backgroundColor: '#262626',
+  },
+  chartCard: {
+    backgroundColor: '#121212',
+    borderWidth: 1,
+    borderColor: '#262626',
+    borderRadius: 14,
+    padding: 16,
+    marginBottom: 24,
+  },
+  chartTitle: {
+    color: '#FFD400',
+    fontSize: 11,
+    fontWeight: '900',
+    letterSpacing: 1.5,
+    marginBottom: 12,
+  },
+  tabContainer: {
+    flexDirection: 'row',
+    backgroundColor: '#1A1A1A',
+    borderRadius: 8,
+    padding: 4,
+    marginBottom: 16,
+  },
+  tabButton: {
+    flex: 1,
+    paddingVertical: 8,
+    alignItems: 'center',
+    borderRadius: 6,
+  },
+  tabButtonActive: {
+    backgroundColor: '#FFD400',
+  },
+  tabText: {
+    color: '#A5A5A5',
+    fontSize: 12,
+    fontWeight: '700',
+  },
+  tabTextActive: {
+    color: '#000000',
+    fontWeight: '900',
+  },
+  chartContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    alignItems: 'flex-end',
+    height: 140,
+    paddingTop: 20,
+  },
+  barWrapper: {
+    alignItems: 'center',
+    flex: 1,
+  },
+  barVal: {
+    color: '#FFFFFF',
+    fontSize: 10,
+    fontWeight: '700',
+    marginBottom: 4,
+  },
+  barTrack: {
+    height: 90,
+    width: 12,
+    backgroundColor: '#222222',
+    borderRadius: 6,
+    justifyContent: 'flex-end',
+    overflow: 'hidden',
+  },
+  barFill: {
+    backgroundColor: '#FFD400',
+    borderRadius: 6,
+    width: '100%',
+  },
+  barLabel: {
+    color: '#777777',
+    fontSize: 10,
+    marginTop: 6,
   },
   sectionTitle: {
     color: '#FFFFFF',
