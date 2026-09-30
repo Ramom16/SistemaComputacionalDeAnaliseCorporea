@@ -1,138 +1,119 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import DashboardNavbar from '../components/DashboardNavbar';
-import api from '../services/api';
+import api, { unwrap, getApiError } from '../services/api';
+import { getUsuario, limparSessao, isAdmin } from '../services/auth';
 import '../styles/dashboard.css';
 
 export default function Configuracoes() {
   const navigate = useNavigate();
-  const [usuario, setUsuario] = useState(() => JSON.parse(localStorage.getItem('usuario') || '{}'));
+  const usuario = getUsuario();
+  const admin = isAdmin();
+
   const [usuariosList, setUsuariosList] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [carregado, setCarregado] = useState(false);
   const [erro, setErro] = useState('');
 
   useEffect(() => {
-    setUsuario(JSON.parse(localStorage.getItem('usuario') || '{}'));
-  }, []);
+    if (!admin) return;
 
-  useEffect(() => {
-    async function fetchUsuarios() {
-      if (usuario?.role !== 'ADMIN') return;
-      try {
-        setLoading(true);
-        const resp = await api.get('/usuarios');
-        const data = resp.data || resp.data?.data || resp.data?.usuarios || resp.data;
-        setUsuariosList(data.data || data || []);
-      } catch (err) {
+    let ativo = true;
+
+    api.get('/usuarios')
+      .then((res) => { if (ativo) setUsuariosList(unwrap(res)); })
+      .catch((err) => {
+        if (!ativo) return;
         console.error(err);
-        setErro('Não foi possível carregar a lista de usuários.');
-      } finally {
-        setLoading(false);
-      }
-    }
-    fetchUsuarios();
-  }, [usuario]);
+        setErro(getApiError(err, 'Não foi possível carregar a lista de usuários.'));
+      })
+      .finally(() => { if (ativo) setCarregado(true); });
 
-  const handleLogout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('usuario');
-    navigate('/login');
-  };
+    return () => { ativo = false; };
+  }, [admin]);
 
-  const confirmarDesativacaoConta = async () => {
-    if (!window.confirm('Tem certeza que deseja desativar sua conta? Esta ação irá desconectá-lo.')) return;
+  const loading = admin && !carregado;
+
+  const desativarMinhaConta = async () => {
+    const aviso = 'Desativar sua conta é reversível apenas pelo suporte. Seus dados serão '
+      + 'preservados, porém você será desconectado. Deseja continuar?';
+    if (!window.confirm(aviso)) return;
+
     try {
       await api.delete('/usuarios/desativar-conta');
-      localStorage.removeItem('token');
-      localStorage.removeItem('usuario');
-      navigate('/login');
+      limparSessao();
+      navigate('/login', { replace: true });
     } catch (err) {
-      console.error(err);
-      setErro('Erro ao desativar conta. Tente novamente.');
+      setErro(getApiError(err, 'Erro ao desativar conta. Tente novamente.'));
     }
   };
 
   const alterarRole = async (userId, novaRole) => {
     try {
       await api.patch(`/usuarios/${userId}/role`, { role: novaRole });
-      setUsuariosList(prev => prev.map(u => u.id === userId ? { ...u, role: novaRole } : u));
+      setUsuariosList((prev) => prev.map((u) => (u.id === userId ? { ...u, role: novaRole } : u)));
     } catch (err) {
-      console.error(err);
-      setErro('Erro ao alterar role.');
+      setErro(getApiError(err, 'Erro ao alterar role.'));
     }
   };
 
-  const desativarOutroUsuario = async (userId) => {
-    if (!window.confirm('Desativar esta conta? O usuário será bloqueado.')) return;
+  const alterarSituacao = async (u, acao) => {
+    const rotulo = acao === 'desativar' ? 'Desativar' : 'Reativar';
+    if (!window.confirm(`${rotulo} a conta de ${u.nome}?`)) return;
+
     try {
-      // endpoint admin para desativar outro usuário: /usuarios/:id/desativar
-      await api.delete(`/usuarios/${userId}/desativar`);
-      setUsuariosList(prev => prev.filter(u => u.id !== userId));
+      await api[acao === 'desativar' ? 'delete' : 'patch'](`/usuarios/${u.id}/${acao}`);
+      setUsuariosList((prev) => prev.filter((outro) => outro.id !== u.id));
     } catch (err) {
-      console.error(err);
-      setErro('Erro ao desativar usuário.');
+      setErro(getApiError(err, `Erro ao ${acao} usuário.`));
     }
   };
-
-  const reativarOutroUsuario = async (userId) => {
-    if (!window.confirm('Reativar esta conta? O usuário será desbloqueado.')) return;
-    try {
-      await api.patch(`/usuarios/${userId}/reativar`);
-      setUsuariosList(prev => prev.filter(u => u.id !== userId));
-    } catch (err) {
-      console.error(err);
-      setErro('Erro ao reativar usuário.');
-    }
-  };  
 
   return (
     <>
-      <DashboardNavbar onLogout={handleLogout} />
+      <DashboardNavbar />
       <div className="dashboard-layout">
         <main className="dashboard-content">
           <section className="welcome-section">
             <h1 className="welcome-title">Configurações</h1>
-            <p className="welcome-desc">Gerencie seu perfil e, se for ADMIN, gerencie usuários.</p>
+            <p className="welcome-desc">
+              Gerencie seu perfil. Se for ADMIN, gerencie também os usuários.
+            </p>
           </section>
 
-          {/* Perfil do Usuário */}
+          {erro && <p className="calc-feedback erro">{erro}</p>}
+
           <div className="calc-card" style={{ marginBottom: 20 }}>
             <h3>Meu Perfil</h3>
-            <p><strong>Nome:</strong> {usuario?.nome || '—'}</p>
-            <p><strong>E-mail:</strong> {usuario?.email || '—'}</p>
+            <p><strong>Nome:</strong> {usuario.nome || '—'}</p>
+            <p><strong>E-mail:</strong> {usuario.email || '—'}</p>
             <p>
               <strong>Perfil:</strong>{' '}
-              <span style={{
-                padding: '6px 10px',
-                borderRadius: 16,
-                background: usuario?.role === 'ADMIN' ? 'rgba(255, 230, 0, 0.15)' : 'rgba(255,255,255,0.03)',
-                color: usuario?.role === 'ADMIN' ? 'var(--primary-yellow)' : 'var(--text-gray)'
-              }}>{usuario?.role === 'ADMIN' ? 'Administrador' : 'Aluno'}</span>
+              <span className="role-badge">{admin ? 'Administrador' : 'Aluno'}</span>
             </p>
           </div>
 
-          {/* Zona de Perigo */}
           <div className="calc-card" style={{ marginBottom: 20 }}>
             <h3>Zona de Perigo</h3>
-            <p>Desativar sua conta é uma ação reversível apenas pelo suporte. Seus dados serão preservados, porém você será desconectado.</p>
+            <p>
+              Desativar sua conta é uma ação reversível apenas pelo suporte. Seus dados serão
+              preservados, porém você será desconectado.
+            </p>
             <div style={{ display: 'flex', gap: 12, justifyContent: 'flex-end' }}>
               <button className="btn btn-cancel" onClick={() => navigate('/meus-treinos')}>Cancelar</button>
-              <button className="btn btn-danger" onClick={confirmarDesativacaoConta}>Desativar minha conta</button>
+              <button className="btn btn-danger" onClick={desativarMinhaConta}>Desativar minha conta</button>
             </div>
           </div>
 
-          {/* Painel ADMIN */}
-          {usuario?.role === 'ADMIN' && (
+          {admin && (
             <div className="calc-card">
               <h3>Painel de Administração</h3>
-              {erro && <div style={{ color: '#ff6b75' }}>{erro}</div>}
               {loading ? (
                 <p>Carregando usuários...</p>
               ) : (
                 <div style={{ overflowX: 'auto' }}>
-                  <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                  <table className="admin-tabela">
                     <thead>
-                      <tr style={{ textAlign: 'left', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+                      <tr>
                         <th>Nome</th>
                         <th>E-mail</th>
                         <th>Role</th>
@@ -140,23 +121,25 @@ export default function Configuracoes() {
                       </tr>
                     </thead>
                     <tbody>
-                      {usuariosList.map(u => (
-                        <tr key={u.id} style={{ borderBottom: '1px solid rgba(255,255,255,0.03)' }}>
-                          <td style={{ padding: '10px 8px' }}>{u.nome}</td>
-                          <td style={{ padding: '10px 8px' }}>{u.email}</td>
-                          <td style={{ padding: '10px 8px' }}>{u.role}</td>
-                          <td style={{ padding: '10px 8px' }}>
-                            <button onClick={() => alterarRole(u.id, u.role === 'ADMIN' ? 'USER' : 'ADMIN')} className="btn btn-cancel" style={{ marginRight: 8 }}>
+                      {usuariosList.map((u) => (
+                        <tr key={u.id}>
+                          <td>{u.nome}</td>
+                          <td>{u.email}</td>
+                          <td>{u.role}</td>
+                          <td>
+                            <button
+                              className="btn btn-cancel"
+                              onClick={() => alterarRole(u.id, u.role === 'ADMIN' ? 'USER' : 'ADMIN')}
+                            >
                               {u.role === 'ADMIN' ? 'Tornar Aluno' : 'Tornar Admin'}
                             </button>
-                            {u.ativo === true && (
-                              <button onClick={() => desativarOutroUsuario(u.id)} className="btn btn-danger" style={{ marginRight: 8 }}>
-                                Desativar
-                              </button>
-                            )}
-                            {u.ativo === false && (
-                              <button onClick={() => reativarOutroUsuario(u.id)} className="btn btn-success" style={{ marginRight: 8 }}>
+                            {u.ativo === false ? (
+                              <button className="btn btn-success" onClick={() => alterarSituacao(u, 'reativar')}>
                                 Reativar
+                              </button>
+                            ) : (
+                              <button className="btn btn-danger" onClick={() => alterarSituacao(u, 'desativar')}>
+                                Desativar
                               </button>
                             )}
                           </td>

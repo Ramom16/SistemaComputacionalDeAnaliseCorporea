@@ -1,106 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Oswald:wght@500;700;900&display=swap');
 
-:root {
-  --bg-dark: #070707;
-  --bg-card: #121212;
-  --primary-yellow: #FFE600;
-  --text-white: #ffffff;
-  --text-gray: #b0b0b0;
-  --overlay-dark: rgba(0, 0, 0, 0.65);
-  --overlay-heavy: rgba(0, 0, 0, 0.85);
-  --font-title: 'Oswald', sans-serif;
-  --font-body: 'Inter', sans-serif;
-}
-
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-html {
-  scroll-behavior: smooth;
-}
-
-body {
-  font-family: var(--font-body);
-  background-color: var(--bg-dark);
-  color: var(--text-white);
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  overflow-x: hidden;
-  line-height: 1.6;
-}
-
-/* Navbar */
-.navbar {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  padding: 24px 60px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  z-index: 100;
-}
-
-.logo {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  text-decoration: none;
-}
-
-.logo-icon {
-  display: flex;
-  gap: 3px;
-}
-
-.logo-bar {
-  width: 4px;
-  height: 16px;
-  background-color: var(--primary-yellow);
-  transform: skewX(-15deg);
-}
-
-.logo-bar:nth-child(2) {
-  height: 20px;
-}
-
-.logo-bar:nth-child(3) {
-  height: 24px;
-}
-
-.logo-text {
-  font-family: var(--font-title);
-  font-weight: 700;
-  font-style: italic;
-  font-size: 1.5rem;
-  color: var(--text-white);
-  letter-spacing: 1px;
-}
-
-.nav-links {
-  display: flex;
-  gap: 32px;
-  list-style: none;
-}
-
-.nav-links a {
-  color: var(--text-white);
-  text-decoration: none;
-  font-size: 0.9rem;
-  font-weight: 500;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  transition: color 0.3s;
-}
-
-.nav-links a:hover {
-  color: var(--primary-yellow);
-}
 
 /* HERO / LOGIN SECTION */
 .login-hero {
@@ -170,55 +68,6 @@ body {
   font-weight: 300;
 }
 
-/* Accent line */
-.accent-line {
-  width: 60px;
-  height: 3px;
-  background: var(--primary-yellow);
-  margin: 16px auto 0;
-  border-radius: 2px;
-}
-
-/* Form Inputs */
-.form-group {
-  margin-bottom: 20px;
-  position: relative;
-}
-
-.form-group label {
-  display: block;
-  font-family: var(--font-title);
-  font-weight: 500;
-  font-size: 0.8rem;
-  text-transform: uppercase;
-  letter-spacing: 1.5px;
-  color: var(--text-gray);
-  margin-bottom: 8px;
-}
-
-.form-group input {
-  width: 100%;
-  padding: 14px 16px;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 6px;
-  font-family: var(--font-body);
-  font-size: 0.95rem;
-  color: var(--text-white);
-  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-  outline: none;
-}
-
-.form-group input::placeholder {
-  color: rgba(255, 255, 255, 0.3);
-}
-
-.form-group input:focus {
-  border-color: var(--primary-yellow);
-  background: rgba(255, 230, 0, 0.04);
-  box-shadow: 0 0 0 3px rgba(255, 230, 0, 0.1);
-}
-
 /* Submit Button */
 .btn-login {
   width: 100%;
@@ -254,23 +103,6 @@ body {
   color: var(--text-gray);
   cursor: not-allowed;
   box-shadow: none;
-}
-
-/* Messages */
-#msg {
-  text-align: center;
-  margin-top: 20px;
-  font-weight: 600;
-  font-size: 0.9rem;
-  min-height: 20px;
-}
-
-.erro {
-  color: #ff4d5a;
-}
-
-.sucesso {
-  color: #4ade80;
 }
 
 /* API Return Boxes (.retorno) */

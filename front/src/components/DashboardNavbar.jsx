@@ -1,70 +1,46 @@
-import React, { useState } from 'react';
-import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
+import { limparSessao } from '../services/auth';
 
-export default function DashboardNavbar({ onLogout }) {
+const LINKS = [
+  ['/dashboard', 'Análise Corporal'],
+  ['/meus-treinos', 'Meus Treinos'],
+  ['/exercicios', 'Exercícios'],
+  ['/evolucao', 'Evolução'],
+  ['/configuracoes', 'Configurações'],
+];
+
+export default function DashboardNavbar() {
   const navigate = useNavigate();
-  const location = useLocation();
 
   const handleLogout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('usuario');
-    onLogout?.();
-    navigate('/login');
+    limparSessao();
+    navigate('/login', { replace: true });
   };
-
-  const isActive = (path) => location.pathname === path ? 'active' : '';
 
   return (
     <header className="dashboard-navbar">
-      {/* Logo - Lado Esquerdo */}
-      <Link to="/" className="navbar-logo">
+      <NavLink to="/dashboard" className="navbar-logo">
         <div className="logo-icon">
           <span className="logo-bar"></span>
           <span className="logo-bar"></span>
           <span className="logo-bar"></span>
         </div>
         <span className="logo-text">IRONFIT</span>
-      </Link>
+      </NavLink>
 
-      {/* Links de Navegação - Centro */}
       <nav className="navbar-nav">
-        <Link 
-          to="/dashboard" 
-          className={`nav-link ${isActive('/dashboard')}`}
-        >
-          Análise Corporal
-        </Link>
-        <Link 
-          to="/meus-treinos" 
-          className={`nav-link ${isActive('/meus-treinos')}`}
-        >
-          Meus Treinos
-        </Link>
-        <Link 
-          to="/exercicios" 
-          className={`nav-link ${isActive('/exercicios')}`}
-        >
-          Exercícios
-        </Link>
-        <Link 
-          to="/evolucao" 
-          className={`nav-link ${isActive('/evolucao')}`}
-        >
-          Evolução
-        </Link>
-        <Link 
-          to="/configuracoes" 
-          className={`nav-link ${isActive('/configuracoes')}`}
-        >
-          Configurações
-        </Link>
+        {LINKS.map(([to, label]) => (
+          <NavLink
+            key={to}
+            to={to}
+            className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}
+          >
+            {label}
+          </NavLink>
+        ))}
       </nav>
 
-      {/* Ação do Usuário - Lado Direito */}
-      <button 
-        onClick={handleLogout} 
-        className="navbar-logout-btn"
-      >
+      <button onClick={handleLogout} className="navbar-logout-btn">
         Sair da Conta
       </button>
     </header>

@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { FaDownload, FaShareAlt, FaFire, FaScaleBalanced, FaCalendarCheck } from "react-icons/fa";
+import { FaDownload, FaShareAlt, FaFire, FaBalanceScale, FaCalendarCheck } from "react-icons/fa";
 
 const META_SEMANAL_PADRAO = 3;
 
@@ -100,7 +100,7 @@ export default function CardsCompartilhamento({ historico = [], cards = {}, nome
         valor: perdaPeso > 0 ? `-${perdaPeso.toFixed(1)} kg` : `${Math.abs(variacaoPeso).toFixed(1)} kg`,
         subtitulo: perdaPeso > 0 ? "a menos na balança" : "de variação acompanhada",
         descricao: pesos.length > 1 ? "Cada registro aproxima você do seu objetivo." : "Registre suas medidas para acompanhar a evolução.",
-        icone: <FaScaleBalanced />
+        icone: <FaBalanceScale />
       },
       {
         slug: "constancia-semanal",
