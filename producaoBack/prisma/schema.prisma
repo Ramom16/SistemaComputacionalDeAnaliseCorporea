@@ -24,6 +24,9 @@ model Usuario {
 
   role Role @default(USER)
 
+  push_token       String?   @db.VarChar(255)
+  fcm_token        String?   @db.VarChar(255)
+
   ultimo_login     DateTime? @default(now()) 
   criado_em        DateTime  @default(now())  
 

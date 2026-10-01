@@ -217,6 +217,20 @@ const usuariosRepository = {
       }
     });
   },
+
+  /**
+   * Atualiza os tokens de push do usuário (Expo e/ou Firebase FCM)
+   */
+  atualizarPushTokens: async (id, { pushToken, fcmToken }) => {
+    const data = {};
+    if (pushToken !== undefined) data.push_token = pushToken;
+    if (fcmToken !== undefined) data.fcm_token = fcmToken;
+
+    return await prisma.usuario.update({
+      where: { id: String(id) },
+      data,
+    });
+  },
 };
 
 export default usuariosRepository;

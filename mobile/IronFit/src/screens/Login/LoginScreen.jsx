@@ -12,7 +12,20 @@ import {
   Alert,
   Modal,
 } from 'react-native';
+import { z } from 'zod';
 import { useAuth } from '../../context/AuthContext';
+
+const loginSchema = z.object({
+  email: z
+    .string()
+    .trim()
+    .min(1, 'Preencha todos os campos para prosseguir.')
+    .pipe(z.email('Digite um e-mail válido.')),
+  senha: z
+    .string()
+    .min(6, 'Preencha todos os campos para prosseguir.')
+    .min(6, 'A senha deve ter no mínimo 6 caracteres.'),
+});
 
 export default function LoginScreen({ navigation }) {
   const { login, loading, solicitarRecuperacao, reenviarEmail } = useAuth();
@@ -31,8 +44,13 @@ export default function LoginScreen({ navigation }) {
   const [loadingReenvio, setLoadingReenvio] = useState(false);
 
   async function handleLogin() {
-    if (!email.trim() || !senha.trim()) {
-      setErro('Preencha todos os campos para prosseguir.');
+    // Validação usando o Zod
+    const result = loginSchema.safeParse({ email, senha });
+
+    if (!result.success) {
+      // Pega a mensagem de erro do primeiro campo que falhar
+      const primeiraMensagem = result.error.issues[0].message;
+      setErro(primeiraMensagem);
       return;
     }
 

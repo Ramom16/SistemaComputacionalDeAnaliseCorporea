@@ -1,6 +1,7 @@
 import usuariosRepository from "../repositories/usuariosRepository.js";
 import { anexarIdsCriptografados } from "../middlewares/tratarIdsCriptografados.js";
 import { enviarEmaildeContaDesativada, enviarEmaildeContaReativada } from "../services/emailService.js";
+import { notificarUsuario } from "../services/notificacaoService.js";
 
 const usuariosController = {
   selecionarUsuario: async (req, res) => {
@@ -200,6 +201,49 @@ usuariosController.reativarUsuarioPorId = async (req, res) => {
     }
 
     return res.status(200).json({ msg: 'Usuário reativado com sucesso.' });
+  } catch (error) {
+    return res.status(500).json({ erro: error.message });
+  }
+};
+
+// Salvar / atualizar Push Token e FCM Token da conta autenticada
+usuariosController.salvarPushToken = async (req, res) => {
+  try {
+    const usuarioId = req.usuario?.id;
+    if (!usuarioId) {
+      return res.status(401).json({ erro: "Usuário não autenticado." });
+    }
+
+    const { pushToken, fcmToken } = req.body;
+
+    if (pushToken === undefined && fcmToken === undefined) {
+      return res.status(400).json({ erro: "Ao menos um token (pushToken ou fcmToken) deve ser fornecido." });
+    }
+
+    const usuarioAtualizado = await usuariosRepository.atualizarPushTokens(usuarioId, {
+      pushToken,
+      fcmToken,
+    });
+
+    return res.status(200).json({
+      msg: "Tokens de notificação salvos com sucesso.",
+      push_token: usuarioAtualizado.push_token,
+      fcm_token: usuarioAtualizado.fcm_token,
+    });
+  } catch (error) {
+    console.error("Erro ao salvar push token:", error);
+    return res.status(500).json({ erro: error.message });
+  }
+};
+
+// Testar envio de notificação para o usuário autenticado
+usuariosController.testarNotificacao = async (req, res) => {
+  try {
+    const usuarioId = req.usuario?.id;
+    const { titulo = "Treino IronFit 💪", mensagem = "Sua notificação de teste foi entregue com sucesso!" } = req.body || {};
+
+    const resultado = await notificarUsuario(usuarioId, titulo, mensagem, { screen: "Treinos" });
+    return res.status(200).json({ msg: "Disparo processado com sucesso.", resultado });
   } catch (error) {
     return res.status(500).json({ erro: error.message });
   }

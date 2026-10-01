@@ -5,6 +5,7 @@ import {
   setAuthToken,
   calcularMetabolismo,
 } from '../services/api';
+import { registrarParaPushNotificationsAsync } from '../notifications/notificationService';
 
 function generateUUID() {
   return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
@@ -41,9 +42,16 @@ export function AuthProvider({ children }) {
           if (usuarioArmazenado) {
             try {
               const u = JSON.parse(usuarioArmazenado);
+<<<<<<< HEAD
               const usuarioFormatado = { ...u, id: String(u.id) };
               setUser(usuarioFormatado);
               carregarDadosCorporais(usuarioFormatado.id);
+=======
+              setUser(u);
+              // Busca os dados corporais do usuário silenciosamente
+              carregarDadosCorporais(u.id);
+              sincronizarPushTokens();
+>>>>>>> lembretes/mobile
             } catch {
               // Ignore parse error
             }
@@ -52,6 +60,7 @@ export function AuthProvider({ children }) {
           try {
             const meResponse = await api.getMe();
             if (meResponse?.usuario) {
+<<<<<<< HEAD
               const u = {
                 ...meResponse.usuario,
                 id: String(meResponse.usuario.id),
@@ -59,6 +68,12 @@ export function AuthProvider({ children }) {
               setUser(u);
               await storage.setItem(STORAGE_KEY_USER, JSON.stringify(u));
               carregarDadosCorporais(u.id);
+=======
+              setUser(meResponse.usuario);
+              await storage.setItem(STORAGE_KEY_USER, JSON.stringify(meResponse.usuario));
+              carregarDadosCorporais(meResponse.usuario.id);
+              sincronizarPushTokens();
+>>>>>>> lembretes/mobile
             }
           } catch (meError) {
             if (meError.status === 401 || meError.status === 403) {
@@ -77,9 +92,29 @@ export function AuthProvider({ children }) {
     restaurarSessao();
   }, []);
 
+<<<<<<< HEAD
   async function carregarDadosCorporais(idUsuarioParam) {
     const idUsuario = idUsuarioParam ? String(idUsuarioParam) : (user?.id ? String(user.id) : null);
     if (!idUsuario) return;
+=======
+  // Sincroniza tokens de push e FCM com a conta no backend
+  async function sincronizarPushTokens() {
+    try {
+      const { expoPushToken, fcmDeviceToken } = await registrarParaPushNotificationsAsync();
+      if (expoPushToken || fcmDeviceToken) {
+        await api.salvarPushToken(expoPushToken, fcmDeviceToken);
+        console.log('✅ Tokens de notificação sincronizados com a conta no backend.');
+      }
+    } catch (err) {
+      console.warn('Não foi possível sincronizar tokens de push:', err.message);
+    }
+  }
+
+  // Busca dados corporais do banco de dados
+  async function carregarDadosCorporais(usuarioId) {
+    const id = usuarioId || user?.id;
+    if (!id) return;
+>>>>>>> lembretes/mobile
 
     try {
       const response = await api.getDadosCorporais(idUsuario);
@@ -146,6 +181,9 @@ export function AuthProvider({ children }) {
 
         carregarDadosCorporais(usuario.id);
 
+        // Sincroniza tokens de push e FCM do dispositivo com a conta do usuário
+        sincronizarPushTokens();
+
         return { success: true };
       }
 
@@ -181,6 +219,13 @@ export function AuthProvider({ children }) {
   }
 
   async function logout() {
+    try {
+      // Tenta desvincular o token da conta no backend antes de sair
+      await api.salvarPushToken(null, null);
+    } catch {
+      // Ignora erro caso o usuário já esteja desconectado ou sem rede
+    }
+
     setUser(null);
     setToken(null);
     setDadosCorporais([]);
