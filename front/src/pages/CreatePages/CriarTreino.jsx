@@ -92,10 +92,11 @@ export default function CriarTreino() {
       if (!idTreino) throw new Error('ID do treino não retornado pela API');
 
       await api.post(`/treinos/${idTreino}/exercicios`, selecionados.map((ex) => ({
+        idExercicio: ex.idExercicio,
         nome: ex.nome,
         grupo_muscular: ex.grupo_muscular,
         caminho_video: ex.caminho_video || null,
-        serie: ex.series,
+        series: ex.series,
         repeticoes: ex.repeticoes,
         descanso_segundos: ex.descanso_segundos,
         tipo: 'Forca',

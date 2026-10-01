@@ -18,7 +18,8 @@ router.use("/dadosCorporais", dadosRoutes );
 router.use("/historico", historyRoutes);
 router.use("/evolucao", evolucaoRoutes)
 router.use("/treinos", treinoRoutes);
-router.use( "/treinoExercicio", treinoExercicioRoute);
-router.use("/exercicios",exercicioRoutes);
+router.use("/treinos", treinoExercicioRoute);
+router.use("/treinoExercicio", treinoExercicioRoute);
+router.use("/exercicios", exercicioRoutes);
 
 export default router

@@ -22,19 +22,38 @@ export default function Exercicios() {
 
   // Recarrega também após criar/remover; `carregado` evita reexibir o spinner.
   const carregarExercicios = useCallback(async () => {
-    const res = await api.get('/exercicios');
-    setExercicios(unwrap(res));
-    setErro('');
+    try {
+      const res = await api.get('/exercicios');
+      setExercicios(unwrap(res));
+      setErro('');
+    } catch (err) {
+      setErro(getApiError(err, 'Erro ao carregar exercícios. Tente novamente mais tarde.'));
+      console.error(err);
+    }
   }, []);
 
   useEffect(() => {
-    carregarExercicios()
-      .catch((err) => {
-        setErro(getApiError(err, 'Erro ao carregar exercícios. Tente novamente mais tarde.'));
-        console.error(err);
+    let ativo = true;
+
+    api.get('/exercicios')
+      .then((res) => {
+        if (ativo) {
+          setExercicios(unwrap(res));
+          setErro('');
+        }
       })
-      .finally(() => setCarregado(true));
-  }, [carregarExercicios]);
+      .catch((err) => {
+        if (ativo) {
+          setErro(getApiError(err, 'Erro ao carregar exercícios. Tente novamente mais tarde.'));
+          console.error(err);
+        }
+      })
+      .finally(() => {
+        if (ativo) setCarregado(true);
+      });
+
+    return () => { ativo = false; };
+  }, []);
 
   const loading = !carregado;
 

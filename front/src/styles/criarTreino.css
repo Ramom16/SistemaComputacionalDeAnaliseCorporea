@@ -1,0 +1,217 @@
+/* Estilos da tela de Criar Treino */
+
+.criar-treino-form {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.filtros-catalogo {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 15px;
+  margin-bottom: 25px;
+}
+
+@media (max-width: 600px) {
+  .filtros-catalogo {
+    grid-template-columns: 1fr;
+  }
+}
+
+.catalogo-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+  max-height: 480px;
+  overflow-y: auto;
+  padding-right: 8px;
+}
+
+.catalogo-grid::-webkit-scrollbar {
+  width: 6px;
+}
+
+.catalogo-grid::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 4px;
+}
+
+.catalogo-grid::-webkit-scrollbar-thumb {
+  background: var(--primary-yellow, #f5c300);
+  border-radius: 4px;
+}
+
+.catalogo-card {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  padding: 14px 16px;
+  transition: all 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.catalogo-card:hover {
+  border-color: rgba(245, 195, 0, 0.4);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.catalogo-card.selecionado {
+  border-color: var(--primary-yellow, #f5c300);
+  background: rgba(245, 195, 0, 0.07);
+}
+
+.catalogo-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  cursor: pointer;
+  user-select: none;
+}
+
+.catalogo-card-info {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.badge-grupo {
+  align-self: flex-start;
+  background: rgba(245, 195, 0, 0.15);
+  color: var(--primary-yellow, #f5c300);
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 4px;
+  text-transform: uppercase;
+}
+
+.catalogo-card-info h4 {
+  margin: 0;
+  font-size: 1rem;
+  color: var(--text-white, #fff);
+  font-weight: 600;
+}
+
+.link-video {
+  font-size: 0.8rem;
+  color: var(--primary-yellow, #f5c300);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.link-video:hover {
+  text-decoration: underline;
+}
+
+.circle-checkbox {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.2s;
+}
+
+.catalogo-card.selecionado .circle-checkbox {
+  border-color: var(--primary-yellow, #f5c300);
+  background: var(--primary-yellow, #f5c300);
+}
+
+.check-icon {
+  color: #000;
+  font-size: 0.8rem;
+  font-weight: bold;
+}
+
+.catalogo-card-form {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 10px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.input-group-mini {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.input-group-mini label {
+  font-size: 0.72rem;
+  color: var(--text-gray, #aaa);
+}
+
+.input-group-mini input {
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 6px;
+  color: #fff;
+  padding: 6px 8px;
+  font-size: 0.85rem;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.input-group-mini input:focus {
+  outline: none;
+  border-color: var(--primary-yellow, #f5c300);
+}
+
+.textarea-custom {
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  color: #fff;
+  padding: 10px 14px;
+  font-family: inherit;
+  font-size: 0.95rem;
+  resize: vertical;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.textarea-custom:focus {
+  outline: none;
+  border-color: var(--primary-yellow, #f5c300);
+}
+
+.action-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 15px;
+  margin-top: 25px;
+}
+
+.btn-cancel {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #fff;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-cancel:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.feedback-message {
+  padding: 12px 16px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  font-size: 0.9rem;
+}
+
+.feedback-message.error {
+  background: rgba(255, 77, 77, 0.15);
+  border: 1px solid rgba(255, 77, 77, 0.4);
+  color: #ff6b6b;
+}

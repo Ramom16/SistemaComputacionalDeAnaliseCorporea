@@ -39,9 +39,20 @@ const CARD_RESULTADO = [
   },
 ];
 
+function obterClassificacaoIMC(imc) {
+  const val = Number(imc);
+  if (!val || Number.isNaN(val)) return '';
+  if (val < 18.5) return 'Abaixo do peso';
+  if (val < 25) return 'Peso normal';
+  if (val < 30) return 'Sobrepeso';
+  if (val < 35) return 'Obesidade Grau I';
+  if (val < 40) return 'Obesidade Grau II';
+  return 'Obesidade Grau III';
+}
+
 function CardResultado({ card, resultados }) {
   const valor = resultados ? card.formatar(resultados[card.chave]) : '---';
-  const classificacao = card.classificacao && resultados?.classificacao_imc;
+  const classificacao = card.classificacao && (resultados?.classificacao_imc || obterClassificacaoIMC(resultados?.imc));
 
   return (
     <div className="result-table-card">

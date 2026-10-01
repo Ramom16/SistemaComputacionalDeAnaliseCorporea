@@ -81,10 +81,13 @@ const treinoService = {
             throw new Error("Treino não encontrado.");
         }
 
+        const ehTreinoOficial = Boolean(treino.is_oficial);
         const donoDoTreino =
-            treino.calculo?.dados?.usuario?.id === String(idUsuario);
+            treino.idUsuario === String(idUsuario) ||
+            treino.calculo?.dados?.usuario?.id === String(idUsuario) ||
+            treino.calculo?.dados?.idUsuario === String(idUsuario);
 
-        if (!donoDoTreino && role !== "ADMIN") {
+        if (!ehTreinoOficial && !donoDoTreino && role !== "ADMIN") {
             throw new Error(
                 "Você não possui permissão para acessar este treino."
             );
