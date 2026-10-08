@@ -7,8 +7,13 @@ import {
   Pressable,
   ActivityIndicator,
   RefreshControl,
+  Alert,
 } from 'react-native';
 import { api } from '../../services/api';
+import {
+  exibirNotificacaoLocal,
+  agendarNotificacaoLocal,
+} from '../../notifications/notificationService';
 
 function normalizarTreino(t, idx) {
   const nome = t.nome || t.titulo || `Treino ${String.fromCharCode(65 + idx)} - ${t.objetivo || 'Foco Geral'}`;
@@ -71,6 +76,75 @@ export default function TreinosScreen() {
     );
   }
 
+  function handleConcluirTreino() {
+    if (!treinoAtual) return;
+    Alert.alert(
+      'Treino Finalizado!',
+      `Deseja registrar a conclusão do ${treinoAtual.nome}?`,
+      [
+        { text: 'Cancelar', style: 'cancel' },
+        {
+          text: 'Concluir',
+          onPress: async () => {
+            try {
+              await exibirNotificacaoLocal({
+                titulo: 'Treino Concluído! 🏆',
+                mensagem: `Parabéns por finalizar o ${treinoAtual.nome}! Descanse e hidrate-se bem.`,
+                canalId: 'treinos',
+              });
+              Alert.alert('Parabéns! 🏆', 'Treino concluído com sucesso e notificação disparada!');
+            } catch (err) {
+              Alert.alert('Aviso', 'Treino concluído!');
+            }
+          },
+        },
+      ]
+    );
+  }
+
+  function handleLembrarMaisTarde() {
+    if (!treinoAtual) return;
+    Alert.alert(
+      'Agendar Lembrete',
+      `Quando você deseja ser lembrado sobre o ${treinoAtual.nome}?`,
+      [
+        { text: 'Cancelar', style: 'cancel' },
+        {
+          text: 'Em 1 hora',
+          onPress: async () => {
+            try {
+              await agendarNotificacaoLocal({
+                titulo: `Hora do ${treinoAtual.nome}! 🏋️‍♂️`,
+                mensagem: `Seu treino focado em ${treinoAtual.foco} está te esperando. Bora!`,
+                segundos: 3600,
+                canalId: 'treinos',
+              });
+              Alert.alert('Agendado', 'Lembrete configurado para daqui a 1 hora.');
+            } catch (err) {
+              Alert.alert('Erro', 'Não foi possível agendar o lembrete: ' + err.message);
+            }
+          },
+        },
+        {
+          text: 'Em 2 horas',
+          onPress: async () => {
+            try {
+              await agendarNotificacaoLocal({
+                titulo: `Hora do ${treinoAtual.nome}! 🏋️‍♂️`,
+                mensagem: `Seu treino focado em ${treinoAtual.foco} está te esperando. Bora!`,
+                segundos: 7200,
+                canalId: 'treinos',
+              });
+              Alert.alert('Agendado', 'Lembrete configurado para daqui a 2 horas.');
+            } catch (err) {
+              Alert.alert('Erro', 'Não foi possível agendar o lembrete: ' + err.message);
+            }
+          },
+        },
+      ]
+    );
+  }
+
   const treinoAtual = treinos[treinoAtivoIndex] || treinos[0];
 
   return (
@@ -113,6 +187,15 @@ export default function TreinosScreen() {
             Objetivo: <Text style={{ color: '#FFD400', fontWeight: '800' }}>{treinoAtual.foco}</Text> •{' '}
             {treinoAtual.exercicios?.length || 0} Exercícios
           </Text>
+
+          <View style={styles.workoutActionRow}>
+            <Pressable style={styles.btnLembrete} onPress={handleLembrarMaisTarde}>
+              <Text style={styles.btnLembreteText}>🔔 Lembrar Mais Tarde</Text>
+            </Pressable>
+            <Pressable style={styles.btnConcluir} onPress={handleConcluirTreino}>
+              <Text style={styles.btnConcluirText}>✓ Concluir Treino</Text>
+            </Pressable>
+          </View>
         </View>
       )}
 
@@ -253,6 +336,44 @@ const styles = StyleSheet.create({
   workoutSub: {
     color: '#A5A5A5',
     fontSize: 13,
+  },
+  workoutActionRow: {
+    flexDirection: 'row',
+    gap: 10,
+    marginTop: 14,
+    paddingTop: 14,
+    borderTopWidth: 1,
+    borderTopColor: '#262626',
+  },
+  btnLembrete: {
+    flex: 1,
+    backgroundColor: '#1E1E1E',
+    borderWidth: 1,
+    borderColor: '#333333',
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+    borderRadius: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  btnLembreteText: {
+    color: '#FFD400',
+    fontSize: 12,
+    fontWeight: '800',
+  },
+  btnConcluir: {
+    flex: 1,
+    backgroundColor: '#FFD400',
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+    borderRadius: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  btnConcluirText: {
+    color: '#000000',
+    fontSize: 12,
+    fontWeight: '900',
   },
   exerciseList: {
     gap: 14,

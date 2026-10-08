@@ -1,0 +1,7 @@
+npx expo install @testing-library/react-native --dev
+
+npx expo install jest-expo jest @types/jest --dev
+
+npx install --save-dev test-renderer
+
+npm audit fix --force

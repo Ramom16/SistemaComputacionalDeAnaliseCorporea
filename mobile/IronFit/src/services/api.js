@@ -286,4 +286,11 @@ export const api = {
       body: JSON.stringify({ pushToken, fcmToken }),
     });
   },
+
+  async testarNotificacao(titulo, mensagem) {
+    return await request('/usuarios/testar-notificacao', {
+      method: 'POST',
+      body: JSON.stringify({ titulo, mensagem }),
+    });
+  },
 };

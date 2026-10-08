@@ -11,6 +11,7 @@ import {
 } from 'react-native';
 import { useAuth } from '../../context/AuthContext';
 import { calcularMetabolismo } from '../../services/api';
+import { exibirNotificacaoLocal } from '../../notifications/notificationService';
 
 export default function AvaliacaoScreen({ navigation }) {
   const { user, ultimaAvaliacao, adicionarAvaliacao, loading } = useAuth();
@@ -68,6 +69,12 @@ export default function AvaliacaoScreen({ navigation }) {
       setSucesso(true);
       setTimeout(() => setSucesso(false), 4000);
       Alert.alert('Sucesso!', 'Avaliação corporal salva no seu histórico com sucesso.');
+
+      exibirNotificacaoLocal({
+        titulo: 'Nova Avaliação Registrada 📊',
+        mensagem: `Seus indicadores metabólicos (IMC: ${res.registro?.imc || resultado?.imc}, TMB: ${res.registro?.tmb || resultado?.tmb} kcal) foram atualizados!`,
+        canalId: 'evolucao',
+      }).catch(() => {});
     } else {
       Alert.alert('Erro', res.error || 'Não foi possível salvar a avaliação.');
     }
