@@ -36,9 +36,14 @@ function TreinoCard({ treino, onRemove, eAdmin }) {
       <div className="treino-card-footer">
         <Link className="ver-treino" to={`/treino/${id}`}>Ver treino e exercícios →</Link>
         {eAdmin && (
-          <button className="btn-remover btn-remover-inline" onClick={() => onRemove(id)} title="Remover treino">
-            🗑️ Remover
-          </button>
+          <div className="treino-card-acoes">
+            <Link className="btn-editar-treino" to={`/admin/editar-treino/${id}`} title="Editar treino">
+              ✏️ Editar
+            </Link>
+            <button className="btn-remover btn-remover-inline" onClick={() => onRemove(id)} title="Remover treino">
+              🗑️ Remover
+            </button>
+          </div>
         )}
       </div>
     </article>

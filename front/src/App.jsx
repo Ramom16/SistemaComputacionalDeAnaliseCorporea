@@ -36,6 +36,7 @@ function App() {
 
         <Route element={<ProtectedRoute role="ADMIN" />}>
           <Route path="/admin/criar-treino" element={<CriarTreino />} />
+          <Route path="/admin/editar-treino/:id" element={<CriarTreino />} />
         </Route>
 
         <Route path="*" element={<Navigate to="/" replace />} />

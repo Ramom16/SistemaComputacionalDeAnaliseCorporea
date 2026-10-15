@@ -129,6 +129,25 @@
   letter-spacing: 0.5px;
 }
 
+/* Esqueci-me da palavra-passe */
+.esqueci-senha {
+  text-align: right;
+  margin: -6px 0 4px;
+}
+
+.esqueci-senha a {
+  color: var(--text-gray);
+  text-decoration: none;
+  font-size: 0.85rem;
+  font-weight: 500;
+  transition: color 0.3s;
+}
+
+.esqueci-senha a:hover {
+  color: var(--primary-yellow);
+  text-decoration: underline;
+}
+
 /* Cadastro Link */
 .link-cadastro {
   text-align: center;

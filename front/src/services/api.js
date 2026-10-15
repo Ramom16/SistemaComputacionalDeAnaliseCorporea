@@ -15,6 +15,32 @@ api.interceptors.request.use((config) => {
 });
 
 /**
+ * Sessão expirada/inválida: limpa o token e devolve o utilizador ao login.
+ * Ignora as rotas de autenticação, onde 401 significa "credenciais erradas"
+ * e deve ser mostrado na própria página.
+ */
+const ROTAS_AUTH = ['/auth/login', '/auth/register'];
+
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    const status = error?.response?.status;
+    const url = error?.config?.url || '';
+
+    if (status === 401 && !ROTAS_AUTH.some((rota) => url.includes(rota))) {
+      localStorage.removeItem('token');
+      localStorage.removeItem('usuario');
+
+      if (window.location.pathname !== '/login') {
+        window.location.assign('/login');
+      }
+    }
+
+    return Promise.reject(error);
+  },
+);
+
+/**
  * O backend responde com a coleção direto ou embrulhada em `{ data }`,
  * dependendo do controller. Normaliza os dois formatos.
  */

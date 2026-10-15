@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import DashboardNavbar from '../components/DashboardNavbar';
 import api, { unwrap, getApiError } from '../services/api';
 import { isAdmin } from '../services/auth';
@@ -7,6 +7,24 @@ import '../styles/dashboard.css';
 import '../styles/exercicios.css';
 
 const EXERCICIO_VAZIO = { nome: '', grupo_muscular: 'Peito', descricao: '', caminho_video: '' };
+
+const ITENS_POR_PAGINA = 9;
+
+// Gera a lista de páginas a exibir, com "..." quando há muitas páginas.
+const gerarListaPaginas = (atual, total) => {
+  if (total <= 7) return Array.from({ length: total }, (_, i) => i + 1);
+
+  const paginas = [1];
+  const inicio = Math.max(2, atual - 1);
+  const fim = Math.min(total - 1, atual + 1);
+
+  if (inicio > 2) paginas.push('...');
+  for (let i = inicio; i <= fim; i += 1) paginas.push(i);
+  if (fim < total - 1) paginas.push('...');
+  paginas.push(total);
+
+  return paginas;
+};
 
 export default function Exercicios() {
   const eAdmin = isAdmin();
@@ -18,9 +36,14 @@ export default function Exercicios() {
   const [grupoSelecionado, setGrupoSelecionado] = useState('Todos');
   const [modalAberto, setModalAberto] = useState(false);
   const [salvando, setSalvando] = useState(false);
-  const [novoExercicio, setNovoExercicio] = useState(EXERCICIO_VAZIO);
+  const [formExercicio, setFormExercicio] = useState(EXERCICIO_VAZIO);
+  const [exercicioEmEdicao, setExercicioEmEdicao] = useState(null);
+  const [paginaAtual, setPaginaAtual] = useState(1);
+  const gridRef = useRef(null);
 
-  // Recarrega também após criar/remover; `carregado` evita reexibir o spinner.
+  const editando = Boolean(exercicioEmEdicao);
+
+  // Recarrega também após criar/editar/remover; `carregado` evita reexibir o spinner.
   const carregarExercicios = useCallback(async () => {
     try {
       const res = await api.get('/exercicios');
@@ -35,25 +58,12 @@ export default function Exercicios() {
   useEffect(() => {
     let ativo = true;
 
-    api.get('/exercicios')
-      .then((res) => {
-        if (ativo) {
-          setExercicios(unwrap(res));
-          setErro('');
-        }
-      })
-      .catch((err) => {
-        if (ativo) {
-          setErro(getApiError(err, 'Erro ao carregar exercícios. Tente novamente mais tarde.'));
-          console.error(err);
-        }
-      })
-      .finally(() => {
-        if (ativo) setCarregado(true);
-      });
+    carregarExercicios().finally(() => {
+      if (ativo) setCarregado(true);
+    });
 
     return () => { ativo = false; };
-  }, []);
+  }, [carregarExercicios]);
 
   const loading = !carregado;
 
@@ -66,29 +76,81 @@ export default function Exercicios() {
     });
   }, [exercicios, busca, grupoSelecionado]);
 
+  // Paginação (9 por página)
+  const totalPaginas = Math.max(1, Math.ceil(filtrados.length / ITENS_POR_PAGINA));
+  const paginaSegura = Math.min(paginaAtual, totalPaginas);
+  const indiceInicio = (paginaSegura - 1) * ITENS_POR_PAGINA;
+  const exerciciosPagina = filtrados.slice(indiceInicio, indiceInicio + ITENS_POR_PAGINA);
+  const listaPaginas = gerarListaPaginas(paginaSegura, totalPaginas);
+
+  // Volta à primeira página ao mudar a busca ou o filtro.
+  useEffect(() => {
+    setPaginaAtual(1);
+  }, [busca, grupoSelecionado]);
+
+  // Corrige a página caso o último item dela seja removido.
+  useEffect(() => {
+    if (paginaAtual > totalPaginas) setPaginaAtual(totalPaginas);
+  }, [paginaAtual, totalPaginas]);
+
+  const irParaPagina = (pagina) => {
+    setPaginaAtual(pagina);
+    gridRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
+
+  const abrirCriar = () => {
+    setExercicioEmEdicao(null);
+    setFormExercicio(EXERCICIO_VAZIO);
+    setModalAberto(true);
+  };
+
+  const abrirEditar = (exercicio) => {
+    setExercicioEmEdicao(exercicio);
+    setFormExercicio({
+      nome: exercicio.nome || '',
+      grupo_muscular: exercicio.grupo_muscular || 'Peito',
+      descricao: exercicio.descricao || '',
+      caminho_video: exercicio.caminho_video || '',
+    });
+    setModalAberto(true);
+  };
+
   const fecharModal = () => {
     if (salvando) return;
     setModalAberto(false);
-    setNovoExercicio(EXERCICIO_VAZIO);
+    setExercicioEmEdicao(null);
+    setFormExercicio(EXERCICIO_VAZIO);
   };
 
-  const criarExercicio = async (event) => {
+  const submeterExercicio = async (event) => {
     event.preventDefault();
-    const { nome, grupo_muscular, descricao, caminho_video } = novoExercicio;
+    const { nome, grupo_muscular, descricao, caminho_video } = formExercicio;
+    const payload = {
+      nome: nome.trim(),
+      grupo_muscular,
+      descricao: descricao.trim() || null,
+      caminho_video: caminho_video.trim() || null,
+    };
 
     try {
       setSalvando(true);
-      await api.post('/exercicios', {
-        nome: nome.trim(),
-        grupo_muscular,
-        descricao: descricao.trim() || null,
-        caminho_video: caminho_video.trim() || null,
-      });
+
+      if (editando) {
+        const id = exercicioEmEdicao.id ?? exercicioEmEdicao.idExercicio;
+        await api.put(`/exercicios/${id}`, payload);
+      } else {
+        await api.post('/exercicios', payload);
+      }
+
       setModalAberto(false);
-      setNovoExercicio(EXERCICIO_VAZIO);
+      setExercicioEmEdicao(null);
+      setFormExercicio(EXERCICIO_VAZIO);
       await carregarExercicios();
     } catch (err) {
-      window.alert(getApiError(err, 'Não foi possível criar o exercício.'));
+      window.alert(getApiError(
+        err,
+        editando ? 'Não foi possível editar o exercício.' : 'Não foi possível criar o exercício.',
+      ));
     } finally {
       setSalvando(false);
     }
@@ -107,7 +169,7 @@ export default function Exercicios() {
 
   const atualizarCampo = (event) => {
     const { name, value } = event.target;
-    setNovoExercicio((prev) => ({ ...prev, [name]: value }));
+    setFormExercicio((prev) => ({ ...prev, [name]: value }));
   };
 
   return (
@@ -123,7 +185,7 @@ export default function Exercicios() {
             </p>
           </div>
           {eAdmin && (
-            <button className="criar-exercicio-btn" onClick={() => setModalAberto(true)}>
+            <button className="criar-exercicio-btn" onClick={abrirCriar}>
               + Criar Exercício Global
             </button>
           )}
@@ -172,8 +234,8 @@ export default function Exercicios() {
 
         {!loading && !erro && filtrados.length > 0 && (
           <>
-            <div className="exercicios-grid">
-              {filtrados.map((exercicio) => {
+            <div className="exercicios-grid" ref={gridRef}>
+              {exerciciosPagina.map((exercicio) => {
                 const id = exercicio.id ?? exercicio.idExercicio;
                 return (
                   <div key={id} className="exercicio-card">
@@ -198,13 +260,22 @@ export default function Exercicios() {
                         )}
 
                         {eAdmin && (
-                          <button
-                            className="btn-remover"
-                            onClick={() => removerExercicio(id)}
-                            title="Remover exercício"
-                          >
-                            🗑️ Remover
-                          </button>
+                          <div className="card-acoes-admin">
+                            <button
+                              className="btn-editar-exercicio"
+                              onClick={() => abrirEditar(exercicio)}
+                              title="Editar exercício"
+                            >
+                              ✏️ Editar
+                            </button>
+                            <button
+                              className="btn-remover btn-remover-inline"
+                              onClick={() => removerExercicio(id)}
+                              title="Remover exercício"
+                            >
+                              🗑️ Remover
+                            </button>
+                          </div>
                         )}
                       </div>
                     </div>
@@ -215,9 +286,48 @@ export default function Exercicios() {
 
             <div className="exercicios-footer">
               <p>
-                Mostrando <strong>{filtrados.length}</strong> de <strong>{exercicios.length}</strong> exercícios
+                Mostrando <strong>{indiceInicio + 1}</strong>–<strong>{indiceInicio + exerciciosPagina.length}</strong> de <strong>{filtrados.length}</strong> exercícios
               </p>
             </div>
+
+            {totalPaginas > 1 && (
+              <nav className="paginacao" aria-label="Paginação de exercícios">
+                <button
+                  type="button"
+                  className="paginacao-btn paginacao-seta"
+                  onClick={() => irParaPagina(paginaSegura - 1)}
+                  disabled={paginaSegura === 1}
+                >
+                  ‹ Anterior
+                </button>
+
+                {listaPaginas.map((item, indice) => (
+                  item === '...'
+                    ? <span key={`reticencias-${indice}`} className="paginacao-reticencias">…</span>
+                    : (
+                      <button
+                        key={item}
+                        type="button"
+                        className={`paginacao-btn${item === paginaSegura ? ' ativa' : ''}`}
+                        aria-current={item === paginaSegura ? 'page' : undefined}
+                        aria-label={`Ir para a página ${item}`}
+                        onClick={() => irParaPagina(item)}
+                      >
+                        {item}
+                      </button>
+                    )
+                ))}
+
+                <button
+                  type="button"
+                  className="paginacao-btn paginacao-seta"
+                  onClick={() => irParaPagina(paginaSegura + 1)}
+                  disabled={paginaSegura === totalPaginas}
+                >
+                  Próxima ›
+                </button>
+              </nav>
+            )}
           </>
         )}
       </main>
@@ -228,32 +338,34 @@ export default function Exercicios() {
             className="exercicio-modal"
             role="dialog"
             aria-modal="true"
-            aria-labelledby="titulo-criar-exercicio"
+            aria-labelledby="titulo-exercicio-modal"
             onMouseDown={(event) => event.stopPropagation()}
           >
             <div className="modal-header">
-              <h2 id="titulo-criar-exercicio">Criar Exercício Global</h2>
+              <h2 id="titulo-exercicio-modal">
+                {editando ? 'Editar Exercício' : 'Criar Exercício Global'}
+              </h2>
               <button type="button" className="modal-fechar" onClick={fecharModal} aria-label="Fechar">×</button>
             </div>
 
-            <form className="exercicio-form" onSubmit={criarExercicio}>
+            <form className="exercicio-form" onSubmit={submeterExercicio}>
               <label>
                 Nome do Exercício *
-                <input type="text" name="nome" required value={novoExercicio.nome} onChange={atualizarCampo} />
+                <input type="text" name="nome" required value={formExercicio.nome} onChange={atualizarCampo} />
               </label>
               <label>
                 Grupo Muscular
-                <select name="grupo_muscular" value={novoExercicio.grupo_muscular} onChange={atualizarCampo}>
+                <select name="grupo_muscular" value={formExercicio.grupo_muscular} onChange={atualizarCampo}>
                   {GRUPOS_MUSCULARES.map((grupo) => <option key={grupo}>{grupo}</option>)}
                 </select>
               </label>
               <label>
                 Descrição
-                <textarea name="descricao" rows="4" value={novoExercicio.descricao} onChange={atualizarCampo} />
+                <textarea name="descricao" rows="4" value={formExercicio.descricao} onChange={atualizarCampo} />
               </label>
               <label>
                 URL do Vídeo Demonstrativo
-                <input type="url" name="caminho_video" value={novoExercicio.caminho_video} onChange={atualizarCampo} />
+                <input type="url" name="caminho_video" value={formExercicio.caminho_video} onChange={atualizarCampo} />
               </label>
 
               <div className="modal-acoes">
@@ -261,7 +373,9 @@ export default function Exercicios() {
                   Cancelar
                 </button>
                 <button type="submit" className="criar-exercicio-btn" disabled={salvando}>
-                  {salvando ? 'Criando...' : 'Criar Exercício'}
+                  {salvando
+                    ? (editando ? 'Salvando...' : 'Criando...')
+                    : (editando ? 'Salvar Alterações' : 'Criar Exercício')}
                 </button>
               </div>
             </form>

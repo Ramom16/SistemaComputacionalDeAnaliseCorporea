@@ -1,5 +1,5 @@
 import { NavLink, useNavigate } from 'react-router-dom';
-import { limparSessao } from '../services/auth';
+import { getUsuario, limparSessao } from '../services/auth';
 
 const LINKS = [
   ['/dashboard', 'Análise Corporal'],
@@ -11,6 +11,7 @@ const LINKS = [
 
 export default function DashboardNavbar() {
   const navigate = useNavigate();
+  const usuario = getUsuario();
 
   const handleLogout = () => {
     limparSessao();
@@ -40,9 +41,17 @@ export default function DashboardNavbar() {
         ))}
       </nav>
 
-      <button onClick={handleLogout} className="navbar-logout-btn">
-        Sair da Conta
-      </button>
+      <div className="navbar-direita">
+        <span className="navbar-avatar" aria-hidden="true">
+          {usuario.fotoPerfil
+            ? <img src={usuario.fotoPerfil} alt="" />
+            : (usuario.nome || '?').trim().charAt(0).toUpperCase()}
+        </span>
+
+        <button onClick={handleLogout} className="navbar-logout-btn">
+          Sair da Conta
+        </button>
+      </div>
     </header>
   );
 }

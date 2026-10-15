@@ -492,3 +492,90 @@
   margin-top: 16px;
   align-items: stretch;
 }
+
+/* Ações do ADMIN (editar / remover) no card de exercício */
+.card-acoes-admin {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.card-acoes-admin .btn-editar-exercicio {
+  flex: 1;
+}
+
+.card-acoes-admin .btn-remover-inline {
+  flex: 1;
+  padding: 10px 16px;
+}
+
+.btn-editar-exercicio {
+  padding: 10px 16px;
+  border: none;
+  border-radius: 8px;
+  background-color: rgba(255, 230, 0, 0.14);
+  color: var(--primary-yellow);
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.btn-editar-exercicio:hover {
+  background-color: rgba(255, 230, 0, 0.26);
+}
+
+/* Paginação */
+.paginacao {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.paginacao-btn {
+  min-width: 40px;
+  padding: 9px 14px;
+  background-color: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border-light);
+  border-radius: 8px;
+  color: var(--text-white);
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.paginacao-btn:hover:not(:disabled):not(.ativa) {
+  border-color: var(--primary-yellow);
+  background-color: rgba(255, 230, 0, 0.08);
+}
+
+.paginacao-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.paginacao-btn.ativa {
+  background: linear-gradient(135deg, var(--primary-yellow) 0%, #ffdb4d 100%);
+  border-color: var(--primary-yellow);
+  color: #000;
+  box-shadow: 0 2px 10px rgba(255, 230, 0, 0.25);
+}
+
+.paginacao-reticencias {
+  padding: 0 4px;
+  color: var(--text-gray);
+  user-select: none;
+}
+
+@media (max-width: 480px) {
+  .paginacao-seta {
+    padding: 9px 10px;
+    font-size: 0.8rem;
+  }
+}

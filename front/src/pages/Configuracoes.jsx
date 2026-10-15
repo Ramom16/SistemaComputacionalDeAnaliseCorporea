@@ -1,18 +1,34 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import DashboardNavbar from '../components/DashboardNavbar';
+import PasswordChecklist from '../components/PasswordChecklist';
 import api, { unwrap, getApiError } from '../services/api';
-import { getUsuario, limparSessao, isAdmin } from '../services/auth';
+import { getUsuario, atualizarUsuario, limparSessao, isAdmin } from '../services/auth';
+import { senhaValida } from '../constants/senha';
 import '../styles/dashboard.css';
+
+const SENHA_VAZIA = { senhaAtual: '', novaSenha: '', confirmar: '' };
 
 export default function Configuracoes() {
   const navigate = useNavigate();
-  const usuario = getUsuario();
   const admin = isAdmin();
+
+  const [usuario, setUsuario] = useState(getUsuario());
 
   const [usuariosList, setUsuariosList] = useState([]);
   const [carregado, setCarregado] = useState(false);
   const [erro, setErro] = useState('');
+
+  // Foto de perfil
+  const [foto, setFoto] = useState(null);
+  const [preview, setPreview] = useState('');
+  const [salvandoFoto, setSalvandoFoto] = useState(false);
+  const [feedbackFoto, setFeedbackFoto] = useState(null);
+
+  // Alterar palavra-passe
+  const [formSenha, setFormSenha] = useState(SENHA_VAZIA);
+  const [salvandoSenha, setSalvandoSenha] = useState(false);
+  const [feedbackSenha, setFeedbackSenha] = useState(null);
 
   useEffect(() => {
     if (!admin) return;
@@ -68,6 +84,84 @@ export default function Configuracoes() {
     }
   };
 
+  const selecionarFoto = (event) => {
+    const arquivo = event.target.files?.[0];
+    if (!arquivo) return;
+    setFoto(arquivo);
+    setPreview(URL.createObjectURL(arquivo));
+    setFeedbackFoto(null);
+  };
+
+  const enviarFoto = async (event) => {
+    event.preventDefault();
+
+    if (!foto) {
+      setFeedbackFoto({ texto: 'Selecione uma imagem primeiro.', tipo: 'erro' });
+      return;
+    }
+
+    try {
+      setSalvandoFoto(true);
+      setFeedbackFoto(null);
+
+      const dados = new FormData();
+      dados.append('image', foto);
+
+      const { data } = await api.patch('/usuarios/foto-perfil', dados);
+      const fotoPerfil = data?.usuario?.fotoPerfil;
+
+      if (fotoPerfil) {
+        const atualizado = atualizarUsuario({ fotoPerfil });
+        setUsuario(atualizado);
+        setPreview('');
+        setFoto(null);
+      }
+
+      setFeedbackFoto({ texto: data?.mensagem || 'Foto de perfil atualizada!', tipo: 'sucesso' });
+    } catch (err) {
+      setFeedbackFoto({ texto: getApiError(err, 'Erro ao enviar a foto.'), tipo: 'erro' });
+    } finally {
+      setSalvandoFoto(false);
+    }
+  };
+
+  const alterarCampoSenha = (event) => {
+    const { name, value } = event.target;
+    setFormSenha((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const submeterSenha = async (event) => {
+    event.preventDefault();
+    setFeedbackSenha(null);
+
+    if (!senhaValida(formSenha.novaSenha)) {
+      setFeedbackSenha({ texto: 'A nova palavra-passe não cumpre os requisitos.', tipo: 'erro' });
+      return;
+    }
+
+    if (formSenha.novaSenha !== formSenha.confirmar) {
+      setFeedbackSenha({ texto: 'A confirmação não coincide com a nova palavra-passe.', tipo: 'erro' });
+      return;
+    }
+
+    try {
+      setSalvandoSenha(true);
+      await api.post('/auth/alterar-senha', {
+        senhaAtual: formSenha.senhaAtual,
+        novaSenha: formSenha.novaSenha,
+      });
+      setFeedbackSenha({ texto: 'Palavra-passe alterada com sucesso!', tipo: 'sucesso' });
+      setFormSenha(SENHA_VAZIA);
+    } catch (err) {
+      setFeedbackSenha({ texto: getApiError(err, 'Erro ao alterar a palavra-passe.'), tipo: 'erro' });
+    } finally {
+      setSalvandoSenha(false);
+    }
+  };
+
+  const fotoExibida = preview || usuario.fotoPerfil;
+  const iniciais = (usuario.nome || '?').trim().charAt(0).toUpperCase();
+
   return (
     <>
       <DashboardNavbar />
@@ -84,12 +178,96 @@ export default function Configuracoes() {
 
           <div className="calc-card" style={{ marginBottom: 20 }}>
             <h3>Meu Perfil</h3>
-            <p><strong>Nome:</strong> {usuario.nome || '—'}</p>
-            <p><strong>E-mail:</strong> {usuario.email || '—'}</p>
-            <p>
-              <strong>Perfil:</strong>{' '}
-              <span className="role-badge">{admin ? 'Administrador' : 'Aluno'}</span>
-            </p>
+
+            <form className="perfil-topo" onSubmit={enviarFoto}>
+              <div className="perfil-avatar">
+                {fotoExibida
+                  ? <img src={fotoExibida} alt="Foto de perfil" />
+                  : <span className="perfil-avatar-iniciais">{iniciais}</span>}
+              </div>
+
+              <div className="perfil-dados">
+                <p><strong>Nome:</strong> {usuario.nome || '—'}</p>
+                <p><strong>E-mail:</strong> {usuario.email || '—'}</p>
+                <p>
+                  <strong>Perfil:</strong>{' '}
+                  <span className="role-badge">{admin ? 'Administrador' : 'Aluno'}</span>
+                </p>
+
+                <div className="perfil-foto-acoes">
+                  <label className="btn btn-cancel perfil-foto-label">
+                    Escolher foto
+                    <input
+                      type="file"
+                      accept="image/png, image/jpeg, image/webp"
+                      onChange={selecionarFoto}
+                      hidden
+                    />
+                  </label>
+                  <button type="submit" className="btn btn-calc" disabled={salvandoFoto || !foto}>
+                    {salvandoFoto ? 'Enviando...' : 'Salvar foto'}
+                  </button>
+                </div>
+
+                {feedbackFoto && (
+                  <p className={`calc-feedback ${feedbackFoto.tipo}`}>{feedbackFoto.texto}</p>
+                )}
+              </div>
+            </form>
+          </div>
+
+          <div className="calc-card" style={{ marginBottom: 20 }}>
+            <h3>Alterar Palavra-passe</h3>
+
+            <form onSubmit={submeterSenha}>
+              <div className="input-group">
+                <label htmlFor="senhaAtual">Palavra-passe atual</label>
+                <input
+                  id="senhaAtual"
+                  name="senhaAtual"
+                  type="password"
+                  value={formSenha.senhaAtual}
+                  onChange={alterarCampoSenha}
+                  required
+                />
+              </div>
+
+              <div className="input-group">
+                <label htmlFor="novaSenha">Nova palavra-passe</label>
+                <input
+                  id="novaSenha"
+                  name="novaSenha"
+                  type="password"
+                  value={formSenha.novaSenha}
+                  onChange={alterarCampoSenha}
+                  required
+                />
+              </div>
+
+              <PasswordChecklist senha={formSenha.novaSenha} />
+
+              <div className="input-group" style={{ marginTop: 16 }}>
+                <label htmlFor="confirmar">Confirmar nova palavra-passe</label>
+                <input
+                  id="confirmar"
+                  name="confirmar"
+                  type="password"
+                  value={formSenha.confirmar}
+                  onChange={alterarCampoSenha}
+                  required
+                />
+              </div>
+
+              {feedbackSenha && (
+                <p className={`calc-feedback ${feedbackSenha.tipo}`}>{feedbackSenha.texto}</p>
+              )}
+
+              <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 12 }}>
+                <button type="submit" className="btn btn-calc" disabled={salvandoSenha}>
+                  {salvandoSenha ? 'A alterar...' : 'Alterar palavra-passe'}
+                </button>
+              </div>
+            </form>
           </div>
 
           <div className="calc-card" style={{ marginBottom: 20 }}>
