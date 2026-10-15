@@ -2,6 +2,7 @@ import { useEvolucao } from '../hooks/useEvolucao';
 import { useMetas } from '../hooks/useMetas';
 import DashboardNavbar from '../components/DashboardNavbar';
 import { getUsuario } from '../services/auth';
+import { Skeleton } from '../components/Skeleton';
 
 import Header from '../components/evolucao/Header';
 import DashboardCards from '../components/evolucao/DashboardCards';
@@ -23,7 +24,26 @@ export default function Evolucao() {
   const usuario = getUsuario();
   const { metas, salvar } = useMetas(usuario.id);
 
-  if (loading) return <div className="loading">Carregando evolução...</div>;
+  if (loading) {
+    return (
+      <>
+        <DashboardNavbar />
+        <div className="dashboard-layout">
+          <main className="dashboard-content">
+            <Skeleton variante="titulo" largura="240px" />
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 20, marginTop: 24 }}>
+              {Array.from({ length: 4 }).map((_, indice) => (
+                <Skeleton key={indice} variante="retangulo" altura="120px" />
+              ))}
+            </div>
+            <div style={{ marginTop: 24 }}>
+              <Skeleton variante="retangulo" altura="320px" />
+            </div>
+          </main>
+        </div>
+      </>
+    );
+  }
   if (erro) return <div className="loading" role="alert">{erro}</div>;
 
   return (

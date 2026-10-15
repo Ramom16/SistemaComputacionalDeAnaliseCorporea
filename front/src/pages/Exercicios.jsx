@@ -1,5 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import DashboardNavbar from '../components/DashboardNavbar';
+import { useFeedback } from '../hooks/useFeedback';
+import { SkeletonGrid } from '../components/Skeleton';
 import api, { unwrap, getApiError } from '../services/api';
 import { isAdmin } from '../services/auth';
 import { GRUPOS_MUSCULARES } from '../constants/dominio';
@@ -28,6 +30,7 @@ const gerarListaPaginas = (atual, total) => {
 
 export default function Exercicios() {
   const eAdmin = isAdmin();
+  const { toast, confirmar } = useFeedback();
 
   const [exercicios, setExercicios] = useState([]);
   const [carregado, setCarregado] = useState(false);
@@ -145,9 +148,10 @@ export default function Exercicios() {
       setModalAberto(false);
       setExercicioEmEdicao(null);
       setFormExercicio(EXERCICIO_VAZIO);
+      toast.sucesso(editando ? 'Exercício atualizado com sucesso!' : 'Exercício criado com sucesso!');
       await carregarExercicios();
     } catch (err) {
-      window.alert(getApiError(
+      toast.erro(getApiError(
         err,
         editando ? 'Não foi possível editar o exercício.' : 'Não foi possível criar o exercício.',
       ));
@@ -157,13 +161,20 @@ export default function Exercicios() {
   };
 
   const removerExercicio = async (id) => {
-    if (!window.confirm('Tem certeza que deseja remover este exercício?')) return;
+    const confirmado = await confirmar({
+      titulo: 'Remover exercício',
+      mensagem: 'Tem certeza que deseja remover este exercício? Esta ação não pode ser desfeita.',
+      textoConfirmar: 'Remover',
+      perigoso: true,
+    });
+    if (!confirmado) return;
 
     try {
       await api.delete(`/exercicios/${id}`);
       await carregarExercicios();
+      toast.sucesso('Exercício removido.');
     } catch (err) {
-      window.alert(getApiError(err, 'Não foi possível remover o exercício.'));
+      toast.erro(getApiError(err, 'Não foi possível remover o exercício.'));
     }
   };
 
@@ -219,12 +230,7 @@ export default function Exercicios() {
 
         {erro && <div className="exercicios-erro"><p>{erro}</p></div>}
 
-        {loading && (
-          <div className="exercicios-loading">
-            <div className="spinner"></div>
-            <p>Carregando exercícios...</p>
-          </div>
-        )}
+        {loading && <SkeletonGrid itens={9} className="exercicios-grid" />}
 
         {!loading && !erro && filtrados.length === 0 && (
           <div className="exercicios-vazio">

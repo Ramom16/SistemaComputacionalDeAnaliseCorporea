@@ -1,0 +1,139 @@
+/* ------------------------------------------------------------------
+   Ecrãs de erro: ErrorBoundary global e página 404
+   ------------------------------------------------------------------ */
+
+/* ------------------------- ErrorBoundary --------------------------- */
+.erro-global {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-dark);
+  padding: 24px;
+}
+
+.erro-global-card {
+  width: 100%;
+  max-width: 520px;
+  text-align: center;
+  background: rgba(18, 18, 18, 0.92);
+  border: 1px solid var(--border-light);
+  border-radius: 12px;
+  padding: 40px 32px;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.5);
+}
+
+.erro-global-card h1 {
+  font-family: var(--font-title);
+  font-size: 1.9rem;
+  color: var(--primary-yellow);
+  margin-bottom: 12px;
+}
+
+.erro-global-card p {
+  color: var(--text-gray);
+  line-height: 1.6;
+  margin-bottom: 26px;
+}
+
+.erro-global-acoes {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.erro-global-acoes .btn-primario {
+  display: inline-block;
+  padding: 12px 24px;
+  border-radius: 8px;
+  border: none;
+  background: var(--primary-yellow);
+  color: #000;
+  font-family: var(--font-title);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.erro-global-acoes .btn-secundario {
+  display: inline-block;
+  padding: 12px 24px;
+  border-radius: 8px;
+  border: none;
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text-white);
+  font-family: var(--font-title);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.erro-global-acoes .btn-secundario:hover { background: rgba(255, 255, 255, 0.16); }
+.erro-global-acoes .btn-primario:hover { filter: brightness(1.08); }
+
+/* ---------------------------- Página 404 --------------------------- */
+.nao-encontrado {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-dark);
+  padding: 24px;
+  text-align: center;
+}
+
+.nao-encontrado-codigo {
+  font-family: var(--font-title);
+  font-size: clamp(4rem, 18vw, 9rem);
+  line-height: 1;
+  color: var(--primary-yellow);
+}
+
+.nao-encontrado-titulo {
+  font-family: var(--font-title);
+  font-size: 1.7rem;
+  color: var(--text-white);
+  margin: 8px 0 12px;
+}
+
+.nao-encontrado-texto {
+  color: var(--text-gray);
+  margin-bottom: 28px;
+}
+
+.nao-encontrado-acoes {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.nao-encontrado-acoes a {
+  display: inline-block;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-family: var(--font-title);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  text-decoration: none;
+  transition: filter 0.2s, background 0.2s;
+}
+
+.nao-encontrado-acoes .btn-primario {
+  background: var(--primary-yellow);
+  color: #000;
+}
+
+.nao-encontrado-acoes .btn-secundario {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text-white);
+}
+
+.nao-encontrado-acoes .btn-primario:hover { filter: brightness(1.08); }
+.nao-encontrado-acoes .btn-secundario:hover { background: rgba(255, 255, 255, 0.16); }

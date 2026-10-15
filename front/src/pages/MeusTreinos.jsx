@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import DashboardNavbar from '../components/DashboardNavbar';
+import { useFeedback } from '../hooks/useFeedback';
+import { SkeletonGrid } from '../components/Skeleton';
 import api, { unwrap, getApiError } from '../services/api';
 import { getUsuario, isAdmin } from '../services/auth';
 import { OBJETIVOS_TREINO } from '../constants/dominio';
@@ -54,6 +56,7 @@ export default function MeusTreinos() {
   const navigate = useNavigate();
   const usuario = getUsuario();
   const eAdmin = isAdmin();
+  const { toast, confirmar } = useFeedback();
 
   const [treinos, setTreinos] = useState([]);
   const [filtroObjetivo, setFiltroObjetivo] = useState('Todos');
@@ -71,13 +74,20 @@ export default function MeusTreinos() {
   }, []);
 
   const removerTreino = async (id) => {
-    if (!window.confirm('Tem certeza que deseja remover este treino?')) return;
+    const confirmado = await confirmar({
+      titulo: 'Remover treino',
+      mensagem: 'Tem certeza que deseja remover este treino? Esta ação não pode ser desfeita.',
+      textoConfirmar: 'Remover',
+      perigoso: true,
+    });
+    if (!confirmado) return;
 
     try {
       await api.delete(`/treinos/${id}`);
       setTreinos((prev) => prev.filter((t) => (t.idTreino ?? t.id) !== id));
+      toast.sucesso('Treino removido.');
     } catch (err) {
-      window.alert(getApiError(err, 'Não foi possível remover o treino.'));
+      toast.erro(getApiError(err, 'Não foi possível remover o treino.'));
     }
   };
 
@@ -119,7 +129,7 @@ export default function MeusTreinos() {
             ))}
           </div>
 
-          {loading && <p className="loading-txt">Carregando treinos personalizados da API...</p>}
+          {loading && <SkeletonGrid itens={6} className="treinos-grid" linhas={2} />}
           {erro && <p className="erro-txt">{erro}</p>}
 
           {!loading && !erro && filtrados.length === 0 && (

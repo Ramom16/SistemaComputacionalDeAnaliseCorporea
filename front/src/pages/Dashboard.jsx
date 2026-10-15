@@ -4,6 +4,7 @@ import api, { unwrap, getApiError } from '../services/api';
 import { getUsuario, limparSessao } from '../services/auth';
 import { GENEROS, NIVEIS_ATIVIDADE } from '../constants/dominio';
 import DashboardNavbar from '../components/DashboardNavbar';
+import { SkeletonGrid } from '../components/Skeleton';
 import '../styles/dashboard.css';
 
 const CAMPOS = [
@@ -243,7 +244,7 @@ export default function Dashboard() {
               </div>
 
               {loadingSugestoes ? (
-                <p className="sugestoes-vazio">Carregando treinos personalizados...</p>
+                <SkeletonGrid itens={3} className="sugestoes-grid" linhas={2} />
               ) : sugestoes.length > 0 ? (
                 <div className="sugestoes-grid">
                   {sugestoes.map((treino) => {

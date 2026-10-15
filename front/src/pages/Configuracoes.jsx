@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import DashboardNavbar from '../components/DashboardNavbar';
 import PasswordChecklist from '../components/PasswordChecklist';
+import { useFeedback } from '../hooks/useFeedback';
+import { Skeleton } from '../components/Skeleton';
 import api, { unwrap, getApiError } from '../services/api';
 import { getUsuario, atualizarUsuario, limparSessao, isAdmin } from '../services/auth';
 import { senhaValida } from '../constants/senha';
@@ -12,6 +14,7 @@ const SENHA_VAZIA = { senhaAtual: '', novaSenha: '', confirmar: '' };
 export default function Configuracoes() {
   const navigate = useNavigate();
   const admin = isAdmin();
+  const { toast, confirmar } = useFeedback();
 
   const [usuario, setUsuario] = useState(getUsuario());
 
@@ -50,9 +53,14 @@ export default function Configuracoes() {
   const loading = admin && !carregado;
 
   const desativarMinhaConta = async () => {
-    const aviso = 'Desativar sua conta é reversível apenas pelo suporte. Seus dados serão '
-      + 'preservados, porém você será desconectado. Deseja continuar?';
-    if (!window.confirm(aviso)) return;
+    const confirmado = await confirmar({
+      titulo: 'Desativar conta',
+      mensagem: 'Desativar sua conta é reversível apenas pelo suporte. Seus dados serão '
+        + 'preservados, porém você será desconectado.',
+      textoConfirmar: 'Desativar',
+      perigoso: true,
+    });
+    if (!confirmado) return;
 
     try {
       await api.delete('/usuarios/desativar-conta');
@@ -67,20 +75,30 @@ export default function Configuracoes() {
     try {
       await api.patch(`/usuarios/${userId}/role`, { role: novaRole });
       setUsuariosList((prev) => prev.map((u) => (u.id === userId ? { ...u, role: novaRole } : u)));
+      toast.sucesso('Perfil de acesso atualizado.');
     } catch (err) {
-      setErro(getApiError(err, 'Erro ao alterar role.'));
+      toast.erro(getApiError(err, 'Erro ao alterar role.'));
     }
   };
 
   const alterarSituacao = async (u, acao) => {
-    const rotulo = acao === 'desativar' ? 'Desativar' : 'Reativar';
-    if (!window.confirm(`${rotulo} a conta de ${u.nome}?`)) return;
+    const desativando = acao === 'desativar';
+    const rotulo = desativando ? 'Desativar' : 'Reativar';
+
+    const confirmado = await confirmar({
+      titulo: `${rotulo} conta`,
+      mensagem: `${rotulo} a conta de ${u.nome}?`,
+      textoConfirmar: rotulo,
+      perigoso: desativando,
+    });
+    if (!confirmado) return;
 
     try {
-      await api[acao === 'desativar' ? 'delete' : 'patch'](`/usuarios/${u.id}/${acao}`);
+      await api[desativando ? 'delete' : 'patch'](`/usuarios/${u.id}/${acao}`);
       setUsuariosList((prev) => prev.filter((outro) => outro.id !== u.id));
+      toast.sucesso(`Conta de ${u.nome} ${desativando ? 'desativada' : 'reativada'}.`);
     } catch (err) {
-      setErro(getApiError(err, `Erro ao ${acao} usuário.`));
+      toast.erro(getApiError(err, `Erro ao ${acao} usuário.`));
     }
   };
 
@@ -286,7 +304,11 @@ export default function Configuracoes() {
             <div className="calc-card">
               <h3>Painel de Administração</h3>
               {loading ? (
-                <p>Carregando usuários...</p>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }} aria-busy="true">
+                  {Array.from({ length: 4 }).map((_, indice) => (
+                    <Skeleton key={indice} variante="texto" altura="38px" />
+                  ))}
+                </div>
               ) : (
                 <div style={{ overflowX: 'auto' }}>
                   <table className="admin-tabela">
