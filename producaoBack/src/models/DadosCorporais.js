@@ -172,9 +172,7 @@ export class DadosCorporais {
 
     set genero(value) {
 
-        this.#validarGenero(value);
-
-        this.#genero = value;
+        this.#genero = this.#validarGenero(value);
     }
 
     set idade(value) {
@@ -194,9 +192,7 @@ export class DadosCorporais {
 
     set nivel_atividade(value) {
 
-        this.#validarNivelAtividade(value);
-
-        this.#nivel_atividade = value;
+        this.#nivel_atividade = this.#validarNivelAtividade(value);
     }
 
     set data_registro_Inicial(value) {
@@ -236,31 +232,37 @@ export class DadosCorporais {
     // =========================
 
     #validarGenero(genero) {
-
-        const generosValidos = [
-            "Masculino",
-            "Feminino",
-            "Outro"
-        ];
-
-        if (!generosValidos.includes(genero)) {
+        if (typeof genero !== "string") {
             throw new Error("Gênero inválido");
         }
+        const mapa = {
+            masculino: "Masculino",
+            feminino: "Feminino",
+            outro: "Outro"
+        };
+        const normalizado = mapa[genero.trim().toLowerCase()];
+        if (!normalizado) {
+            throw new Error("Gênero inválido");
+        }
+        return normalizado;
     }
 
     #validarNivelAtividade(nivel) {
-
-        const niveisValidos = [
-            "Sedentario",
-            "Leve",
-            "Moderado",
-            "Intenso",
-            "MuitoIntenso"
-        ];
-
-        if (!niveisValidos.includes(nivel)) {
+        if (typeof nivel !== "string") {
             throw new Error("Nível de atividade inválido");
         }
+        const mapa = {
+            sedentario: "Sedentario",
+            leve: "Leve",
+            moderado: "Moderado",
+            intenso: "Intenso",
+            muitointenso: "MuitoIntenso"
+        };
+        const normalizado = mapa[nivel.replace(/[\s_]/g, "").toLowerCase()];
+        if (!normalizado) {
+            throw new Error("Nível de atividade inválido");
+        }
+        return normalizado;
     }
 
     // =========================

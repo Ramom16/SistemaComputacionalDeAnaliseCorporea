@@ -24,7 +24,7 @@ const DadosCorporaisController = {
             } = req.body;
 
             // Validação da model com UUID
-            DadosCorporais.criar({
+            const modelValida = DadosCorporais.criar({
                 idUsuario: String(idUsuario),
                 peso_kg: Number(peso_kg),
                 altura_cm: Number(altura_cm),
@@ -37,9 +37,9 @@ const DadosCorporaisController = {
                 idUsuario: String(idUsuario),
                 peso_kg: Number(peso_kg),
                 altura_cm: Number(altura_cm),
-                genero,
+                genero: modelValida.genero,
                 idade: Number(idade),
-                nivel_atividade
+                nivel_atividade: modelValida.nivel_atividade
             };
 
             const resultado = await DadosCorporaisService.criar(dadosCorporais);
@@ -153,13 +153,22 @@ const DadosCorporaisController = {
             } = req.body;
 
             // Validação
-            const dadosCorporais = {
+            const modelValida = DadosCorporais.criar({
                 idUsuario: String(idUsuario),
                 peso_kg: Number(peso_kg),
                 altura_cm: Number(altura_cm),
                 genero,
                 idade: Number(idade),
                 nivel_atividade
+            });
+
+            const dadosCorporais = {
+                idUsuario: String(idUsuario),
+                peso_kg: Number(peso_kg),
+                altura_cm: Number(altura_cm),
+                genero: modelValida.genero,
+                idade: Number(idade),
+                nivel_atividade: modelValida.nivel_atividade
             };
 
             const resultado = await DadosCorporaisService.atualizar(

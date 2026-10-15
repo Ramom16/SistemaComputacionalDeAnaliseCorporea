@@ -12,6 +12,7 @@ import { envTokenExpiraMinutos } from "../config/env.js";
 
 import { anexarIdsCriptografados } from "../middlewares/tratarIdsCriptografados.js";
 import { criptografarId } from "../utils/cryptoUtils.js";
+import { notificarUsuario } from "../services/notificacaoService.js";
 
 const conversorMinutos = 60 * 1000;
 
@@ -130,6 +131,8 @@ const authController = {
 
       // 5. Sucesso - atualiza último login e reseta contadores de falhas
       await usuariosRepository.atualizarUltimoLogin(usuario.id);
+      // Envia notificação de boas-vindas se o usuário tiver push token cadastrado
+      notificarUsuario(usuario.id, "IronFit 💪", "Login realizado com sucesso no seu perfil!");
 
       const token = gerarTokenLogin(usuario);
 
@@ -143,7 +146,8 @@ const authController = {
           email: usuario.email,
           role: usuario.role || "USER"
         }
-      });
+      }
+    );
     } catch (error) {
       console.error("Erro no login:", error);
       return res.status(400).json({ erro: error.message });
