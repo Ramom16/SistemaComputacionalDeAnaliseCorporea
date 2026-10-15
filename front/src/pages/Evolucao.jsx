@@ -1,4 +1,5 @@
 import { useEvolucao } from '../hooks/useEvolucao';
+import { useMetas } from '../hooks/useMetas';
 import DashboardNavbar from '../components/DashboardNavbar';
 import { getUsuario } from '../services/auth';
 
@@ -11,12 +12,16 @@ import Recordes from '../components/evolucao/Records';
 import CalendarioTreinos from '../components/evolucao/CalendarioTreinos';
 import HistoricoTabela from '../components/evolucao/HistoricoTabela';
 import CardsCompartilhamento from '../components/evolucao/CardsCompartilhamento';
+import MetasEditor from '../components/evolucao/MetasEditor';
+import RelatorioPdf from '../components/evolucao/RelatorioPdf';
 
 import '../styles/dashboard.css';
 import '../styles/evolucao.css';
 
 export default function Evolucao() {
   const { loading, erro, cards, historico, exercicios, grupos, recordes } = useEvolucao();
+  const usuario = getUsuario();
+  const { metas, salvar } = useMetas(usuario.id);
 
   if (loading) return <div className="loading">Carregando evolução...</div>;
   if (erro) return <div className="loading" role="alert">{erro}</div>;
@@ -29,6 +34,15 @@ export default function Evolucao() {
           <Header />
 
           <DashboardCards cards={cards} />
+
+          <MetasEditor metas={metas} onSalvar={salvar} />
+
+          <RelatorioPdf
+            usuario={usuario}
+            historico={historico}
+            cards={cards}
+            metas={metas}
+          />
 
           <CardsCompartilhamento
             historico={historico}

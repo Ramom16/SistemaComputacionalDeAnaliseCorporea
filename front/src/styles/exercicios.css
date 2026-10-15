@@ -267,18 +267,19 @@
 /* Badge do Grupo Muscular */
 .card-badge {
   display: inline-block;
-  align-self: flex-start;
+  align-self: center;
+  margin: 0 auto;
   padding: 6px 12px;
   background: linear-gradient(135deg, var(--primary-yellow) 0%, #ffdb4d 100%);
   color: #000;
-  font-family: var(--font-body);
+  border-radius: 20px;
   font-size: 0.75rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.8px;
   border-radius: 20px;
   z-index: 1;
-  box-shadow: 0 2px 8px rgba(255, 230, 0, 0.2);
+  box-shadow: 0 2px 8px rgba(255,230,0,0.2);
 }
 
 /* Conteúdo do Card */
@@ -316,7 +317,8 @@
 
 /* Botão de Vídeo */
 .card-video-btn {
-  align-self: flex-start;
+  align-self: stretch;
+  width: 100%;
   padding: 10px 16px;
   background: linear-gradient(135deg, var(--primary-yellow) 0%, #ffdb4d 100%);
   color: #000;
@@ -330,6 +332,10 @@
   box-shadow: 0 4px 12px rgba(255, 230, 0, 0.2);
   text-transform: uppercase;
   letter-spacing: 0.5px;
+  text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .card-video-btn:hover {
@@ -484,4 +490,5 @@
   flex-direction: column;
   gap: 8px;
   margin-top: 16px;
+  align-items: stretch;
 }

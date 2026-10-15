@@ -100,6 +100,24 @@
 .card-conquista-acoes .btn-compartilhar { background: var(--primary-yellow); border-color: var(--primary-yellow); color: #111; }
 .compartilhamento-aviso { margin-top: 16px; color: #4ade80; }
 
+/* Metas de evolução */
+.metas-section, .relatorio-section { background: var(--bg-card); border: 1px solid var(--border-light); border-radius: 16px; padding: 28px; margin-bottom: 40px; box-shadow: 0 15px 35px rgba(0, 0, 0, .3); }
+.metas-header h2, .relatorio-header h2 { font-family: var(--font-title); margin: 0 0 4px; color: var(--text-white); text-transform: uppercase; font-size: 1.35rem; }
+.metas-header p, .relatorio-header p { color: var(--text-gray); margin: 0; font-size: .9rem; }
+.metas-form { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; margin-top: 22px; }
+.metas-campo { display: flex; flex-direction: column; gap: 8px; }
+.metas-campo label { color: var(--text-gray); font-size: .82rem; text-transform: uppercase; letter-spacing: .6px; }
+.metas-campo input { background: rgba(255, 255, 255, .05); border: 1px solid rgba(255, 255, 255, .12); color: var(--text-white); border-radius: 8px; padding: 10px 14px; font-family: var(--font-body); font-size: .95rem; outline: none; transition: all .3s ease; }
+.metas-campo input:focus { border-color: var(--primary-yellow); background: rgba(255, 230, 0, .08); }
+.metas-acoes { grid-column: 1 / -1; display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+.metas-aviso, .relatorio-aviso { margin: 0; color: #4ade80; font-size: .88rem; }
+.relatorio-erro { color: #f87171; }
+
+/* Botão primário das seções de metas e relatório */
+.metas-section .btn-primario, .relatorio-section .btn-primario { display: inline-flex; align-items: center; gap: 8px; cursor: pointer; border-radius: 8px; border: 1px solid var(--primary-yellow); background: var(--primary-yellow); color: #111; padding: 12px 20px; font-weight: 700; font-size: .95rem; transition: all .3s ease; }
+.metas-section .btn-primario:hover, .relatorio-section .btn-primario:hover { filter: brightness(1.08); transform: translateY(-1px); }
+.metas-section .btn-primario:disabled, .relatorio-section .btn-primario:disabled { opacity: .6; cursor: wait; transform: none; }
+
 /* Gráficos Grid */
 .graficos-grid {
   display: grid;
@@ -435,6 +453,10 @@
 /* Media Queries Responsivas */
 @media (max-width: 900px) {
   .compartilhamento-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .metas-form {
     grid-template-columns: 1fr;
   }
 

@@ -678,21 +678,12 @@
   font-weight: bold;
   cursor: pointer;
   transition: background-color 0.2s;
+  width: 100%;
+  text-align: center;
 }
 
 .btn-remover:hover {
   background-color: #ff7875;
-}
-
-.btn-remover {
-  padding: 10px 16px;
-  border: none;
-  border-radius: 8px;
-  background-color: #ff4d4f;
-  color: #fff;
-  font-weight: bold;
-  cursor: pointer;
-  transition: background-color 0.2s;
 }
 
 .btn-remover:hover {
