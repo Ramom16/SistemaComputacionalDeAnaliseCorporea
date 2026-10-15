@@ -73,11 +73,7 @@ const usuariosRepository = {
             }
           }
         },
-        usuariosPerfil: {
-          include: {
-            perfil: true
-          }
-        }
+        perfil: true
       }
     });
   },

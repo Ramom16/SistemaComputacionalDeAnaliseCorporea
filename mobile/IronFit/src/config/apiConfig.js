@@ -9,7 +9,9 @@ function getBaseUrl() {
   }
 
   if (Platform.OS === 'android') {
-    return 'http://localhost:3000';
+    // 10.0.2.2 é o alias do Android Emulator para acessar o localhost da máquina host
+    // Para dispositivo físico na mesma rede Wi-Fi, use o IP da máquina (ex: 10.87.166.131)
+    return 'http://10.0.2.2:3000';
   }
 
   return 'http://localhost:3000';

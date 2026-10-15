@@ -131,7 +131,8 @@ const authController = {
 
       // 5. Sucesso - atualiza último login e reseta contadores de falhas
       await usuariosRepository.atualizarUltimoLogin(usuario.id);
-      notificarUsuario(usuario.id, "Login realizado com sucesso");
+      // Envia notificação de boas-vindas se o usuário tiver push token cadastrado
+      notificarUsuario(usuario.id, "IronFit 💪", "Login realizado com sucesso no seu perfil!");
 
       const token = gerarTokenLogin(usuario);
 

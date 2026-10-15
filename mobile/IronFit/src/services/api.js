@@ -42,21 +42,22 @@ export function formatarDataParaISO(dataStr) {
 // Normalizador de enums compatíveis com o backend Prisma
 export function normalizarGeneroParaBackend(genero) {
   const g = String(genero || '').trim().toLowerCase();
-  if (g.startsWith('fem')) return 'feminino';
-  return 'masculino';
+  if (g.startsWith('fem')) return 'Feminino';
+  if (g.startsWith('out')) return 'Outro';
+  return 'Masculino';
 }
 
 export function normalizarNivelAtividadeParaBackend(nivel) {
   const mapa = {
-    sedentario: 'sedentario',
-    leve: 'leve',
-    moderado: 'moderado',
-    intenso: 'intenso',
-    muito_intenso: 'muitointenso',
-    muitointenso: 'muitointenso',
+    sedentario: 'Sedentario',
+    leve: 'Leve',
+    moderado: 'Moderado',
+    intenso: 'Intenso',
+    muito_intenso: 'MuitoIntenso',
+    muitointenso: 'MuitoIntenso',
   };
   const limpo = String(nivel || '').replace(/[\s_]/g, '').toLowerCase();
-  return mapa[limpo] || 'moderado';
+  return mapa[limpo] || 'Moderado';
 }
 
 // Requisição HTTP centralizada com Bearer Token e timeout de 10s
@@ -233,8 +234,9 @@ export const api = {
   },
 
   async salvarDadosCorporais(dados, usuarioId) {
+    const idFinal = usuarioId || dados.idUsuario;
     const payload = {
-      idUsuario: usuarioId ? String(usuarioId) : undefined,
+      idUsuario: idFinal ? String(idFinal) : undefined,
       peso_kg: parseFloat(dados.peso_kg || dados.peso),
       altura_cm: parseFloat(dados.altura_cm || dados.altura),
       idade: parseInt(dados.idade, 10),
@@ -253,9 +255,9 @@ export const api = {
       const msgErro = postError.data?.erro || postError.message || '';
       if (
         postError.status === 400 &&
-        (msgErro.includes('já possui dados') || msgErro.includes('existente') || usuarioId)
+        (msgErro.includes('já possui dados') || msgErro.includes('existente') || idFinal)
       ) {
-        return await request(`/dadosCorporais/${usuarioId || ''}`, {
+        return await request(`/dadosCorporais/${idFinal || ''}`, {
           method: 'PUT',
           body: JSON.stringify(payload),
         });
