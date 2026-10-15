@@ -1,41 +1,34 @@
-import React, { useState } from 'react';
-import { Visibility, VisibilityOff } from '@mui/icons-material';
+import { useState } from 'react';
+import { FaEye, FaEyeSlash } from 'react-icons/fa';
 
 export default function Input({ label, id, type, placeholder, value, onChange, required = true }) {
-  const [showPassword, setShowPassword] = useState(false);
-
-  const isPassword = type === 'password';
-  const inputType = isPassword && showPassword ? 'text' : type;
+  const [visivel, setVisivel] = useState(false);
+  const ehSenha = type === 'password';
+  const Icone = visivel ? FaEyeSlash : FaEye;
 
   return (
-    <div className="form-group" style={{ position: 'relative' }}>
+    <div className="form-group">
       <label htmlFor={id}>{label}</label>
-      <input 
-        type={inputType} 
-        id={id} 
-        placeholder={placeholder} 
-        required={required} 
-        value={value}
-        onChange={onChange}
-        style={{ paddingRight: isPassword ? '40px' : '15px' }} // Espaço para o ícone
-      />
-      {isPassword && (
-        <div 
-          onClick={() => setShowPassword(!showPassword)}
-          style={{
-            position: 'absolute',
-            right: '12px',
-            bottom: '12px', // Tentar alinhar pelo bottom do input
-            cursor: 'pointer',
-            color: '#999',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center'
-          }}
-        >
-          {showPassword ? <VisibilityOff /> : <Visibility />}
-        </div>
-      )}
+      <div className="input-com-icone">
+        <input
+          type={ehSenha && visivel ? 'text' : type}
+          id={id}
+          placeholder={placeholder}
+          required={required}
+          value={value}
+          onChange={onChange}
+        />
+        {ehSenha && (
+          <button
+            type="button"
+            className="btn-ver-senha"
+            onClick={() => setVisivel((v) => !v)}
+            aria-label={visivel ? 'Ocultar senha' : 'Mostrar senha'}
+          >
+            <Icone />
+          </button>
+        )}
+      </div>
     </div>
   );
 }

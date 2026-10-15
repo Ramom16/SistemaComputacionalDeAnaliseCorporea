@@ -1,5 +1,7 @@
 import usuariosRepository from "../repositories/usuariosRepository.js";
 import { anexarIdsCriptografados } from "../middlewares/tratarIdsCriptografados.js";
+import { enviarEmaildeContaDesativada, enviarEmaildeContaReativada } from "../services/emailService.js";
+import { notificarUsuario } from "../services/notificacaoService.js";
 
 const usuariosController = {
   selecionarUsuario: async (req, res) => {
@@ -47,7 +49,16 @@ const usuariosController = {
       }
 
       // Desativa o usuário no banco de dados
-      await usuariosRepository.desativar(usuarioId);
+      const usuarioDesativado = await usuariosRepository.desativar(usuarioId);
+
+      // Dispara envio de e-mail de confirmação de desativação
+      if (usuarioDesativado?.email) {
+        try {
+          await enviarEmaildeContaDesativada(usuarioDesativado.email, usuarioDesativado.nome);
+        } catch (emailError) {
+          console.error("Erro ao enviar e-mail de desativação de conta:", emailError);
+        }
+      }
 
       return res.status(200).json({
         msg: "Conta desativada com sucesso. Você será desconectado.",
@@ -96,6 +107,145 @@ const usuariosController = {
     } catch (error) {
       return res.status(400).json({ erro: error.message });
     }
+  },
+
+  /**
+   * Funcionalidade: Atualiza a foto de perfil do usuário autenticado.
+   * @param {Request} req 
+   * @param {Response} res 
+   * @returns Response com a mensagem de sucesso e os dados do usuário atualizado, incluindo a nova foto de perfil.
+   * utiliza do id de usuário autenticado para atualizar a foto de perfil no banco de dados.
+   * foto deve ser enviada no corpo da requisição (req.body.fotoPerfil).
+   * 
+   * Atualiza a foto de perfil do usuário autenticado.
+   */
+  atualizarFotoPerfil: async (req, res) => {
+    try {
+      const usuarioId = req.usuario?.id;
+
+
+      const baseUrl = `${req.protocol}://${req.get("host")}`;
+      const fotoPerfil = req.file ? `${baseUrl}/uploads/images/${req.file.filename}` : null;
+
+      if (!usuarioId)
+        return res.status(401).json({ erro: "Usuário não autenticado" });
+
+      if (!fotoPerfil)
+        return res.status(400).json({ erro: "A foto de perfil é obrigatória." });
+
+      const usuarioAtualizado = await usuariosRepository.atualizarFotoPerfil(usuarioId, fotoPerfil);
+
+      return res.status(200).json({
+        mensagem: "Foto de perfil atualizada com sucesso.",
+        usuario: anexarIdsCriptografados({
+          id: usuarioAtualizado.id,
+          nome: usuarioAtualizado.nome,
+          email: usuarioAtualizado.email,
+          fotoPerfil: usuarioAtualizado.perfil?.fotoPerfil
+        })
+      });
+    } catch (error) {
+      return res.status(400).json({ erro: error.message });
+    }
+  }
+};
+
+// Admin: desativar usuário por id
+usuariosController.desativarUsuarioPorId = async (req, res) => {
+  try {
+    const idAlvo = req.params.id;
+    const isAdm = req.usuario?.role === 'ADMIN';
+    if (!isAdm) return res.status(403).json({ erro: 'Permissão negada.' });
+    const usuarioExiste = await usuariosRepository.buscarPorId(String(idAlvo));
+    if (!usuarioExiste) return res.status(404).json({ erro: 'Usuário não encontrado.' });
+    
+    const usuarioDesativado = await usuariosRepository.desativar(String(idAlvo));
+
+    if (usuarioDesativado?.email) {
+      try {
+        await enviarEmaildeContaDesativada(usuarioDesativado.email, usuarioDesativado.nome);
+      } catch (emailError) {
+        console.error("Erro ao enviar e-mail de desativação (Admin):", emailError);
+      }
+    }
+
+    return res.status(200).json({ msg: 'Usuário desativado com sucesso.' });
+  } catch (error) {
+    return res.status(500).json({ erro: error.message });
+  }
+};
+
+// Admin: reativar usuário por id
+usuariosController.reativarUsuarioPorId = async (req, res) => {
+  try {
+    const idAlvo = req.params.id;
+    const isAdm = req.usuario?.role === 'ADMIN';
+    if (!isAdm) return res.status(403).json({ erro: 'Permissão negada.' });
+
+    const usuarioExiste = await usuariosRepository.buscarPorId(String(idAlvo));
+    if (!usuarioExiste) return res.status(404).json({ erro: 'Usuário não encontrado.' });
+
+    if (usuarioExiste.ativo) {
+      return res.status(400).json({ erro: 'A conta deste usuário já está ativa.' });
+    }
+
+    const usuarioReativado = await usuariosRepository.ativar(String(idAlvo));
+
+    // Dispara e-mail de confirmação de reativação
+    if (usuarioReativado?.email) {
+      try {
+        await enviarEmaildeContaReativada(usuarioReativado.email, usuarioReativado.nome);
+      } catch (emailError) {
+        console.error("Erro ao enviar e-mail de reativação (Admin):", emailError);
+      }
+    }
+
+    return res.status(200).json({ msg: 'Usuário reativado com sucesso.' });
+  } catch (error) {
+    return res.status(500).json({ erro: error.message });
+  }
+};
+
+// Salvar / atualizar Push Token e FCM Token da conta autenticada
+usuariosController.salvarPushToken = async (req, res) => {
+  try {
+    const usuarioId = req.usuario?.id;
+    if (!usuarioId) {
+      return res.status(401).json({ erro: "Usuário não autenticado." });
+    }
+
+    const { pushToken, fcmToken } = req.body;
+
+    if (pushToken === undefined && fcmToken === undefined) {
+      return res.status(400).json({ erro: "Ao menos um token (pushToken ou fcmToken) deve ser fornecido." });
+    }
+
+    const usuarioAtualizado = await usuariosRepository.atualizarPushTokens(usuarioId, {
+      pushToken,
+      fcmToken,
+    });
+
+    return res.status(200).json({
+      msg: "Tokens de notificação salvos com sucesso.",
+      push_token: usuarioAtualizado.push_token,
+      fcm_token: usuarioAtualizado.fcm_token,
+    });
+  } catch (error) {
+    console.error("Erro ao salvar push token:", error);
+    return res.status(500).json({ erro: error.message });
+  }
+};
+
+// Testar envio de notificação para o usuário autenticado
+usuariosController.testarNotificacao = async (req, res) => {
+  try {
+    const usuarioId = req.usuario?.id;
+    const { titulo = "Treino IronFit 💪", mensagem = "Sua notificação de teste foi entregue com sucesso!" } = req.body || {};
+
+    const resultado = await notificarUsuario(usuarioId, titulo, mensagem, { screen: "Treinos" });
+    return res.status(200).json({ msg: "Disparo processado com sucesso.", resultado });
+  } catch (error) {
+    return res.status(500).json({ erro: error.message });
   }
 };
 

@@ -1,97 +1,68 @@
-import React, { useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { useEvolucao } from "../hooks/useEvolucao";
+import { useEvolucao } from '../hooks/useEvolucao';
+import { useMetas } from '../hooks/useMetas';
+import DashboardNavbar from '../components/DashboardNavbar';
+import { getUsuario } from '../services/auth';
 
-import Header from "../components/evolucao/Header";
-import DashboardCards from "../components/evolucao/DashboardCards";
-import EvolucaoGrafico from "../components/evolucao/EvolucaoGrafico";
-import ExerciciosGrafico from "../components/evolucao/ExercicioGrafico";
-import GrupoMuscularGrafico from "../components/evolucao/GrupoMuscularGrafico";
-import Recordes from "../components/evolucao/Records";
-import CalendarioTreinos from "../components/evolucao/CalendarioTreinos";
-import HistoricoTabela from "../components/evolucao/HistoricoTabela";
+import Header from '../components/evolucao/Header';
+import DashboardCards from '../components/evolucao/DashboardCards';
+import EvolucaoGrafico from '../components/evolucao/EvolucaoGrafico';
+import ExerciciosGrafico from '../components/evolucao/ExercicioGrafico';
+import GrupoMuscularGrafico from '../components/evolucao/GrupoMuscularGrafico';
+import Recordes from '../components/evolucao/Records';
+import CalendarioTreinos from '../components/evolucao/CalendarioTreinos';
+import HistoricoTabela from '../components/evolucao/HistoricoTabela';
+import CardsCompartilhamento from '../components/evolucao/CardsCompartilhamento';
+import MetasEditor from '../components/evolucao/MetasEditor';
+import RelatorioPdf from '../components/evolucao/RelatorioPdf';
 
-import "../styles/dashboard.css";
-import "../styles/evolucao.css";
+import '../styles/dashboard.css';
+import '../styles/evolucao.css';
 
 export default function Evolucao() {
-    const navigate = useNavigate();
+  const { loading, erro, cards, historico, exercicios, grupos, recordes } = useEvolucao();
+  const usuario = getUsuario();
+  const { metas, salvar } = useMetas(usuario.id);
 
-    const {
-        loading,
-        erro,
-        cards,
-        historico,
-        exercicios,
-        grupos,
-        recordes
-    } = useEvolucao();
+  if (loading) return <div className="loading">Carregando evolução...</div>;
+  if (erro) return <div className="loading" role="alert">{erro}</div>;
 
-    const handleLogout = () => {
-        localStorage.removeItem('token');
-        localStorage.removeItem('usuario');
-        navigate('/login');
-    };
+  return (
+    <>
+      <DashboardNavbar />
+      <div className="dashboard-layout">
+        <main className="dashboard-content">
+          <Header />
 
-    if (loading) {
-        return (
-            <div className="loading">
-                Carregando evolução...
-            </div>
-        );
-    }
+          <DashboardCards cards={cards} />
 
-    if (erro) {
-        return (
-            <div className="loading" role="alert">
-                {erro}
-            </div>
-        );
-    }
+          <MetasEditor metas={metas} onSalvar={salvar} />
 
-    return (
-        <div className="dashboard-layout">
-            {/* Sidebar de Navegação */}
-            <aside className="dashboard-sidebar">
-                <Link to="/" className="sidebar-logo">
-                    <div className="logo-icon">
-                        <span className="logo-bar"></span>
-                        <span className="logo-bar"></span>
-                        <span className="logo-bar"></span>
-                    </div>
-                    <span className="logo-text">IRONFIT</span>
-                </Link>
+          <RelatorioPdf
+            usuario={usuario}
+            historico={historico}
+            cards={cards}
+            metas={metas}
+          />
 
-                <nav className="sidebar-nav">
-                    <Link to="/dashboard">Análise Corporal</Link>
-                    <Link to="/meus-treinos">Meus Treinos</Link>
-                    <Link to="/evolucao" className="active">Evolução</Link>
-                    <Link to="#">Configurações</Link>
-                </nav>
+          <CardsCompartilhamento
+            historico={historico}
+            cards={cards}
+            nome={getUsuario().nome}
+          />
 
-                <button onClick={handleLogout} className="logout-btn">
-                    Sair da Conta
-                </button>
-            </aside>
+          <div className="graficos-grid">
+            <EvolucaoGrafico dados={historico} />
+            <ExerciciosGrafico dados={exercicios} />
+            <GrupoMuscularGrafico dados={grupos} />
+          </div>
 
-            {/* Conteúdo Principal */}
-            <main className="dashboard-content">
-                <Header />
+          <Recordes dados={recordes} />
 
-                <DashboardCards cards={cards} />
+          <CalendarioTreinos dados={historico} recordes={recordes} />
 
-                <div className="graficos-grid">
-                    <EvolucaoGrafico dados={historico} />
-                    <ExerciciosGrafico dados={exercicios} />
-                    <GrupoMuscularGrafico dados={grupos} />
-                </div>
-
-                <Recordes dados={recordes} />
-
-                <CalendarioTreinos dados={historico} />
-
-                <HistoricoTabela dados={historico} />
-            </main>
-        </div>
-    );
+          <HistoricoTabela dados={historico} />
+        </main>
+      </div>
+    </>
+  );
 }

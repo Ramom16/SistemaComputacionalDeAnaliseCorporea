@@ -4,16 +4,19 @@ function obterUrlIncorporavel(url) {
   if (!url || typeof url !== "string") return null;
 
   try {
-    const videoUrl = new URL(url);
-    const host = videoUrl.hostname.replace("www.", "");
+    const videoUrl = new URL(url); //new URL(url): separa a URL em partes, como domínio, caminho e parâmetros.
+
+    const host = videoUrl.hostname.replace("www.", ""); //hostname.replace("www.", ""): remove www. para tratar www.youtube.com e youtube.com como o mesmo domínio.
 
     if (host === "youtube.com" || host === "m.youtube.com") {
-      const id = videoUrl.searchParams.get("v");
+      const id = videoUrl.searchParams.get("v"); //searchParams.get("v"): extrai o ID do vídeo de links como youtube.com/watch?v=ID.
+
       return id ? `https://www.youtube.com/embed/${id}` : url;
     }
 
     if (host === "youtu.be") {
-      const id = videoUrl.pathname.slice(1);
+      const id = videoUrl.pathname.slice(1); //pathname.slice(1): extrai o ID de links curtos, como youtu.be/ID.
+
       return id ? `https://www.youtube.com/embed/${id}` : url;
     }
 

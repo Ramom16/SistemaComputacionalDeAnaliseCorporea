@@ -1,86 +1,75 @@
-import { useState, useEffect } from "react";
-import api from "../services/api";
+import { useEffect, useState } from 'react';
+import api, { getApiError } from '../services/api';
+import { getUsuario } from '../services/auth';
+
+const VAZIO = {
+  cards: { totalTreinos: 0, totalExercicios: 0, tempoTreinado: 0, calorias: 0 },
+  recordes: {},
+  exercicios: [],
+  grupos: [],
+};
+
+const numero = (valor) => Number(valor) || 0;
+
+/** Aceita a série como array puro ou como { dados, media } devolvido pela API. */
+function serie(bruto) {
+  if (Array.isArray(bruto)) return bruto;
+  if (Array.isArray(bruto?.dados)) return bruto.dados;
+  return [];
+}
+
+/** Junta as 4 séries (peso/imc/tmb/ndc) em uma linha por medição, na ordem da API. */
+function paraHistorico(bruto) {
+  const peso = serie(bruto?.peso);
+  const imc = serie(bruto?.imc);
+  const tmb = serie(bruto?.tmb);
+  const ndc = serie(bruto?.ndc);
+
+  return peso.map((item, i) => ({
+    id: i + 1,
+    data: item.data,
+    peso: numero(item.valor),
+    imc: Math.round(numero(imc[i]?.valor) * 10) / 10,
+    tmb: Math.round(numero(tmb[i]?.valor)),
+    ndc: Math.round(numero(ndc[i]?.valor)),
+    classificacao: 'Medição',
+  }));
+}
 
 export function useEvolucao() {
-  const [loading, setLoading] = useState(true);
-  const [erro, setErro] = useState("");
+  const idUsuario = getUsuario().id;
 
-  const [historico, setHistorico] = useState([]);
-  const [exercicios, setExercicios] = useState([]);
-  const [grupos, setGrupos] = useState([]);
-  const [recordes, setRecordes] = useState({
-    supinoMax: "0 kg",
-    agachamentoMax: "0 kg",
-    diasSeguidos: "0 dias",
-    maiorPerdaPeso: "0 kg",
-    totalHoras: "0 hrs",
-    caloriasQueimadas: "0 kcal",
-  });
-  const [cards, setCards] = useState({
-    totalTreinos: 0,
-    totalExercicios: 0,
-    tempoTreinado: 0,
-    calorias: 0,
-  });
+  const [carregado, setCarregado] = useState(false);
+  const [erro, setErro] = useState('');
+  const [dados, setDados] = useState({ historico: [], ...VAZIO });
 
   useEffect(() => {
-    async function carregarEvolucao() {
-      const usuarioSalvo = JSON.parse(
-        localStorage.getItem("usuario") || "{}"
-      );
-      const idUsuario = usuarioSalvo.id;
+    if (!idUsuario) return;
 
-      if (!idUsuario) {
-        setLoading(false);
-        return;
-      }
+    let ativo = true;
 
-      try {
-        setLoading(true);
+    Promise.all([
+      api.get(`/historico/usuario/${idUsuario}`),
+      api.get(`/evolucao/estatisticas/${idUsuario}`),
+    ])
+      .then(([historicoRes, statsRes]) => {
+        if (!ativo) return;
+        const evolucao = historicoRes.data ?? {};
+        setDados({
+          ...VAZIO,
+          ...statsRes.data,
+          historico: paraHistorico(evolucao),
+        });
+      })
+      .catch((err) => {
+        if (!ativo) return;
+        console.error('Erro ao carregar evolução do banco:', getApiError(err));
+        setErro('Não foi possível carregar os dados de evolução.');
+      })
+      .finally(() => { if (ativo) setCarregado(true); });
 
-        const [historicoResponse, estatisticasResponse] = await Promise.all([
-          api.get(`/historico/usuario/${idUsuario}`),
-          api.get(`/evolucao/estatisticas/${idUsuario}`),
-        ]);
+    return () => { ativo = false; };
+  }, [idUsuario]);
 
-        const data = historicoResponse.data;
-        const estatisticas = estatisticasResponse.data;
-        const peso = data.peso?.dados || [];
-        const imc = data.imc?.dados || [];
-        const tmb = data.tmb?.dados || [];
-        const ndc = data.ndc?.dados || [];
-
-        setHistorico(peso.map((item, index) => ({
-          id: index + 1,
-          data: item.data,
-          peso: Number(item.valor || 0),
-          imc: Number(Number(imc[index]?.valor || 0).toFixed(1)),
-          tmb: Math.round(Number(tmb[index]?.valor || 0)),
-          ndc: Math.round(Number(ndc[index]?.valor || 0)),
-          classificacao: "Medição",
-        })));
-        setCards(estatisticas.cards || {});
-        setExercicios(estatisticas.exercicios || []);
-        setGrupos(estatisticas.grupos || []);
-        setRecordes(estatisticas.recordes || {});
-      } catch (err) {
-        console.error("Erro ao carregar evolução do banco:", err);
-        setErro("Não foi possível carregar os dados de evolução.");
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    carregarEvolucao();
-  }, []);
-
-  return {
-    loading,
-    erro,
-    cards,
-    historico,
-    exercicios,
-    grupos,
-    recordes,
-  };
+  return { loading: !carregado, erro, ...dados };
 }

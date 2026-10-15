@@ -12,7 +12,20 @@ import {
   Alert,
   Modal,
 } from 'react-native';
+import { z } from 'zod';
 import { useAuth } from '../../context/AuthContext';
+
+const loginSchema = z.object({
+  email: z
+    .string()
+    .trim()
+    .min(1, 'Preencha todos os campos para prosseguir.')
+    .pipe(z.email('Digite um e-mail válido.')),
+  senha: z
+    .string()
+    .min(6, 'Preencha todos os campos para prosseguir.')
+    .min(6, 'A senha deve ter no mínimo 6 caracteres.'),
+});
 
 export default function LoginScreen({ navigation }) {
   const { login, loading, solicitarRecuperacao, reenviarEmail } = useAuth();
@@ -31,8 +44,13 @@ export default function LoginScreen({ navigation }) {
   const [loadingReenvio, setLoadingReenvio] = useState(false);
 
   async function handleLogin() {
-    if (!email.trim() || !senha.trim()) {
-      setErro('Preencha todos os campos para prosseguir.');
+    // Validação usando o Zod
+    const result = loginSchema.safeParse({ email, senha });
+
+    if (!result.success) {
+      // Pega a mensagem de erro do primeiro campo que falhar
+      const primeiraMensagem = result.error.issues[0].message;
+      setErro(primeiraMensagem);
       return;
     }
 
@@ -45,14 +63,6 @@ export default function LoginScreen({ navigation }) {
       setErro(res.error || 'Credenciais inválidas. Tente novamente.');
       setStatusErro(res.status);
     }
-  }
-
-  function handleDemoLogin() {
-    setEmail('atleta@ironfit.com');
-    setSenha('123456');
-    setErro('');
-    setStatusErro(null);
-    login('atleta@ironfit.com', '123456');
   }
 
   async function handleEnviarRecuperacao() {
@@ -202,10 +212,6 @@ export default function LoginScreen({ navigation }) {
               )}
             </Pressable>
 
-            {/* Botão Demo / Acesso Rápido */}
-            <Pressable style={styles.demoButton} onPress={handleDemoLogin}>
-              <Text style={styles.demoButtonText}>⚡ Acesso Rápido (Modo Demo)</Text>
-            </Pressable>
           </View>
 
           {/* Rodapé / Link para Cadastro */}
@@ -409,20 +415,6 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: '900',
     letterSpacing: 1,
-  },
-  demoButton: {
-    borderWidth: 1,
-    borderColor: '#333333',
-    borderRadius: 8,
-    paddingVertical: 14,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#111111',
-  },
-  demoButtonText: {
-    color: '#CCCCCC',
-    fontSize: 14,
-    fontWeight: '700',
   },
   footer: {
     flexDirection: 'row',

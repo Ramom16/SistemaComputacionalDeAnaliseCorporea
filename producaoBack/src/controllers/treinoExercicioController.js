@@ -8,6 +8,7 @@ const treinoExercicioController = {
         try {
 
             const idUsuario = req.usuario.id;
+            const role = req.usuario.role || "USER";
             const idTreino = String(req.params.idTreino);
 
             if (Array.isArray(req.body)) {
@@ -16,7 +17,8 @@ const treinoExercicioController = {
                     const resultado = await treinoExercicioService.adicionar(
                         String(idUsuario),
                         idTreino,
-                        item
+                        item,
+                        role
                     );
                     resultados.push(resultado);
                 }
@@ -30,7 +32,8 @@ const treinoExercicioController = {
                     await treinoExercicioService.adicionar(
                         String(idUsuario),
                         idTreino,
-                        req.body
+                        req.body,
+                        role
                     );
 
                 return res.status(201).json({
@@ -52,12 +55,14 @@ const treinoExercicioController = {
         try {
 
             const idUsuario = req.usuario.id;
+            const role = req.usuario.role || "USER";
             const idTreino = String(req.params.idTreino);
 
             const exercicios =
                 await treinoExercicioService.listar(
                     String(idUsuario),
-                    idTreino
+                    idTreino,
+                    role
                 );
 
             return res.status(200).json({
@@ -77,13 +82,15 @@ const treinoExercicioController = {
         try {
 
             const idUsuario = req.usuario.id;
+            const role = req.usuario.role || "USER";
             const idTreino = String(req.params.idTreino);
             const idExercicio = String(req.params.idExercicio);
 
             await treinoExercicioService.remover(
                 String(idUsuario),
                 idTreino,
-                idExercicio
+                idExercicio,
+                role
             );
 
             return res.status(200).json({
@@ -103,6 +110,7 @@ const treinoExercicioController = {
         try {
 
             const idUsuario = req.usuario.id;
+            const role = req.usuario.role || "USER";
             const idTreino = String(req.params.idTreino);
             const idExercicio = String(req.params.idExercicio);
 
@@ -111,7 +119,8 @@ const treinoExercicioController = {
                     String(idUsuario),
                     idTreino,
                     idExercicio,
-                    req.body
+                    req.body,
+                    role
                 );
 
             return res.status(200).json({

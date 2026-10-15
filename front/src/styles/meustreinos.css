@@ -206,3 +206,23 @@
     gap: 8px;
   }
 }
+
+.btn-criar-treino {
+  background: linear-gradient(135deg, var(--primary-yellow) 0%, #ffd700 100%);
+  color: #000;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  margin-left: 20px;
+  box-shadow: 0 4px 15px rgba(255, 230, 0, 0.2);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.btn-criar-treino:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(255, 230, 0, 0.4);
+}

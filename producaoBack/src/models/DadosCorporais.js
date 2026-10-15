@@ -3,18 +3,8 @@ import { validarUUID } from "../utils/cryptoUtils.js";
 function normalizarIdUsuario(value) {
     if (value === null || value === undefined) return null;
 
-    if (typeof value === "number") {
-        return Number.isInteger(value) && value > 0 ? value : null;
-    }
-
     if (typeof value === "string") {
         const texto = value.trim();
-
-        if (/^\d+$/.test(texto)) {
-            const numero = Number(texto);
-            return Number.isInteger(numero) && numero > 0 ? numero : null;
-        }
-
         return validarUUID(texto) ? texto : null;
     }
 

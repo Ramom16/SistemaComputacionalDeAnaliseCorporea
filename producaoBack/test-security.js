@@ -84,6 +84,7 @@ try {
 try {
   const exercicio = Exercicio.criar({
     nome: "Supino Reto",
+    grupo_muscular: "Peito",
     descricao: "Peitoral",
     caminho_video: null
   });

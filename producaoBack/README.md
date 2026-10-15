@@ -1,5 +1,3 @@
-Não alterei nenhum arquivo. Abaixo está a documentação do backend, pronta para ser copiada para um `README.md` ou arquivo de documentação.
-
 # Sistema Computacional de Análise Corporal — Backend
 
 API REST responsável pelo cadastro e autenticação de usuários, registro de dados corporais, cálculos físicos, acompanhamento de evolução, exercícios e treinos.

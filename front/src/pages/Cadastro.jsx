@@ -1,43 +1,43 @@
-import React, { useState } from "react";
-import { Link } from "react-router-dom";
-import api from "../services/api"; 
-import "../styles/cadastro.css";
-import Navbar from "../components/Navbar";
-import Input from "../components/Input";
-import AlertMessage from "../components/AlertMessage";
+import { Fragment, useState } from 'react';
+import { Link } from 'react-router-dom';
+import { FaCheck, FaTimes } from 'react-icons/fa';
+import api, { getApiError } from '../services/api';
+import Navbar from '../components/Navbar';
+import Input from '../components/Input';
+import AlertMessage from '../components/AlertMessage';
+import '../styles/cadastro.css';
+
+const CAMPOS = [
+  { id: 'nome', label: 'Nome', type: 'text', placeholder: 'Seu nome completo' },
+  { id: 'email', label: 'E-mail', type: 'email', placeholder: 'seu@email.com' },
+  { id: 'senha', label: 'Senha', type: 'password', placeholder: 'Mínimo 6 caracteres' },
+  { id: 'data_nascimento', label: 'Data de Nascimento', type: 'date' },
+];
+
+const REGRAS_SENHA = [
+  { id: 'minimo', label: 'Mínimo de 6 carateres', testar: (senha) => senha.length >= 6 },
+  { id: 'especial', label: 'Pelo menos um caractere especial (!@#$%...)', testar: (senha) => /[\W_]/.test(senha) },
+  { id: 'numero', label: 'Pelo menos um número', testar: (senha) => /\d/.test(senha) },
+];
 
 export default function Cadastro() {
-  const [nome, setNome] = useState("");
-  const [email, setEmail] = useState("");
-  const [senha, setSenha] = useState("");
-  const [data_nascimento, setDataNascimento] = useState("");
+  const [form, setForm] = useState({
+    nome: '', email: '', senha: '', data_nascimento: '',
+  });
   const [loading, setLoading] = useState(false);
-  const [msg, setMsg] = useState({ text: "", type: "" });
+  const [msg, setMsg] = useState(null);
 
-  const lidarCadastro = async (e) => {
-    e.preventDefault();
+  const handleCadastro = async (event) => {
+    event.preventDefault();
     setLoading(true);
-    setMsg({ text: "", type: "" });
+    setMsg(null);
 
     try {
-      // Envia o objeto diretamente com o que o Back-end espera
-      const response = await api.post("/auth/register", {
-        nome,
-        email,
-        senha,
-        data_nascimento,
-      });
-
-      setMsg({ text: response.data.msg || "Cadastro realizado!", type: "sucesso" });
-      
-      // Limpa os campos após sucesso
-      setNome("");
-      setEmail("");
-      setSenha("");
-      setDataNascimento("");
+      const { data } = await api.post('/auth/register', form);
+      setMsg({ texto: data.msg || 'Cadastro realizado!', tipo: 'sucesso' });
+      setForm({ nome: '', email: '', senha: '', data_nascimento: '' });
     } catch (error) {
-      const mensagemErro = error.response?.data?.erro || "Erro ao cadastrar usuário";
-      setMsg({ text: mensagemErro, type: "erro" });
+      setMsg({ texto: getApiError(error, 'Erro ao cadastrar usuário'), tipo: 'erro' });
     } finally {
       setLoading(false);
     }
@@ -46,73 +46,51 @@ export default function Cadastro() {
   return (
     <>
       <Navbar>
-        <li>
-          <Link to="/">Início</Link>
-        </li>
-        <li>
-          <Link to="/login">Login</Link>
-        </li>
-        <li>
-          <Link to="/cadastro" style={{ color: "var(--primary-yellow)" }}>
-            Cadastrar
-          </Link>
-        </li>
+        <li><Link to="/">Início</Link></li>
+        <li><Link to="/login">Login</Link></li>
+        <li><Link to="/cadastro" style={{ color: 'var(--primary-yellow)' }}>Cadastrar</Link></li>
       </Navbar>
 
       <section className="cadastro-hero">
         <div className="cadastro-wrapper">
           <div className="cadastro-container">
             <div className="cadastro-header">
-              <h2>
-                Crie sua
-                <br />
-                conta
-              </h2>
+              <h2>Crie sua conta</h2>
               <p>Comece sua transformação hoje</p>
               <div className="accent-line"></div>
             </div>
 
-            <form id="formCadastro" onSubmit={lidarCadastro}>
-              <Input
-                label="Nome"
-                id="nome"
-                type="text"
-                placeholder="Seu nome completo"
-                value={nome}
-                onChange={(e) => setNome(e.target.value)}
-              />
-              <Input
-                label="E-mail"
-                id="email"
-                type="email"
-                placeholder="seu@email.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-              />
+            <form onSubmit={handleCadastro}>
+              {CAMPOS.map((campo) => (
+                <Fragment key={campo.id}>
+                  <Input
+                    label={campo.label}
+                    id={campo.id}
+                    type={campo.type}
+                    placeholder={campo.placeholder}
+                    value={form[campo.id]}
+                    onChange={(e) => setForm((prev) => ({ ...prev, [campo.id]: e.target.value }))}
+                  />
 
-              <Input
-                label="Senha"
-                id="senha"
-                type="password"
-                placeholder="Mínimo 6 caracteres"
-                value={senha}
-                onChange={(e) => setSenha(e.target.value)}
-              />
-
-              <Input
-                label="Data de Nascimento"
-                id="data_nascimento"
-                type="date"
-                value={data_nascimento}
-                onChange={(e) => setDataNascimento(e.target.value)}
-              />
-              <button
-                type="submit"
-                id="btnCadastro"
-                className="btn-cadastro"
-                disabled={loading}
-              >
-                {loading ? "Cadastrando..." : "Cadastrar"}
+                  {campo.id === 'senha' && (
+                    <ul className="senha-regras">
+                      {REGRAS_SENHA.map((regra) => {
+                        const cumprida = regra.testar(form.senha);
+                        return (
+                          <li key={regra.id} className={cumprida ? 'cumprida' : ''}>
+                            <span className="regra-icone">
+                              {cumprida ? <FaCheck /> : <FaTimes />}
+                            </span>
+                            <span>{regra.label}</span>
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  )}
+                </Fragment>
+              ))}
+              <button type="submit" className="btn-cadastro" disabled={loading}>
+                {loading ? 'Cadastrando...' : 'Cadastrar'}
               </button>
             </form>
 
@@ -120,8 +98,7 @@ export default function Cadastro() {
 
             <div className="link-login">
               <span>Já tem conta? </span>
-              <Link to="/login">Faça login</Link>{" "}
-              {/* Para não precisar do <a> que serve para ir de uma página para outra fazendo uma nova requisição no navegador e recarrega a página do zero. O Link vai fazer o navegador ser gerenciado pelo JavaScript (Single Page Application). Apenas a parte da interface que muda é renderizada, tornando a transição mais instantânea e fluida */}
+              <Link to="/login">Faça login</Link>
             </div>
           </div>
         </div>
