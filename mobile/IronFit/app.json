@@ -42,6 +42,15 @@
       }
     },
 
-    "plugins": []
+    "plugins": [
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/icon.png",
+          "color": "#FFD400",
+          "defaultChannel": "treinos"
+        }
+      ]
+    ]
   }
 }
