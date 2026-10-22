@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import api, { getApiError } from '../services/api';
-import AuthCard from '../components/AuthCard';
+import api, { getApiError } from '../../services/api';
+import AuthCard from '../../components/auth/AuthCard';
 import ReenviarEmail from './RecoverPages/ReenviarEmail';
-import '../styles/auth.css';
+import '../../styles/auth.css';
 
 export default function Verify() {
   const [searchParams] = useSearchParams();

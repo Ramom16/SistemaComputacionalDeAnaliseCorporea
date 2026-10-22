@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import api, { getApiError } from '../services/api';
-import DashboardNavbar from '../components/DashboardNavbar';
-import ExercicioItem from '../components/ExercicioItem';
-import '../styles/dashboard.css';
-import '../styles/meustreinos.css';
-import '../styles/detalhestreinos.css';
+import api, { getApiError } from '../../services/api';
+import DashboardNavbar from '../../components/layout/DashboardNavbar';
+import ExercicioItem from '../../components/treinos/ExercicioItem';
+import { Skeleton } from '../../components/ui/Skeleton';
+import '../../styles/dashboard.css';
+import '../../styles/meustreinos.css';
+import '../../styles/detalhestreinos.css';
 
 export default function DetalhesTreino() {
   const navigate = useNavigate();
@@ -35,8 +36,13 @@ export default function DetalhesTreino() {
     return (
       <div className="dashboard-layout">
         <DashboardNavbar />
-        <main className="dashboard-content" style={{ textAlign: 'center', paddingTop: '4rem' }}>
-          <h2>Carregando detalhes do treino...</h2>
+        <main className="dashboard-content">
+          <Skeleton variante="titulo" largura="280px" />
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 16, marginTop: 24 }}>
+            {Array.from({ length: 3 }).map((_, indice) => (
+              <Skeleton key={indice} variante="retangulo" altura="96px" />
+            ))}
+          </div>
         </main>
       </div>
     );
