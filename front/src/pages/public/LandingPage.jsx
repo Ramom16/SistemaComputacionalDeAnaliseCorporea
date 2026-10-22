@@ -144,7 +144,7 @@ export default function LandingPage() {
       <footer className="site-footer">
         <div className="footer-content">
           <span className="footer-label">E-MAIL</span>
-          <a href="mailto:alo@sitebacana.com.br" className="footer-email">alo@sitebacana.com.br</a>
+          <a href="mailto:sistema.verificacao.login@gmail.com" className="footer-email">sistema.verificacao.login@gmail.com</a>
         </div>
       </footer>
     </>
