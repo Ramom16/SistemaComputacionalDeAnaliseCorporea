@@ -1,8 +1,8 @@
 import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import Navbar from '../components/Navbar';
-import FeatureCard from '../components/FeatureCard';
-import '../styles/intro.css';
+import Navbar from '../../components/layout/Navbar';
+import FeatureCard from '../../components/landing/FeatureCard';
+import '../../styles/intro.css';
 
 const ENTREGAS = [
   {

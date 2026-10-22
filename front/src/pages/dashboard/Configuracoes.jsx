@@ -1,13 +1,13 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import DashboardNavbar from '../components/DashboardNavbar';
-import PasswordChecklist from '../components/PasswordChecklist';
-import { useFeedback } from '../hooks/useFeedback';
-import { Skeleton } from '../components/Skeleton';
-import api, { unwrap, getApiError } from '../services/api';
-import { getUsuario, atualizarUsuario, limparSessao, isAdmin } from '../services/auth';
-import { senhaValida } from '../constants/senha';
-import '../styles/dashboard.css';
+import DashboardNavbar from '../../components/layout/DashboardNavbar';
+import PasswordChecklist from '../../components/auth/PasswordChecklist';
+import { useFeedback } from '../../hooks/useFeedback';
+import { Skeleton } from '../../components/ui/Skeleton';
+import api, { unwrap, getApiError } from '../../services/api';
+import { getUsuario, atualizarUsuario, limparSessao, isAdmin } from '../../services/auth';
+import { senhaValida } from '../../constants/senha';
+import '../../styles/dashboard.css';
 
 const SENHA_VAZIA = { senhaAtual: '', novaSenha: '', confirmar: '' };
 

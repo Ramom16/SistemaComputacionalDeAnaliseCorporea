@@ -1,5 +1,5 @@
 import { NavLink, useNavigate } from 'react-router-dom';
-import { getUsuario, limparSessao } from '../services/auth';
+import { getUsuario, limparSessao } from '../../services/auth';
 
 const LINKS = [
   ['/dashboard', 'Análise Corporal'],

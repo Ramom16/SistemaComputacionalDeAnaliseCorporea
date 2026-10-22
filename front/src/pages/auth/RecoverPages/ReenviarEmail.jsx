@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import api, { getApiError } from '../../services/api';
-import AuthCard from '../../components/AuthCard';
-import '../../styles/auth.css';
+import api, { getApiError } from '../../../services/api';
+import AuthCard from '../../../components/auth/AuthCard';
+import '../../../styles/auth.css';
 
 /**
  * Pede um novo link de verificação de e-mail.

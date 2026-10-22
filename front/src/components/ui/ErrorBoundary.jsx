@@ -1,6 +1,6 @@
 import { Component } from 'react';
 import { Link } from 'react-router-dom';
-import '../styles/erro.css';
+import '../../styles/erro.css';
 
 /**
  * Fronteira de erro global: impede o "ecrã branco" caso um componente

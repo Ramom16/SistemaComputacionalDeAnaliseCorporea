@@ -1,12 +1,12 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import DashboardNavbar from '../components/DashboardNavbar';
-import { useFeedback } from '../hooks/useFeedback';
-import { SkeletonGrid } from '../components/Skeleton';
-import api, { unwrap, getApiError } from '../services/api';
-import { isAdmin } from '../services/auth';
-import { GRUPOS_MUSCULARES } from '../constants/dominio';
-import '../styles/dashboard.css';
-import '../styles/exercicios.css';
+import DashboardNavbar from '../../components/layout/DashboardNavbar';
+import { useFeedback } from '../../hooks/useFeedback';
+import { SkeletonGrid } from '../../components/ui/Skeleton';
+import api, { unwrap, getApiError } from '../../services/api';
+import { isAdmin } from '../../services/auth';
+import { GRUPOS_MUSCULARES } from '../../constants/dominio';
+import '../../styles/dashboard.css';
+import '../../styles/exercicios.css';
 
 const EXERCICIO_VAZIO = { nome: '', grupo_muscular: 'Peito', descricao: '', caminho_video: '' };
 

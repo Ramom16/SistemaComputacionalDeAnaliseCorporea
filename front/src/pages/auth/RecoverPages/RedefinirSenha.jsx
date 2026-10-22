@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import api, { getApiError } from '../../services/api';
-import AuthCard from '../../components/AuthCard';
-import '../../styles/auth.css';
+import api, { getApiError } from '../../../services/api';
+import AuthCard from '../../../components/auth/AuthCard';
+import '../../../styles/auth.css';
 
 export default function RedefinirSenha() {
   const [searchParams] = useSearchParams();

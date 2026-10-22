@@ -1,4 +1,4 @@
-import '../styles/skeleton.css';
+import '../../styles/skeleton.css';
 
 /**
  * Bloco de carregamento (placeholder animado).

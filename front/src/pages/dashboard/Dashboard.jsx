@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import api, { unwrap, getApiError } from '../services/api';
-import { getUsuario, limparSessao } from '../services/auth';
-import { GENEROS, NIVEIS_ATIVIDADE } from '../constants/dominio';
-import DashboardNavbar from '../components/DashboardNavbar';
-import { SkeletonGrid } from '../components/Skeleton';
-import '../styles/dashboard.css';
+import api, { unwrap, getApiError } from '../../services/api';
+import { getUsuario, limparSessao } from '../../services/auth';
+import { GENEROS, NIVEIS_ATIVIDADE } from '../../constants/dominio';
+import DashboardNavbar from '../../components/layout/DashboardNavbar';
+import { SkeletonGrid } from '../../components/ui/Skeleton';
+import '../../styles/dashboard.css';
 
 const CAMPOS = [
   { id: 'peso', label: 'Peso (kg)', type: 'number', step: '0.1', placeholder: 'Ex: 75.5' },

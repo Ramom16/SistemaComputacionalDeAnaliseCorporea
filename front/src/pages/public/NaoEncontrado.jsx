@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
-import { getToken } from '../services/auth';
-import '../styles/erro.css';
+import { getToken } from '../../services/auth';
+import '../../styles/erro.css';
 
 export default function NaoEncontrado() {
   const autenticado = Boolean(getToken());

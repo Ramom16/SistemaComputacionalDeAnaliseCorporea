@@ -1,5 +1,5 @@
 import { FaCheck, FaTimes } from 'react-icons/fa';
-import { REGRAS_SENHA } from '../constants/senha';
+import { REGRAS_SENHA } from '../../constants/senha';
 
 /**
  * Lista de critérios de senha em tempo real.

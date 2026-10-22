@@ -1,13 +1,13 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import DashboardNavbar from '../components/DashboardNavbar';
-import { useFeedback } from '../hooks/useFeedback';
-import { SkeletonGrid } from '../components/Skeleton';
-import api, { unwrap, getApiError } from '../services/api';
-import { getUsuario, isAdmin } from '../services/auth';
-import { OBJETIVOS_TREINO } from '../constants/dominio';
-import '../styles/dashboard.css';
-import '../styles/meustreinos.css';
+import DashboardNavbar from '../../components/layout/DashboardNavbar';
+import { useFeedback } from '../../hooks/useFeedback';
+import { SkeletonGrid } from '../../components/ui/Skeleton';
+import api, { unwrap, getApiError } from '../../services/api';
+import { getUsuario, isAdmin } from '../../services/auth';
+import { OBJETIVOS_TREINO } from '../../constants/dominio';
+import '../../styles/dashboard.css';
+import '../../styles/meustreinos.css';
 
 const CORES_POR_OBJETIVO = {
   Hipertrofia: '#FF6B6B',

@@ -1,11 +1,11 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import DashboardNavbar from '../../components/DashboardNavbar';
-import api, { unwrap, getApiError } from '../../services/api';
-import { GRUPOS_MUSCULARES, OBJETIVOS_TREINO } from '../../constants/dominio';
-import '../../styles/dashboard.css';
-import '../../styles/meustreinos.css';
-import '../../styles/criarTreino.css';
+import DashboardNavbar from '../../../components/layout/DashboardNavbar';
+import api, { unwrap, getApiError } from '../../../services/api';
+import { GRUPOS_MUSCULARES, OBJETIVOS_TREINO } from '../../../constants/dominio';
+import '../../../styles/dashboard.css';
+import '../../../styles/meustreinos.css';
+import '../../../styles/criarTreino.css';
 
 const TREINO_VAZIO = { titulo: '', objetivo: 'Hipertrofia', descricao: '' };
 

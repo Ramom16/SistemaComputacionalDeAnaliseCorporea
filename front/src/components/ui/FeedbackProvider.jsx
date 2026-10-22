@@ -1,7 +1,7 @@
 import { useCallback, useMemo, useRef, useState } from 'react';
 import { FaCheckCircle, FaExclamationCircle, FaInfoCircle } from 'react-icons/fa';
-import { FeedbackContext } from '../hooks/useFeedback';
-import '../styles/feedback.css';
+import { FeedbackContext } from '../../hooks/useFeedback';
+import '../../styles/feedback.css';
 
 const ICONES = {
   sucesso: <FaCheckCircle />,

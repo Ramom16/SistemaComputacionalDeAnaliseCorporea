@@ -1,11 +1,11 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import api, { getApiError } from '../services/api';
-import { salvarSessao } from '../services/auth';
-import Navbar from '../components/Navbar';
-import Input from '../components/Input';
-import AlertMessage from '../components/AlertMessage';
-import '../styles/login.css';
+import api, { getApiError } from '../../services/api';
+import { salvarSessao } from '../../services/auth';
+import Navbar from '../../components/layout/Navbar';
+import Input from '../../components/ui/Input';
+import AlertMessage from '../../components/ui/AlertMessage';
+import '../../styles/login.css';
 
 export default function Login() {
   const navigate = useNavigate();

@@ -1,21 +1,21 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import LandingPage from './pages/LandingPage';
-import Login from './pages/Login';
-import Cadastro from './pages/Cadastro';
-import RecuperarSenha from './pages/RecoverPages/RecuperarSenha';
-import Verify from './pages/Verify';
-import Dashboard from './pages/Dashboard';
-import MeusTreinos from './pages/MeusTreinos';
-import DetalhesTreinos from './pages/DetalhesTreinos';
-import Evolucao from './pages/Evolucao';
-import Exercicios from './pages/Exercicios';
-import CriarTreino from './pages/CreatePages/CriarTreino';
-import Configuracoes from './pages/Configuracoes';
-import RedefinirSenha from './pages/RecoverPages/RedefinirSenha';
-import NaoEncontrado from './pages/NaoEncontrado';
-import ProtectedRoute from './components/ProtectedRoute';
-import FeedbackProvider from './components/FeedbackProvider';
-import ErrorBoundary from './components/ErrorBoundary';
+import LandingPage from './pages/public/LandingPage';
+import Login from './pages/auth/Login';
+import Cadastro from './pages/auth/Cadastro';
+import RecuperarSenha from './pages/auth/RecoverPages/RecuperarSenha';
+import Verify from './pages/auth/Verify';
+import Dashboard from './pages/dashboard/Dashboard';
+import MeusTreinos from './pages/treinos/MeusTreinos';
+import DetalhesTreinos from './pages/treinos/DetalhesTreinos';
+import Evolucao from './pages/dashboard/Evolucao';
+import Exercicios from './pages/treinos/Exercicios';
+import CriarTreino from './pages/treinos/CreatePages/CriarTreino';
+import Configuracoes from './pages/dashboard/Configuracoes';
+import RedefinirSenha from './pages/auth/RecoverPages/RedefinirSenha';
+import NaoEncontrado from './pages/public/NaoEncontrado';
+import ProtectedRoute from './components/auth/ProtectedRoute';
+import FeedbackProvider from './components/ui/FeedbackProvider';
+import ErrorBoundary from './components/ui/ErrorBoundary';
 
 function App() {
   return (

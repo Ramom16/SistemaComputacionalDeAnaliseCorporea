@@ -1,23 +1,23 @@
-import { useEvolucao } from '../hooks/useEvolucao';
-import { useMetas } from '../hooks/useMetas';
-import DashboardNavbar from '../components/DashboardNavbar';
-import { getUsuario } from '../services/auth';
-import { Skeleton } from '../components/Skeleton';
+import { useEvolucao } from '../../hooks/useEvolucao';
+import { useMetas } from '../../hooks/useMetas';
+import DashboardNavbar from '../../components/layout/DashboardNavbar';
+import { getUsuario } from '../../services/auth';
+import { Skeleton } from '../../components/ui/Skeleton';
 
-import Header from '../components/evolucao/Header';
-import DashboardCards from '../components/evolucao/DashboardCards';
-import EvolucaoGrafico from '../components/evolucao/EvolucaoGrafico';
-import ExerciciosGrafico from '../components/evolucao/ExercicioGrafico';
-import GrupoMuscularGrafico from '../components/evolucao/GrupoMuscularGrafico';
-import Recordes from '../components/evolucao/Records';
-import CalendarioTreinos from '../components/evolucao/CalendarioTreinos';
-import HistoricoTabela from '../components/evolucao/HistoricoTabela';
-import CardsCompartilhamento from '../components/evolucao/CardsCompartilhamento';
-import MetasEditor from '../components/evolucao/MetasEditor';
-import RelatorioPdf from '../components/evolucao/RelatorioPdf';
+import Header from '../../components/evolucao/Header';
+import DashboardCards from '../../components/evolucao/DashboardCards';
+import EvolucaoGrafico from '../../components/evolucao/EvolucaoGrafico';
+import ExerciciosGrafico from '../../components/evolucao/ExercicioGrafico';
+import GrupoMuscularGrafico from '../../components/evolucao/GrupoMuscularGrafico';
+import Recordes from '../../components/evolucao/Records';
+import CalendarioTreinos from '../../components/evolucao/CalendarioTreinos';
+import HistoricoTabela from '../../components/evolucao/HistoricoTabela';
+import CardsCompartilhamento from '../../components/evolucao/CardsCompartilhamento';
+import MetasEditor from '../../components/evolucao/MetasEditor';
+import RelatorioPdf from '../../components/evolucao/RelatorioPdf';
 
-import '../styles/dashboard.css';
-import '../styles/evolucao.css';
+import '../../styles/dashboard.css';
+import '../../styles/evolucao.css';
 
 export default function Evolucao() {
   const { loading, erro, cards, historico, exercicios, grupos, recordes } = useEvolucao();

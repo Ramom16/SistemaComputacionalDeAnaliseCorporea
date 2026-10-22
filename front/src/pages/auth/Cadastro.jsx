@@ -1,11 +1,11 @@
 import { Fragment, useState } from 'react';
 import { Link } from 'react-router-dom';
-import api, { getApiError } from '../services/api';
-import Navbar from '../components/Navbar';
-import Input from '../components/Input';
-import AlertMessage from '../components/AlertMessage';
-import PasswordChecklist from '../components/PasswordChecklist';
-import '../styles/cadastro.css';
+import api, { getApiError } from '../../services/api';
+import Navbar from '../../components/layout/Navbar';
+import Input from '../../components/ui/Input';
+import AlertMessage from '../../components/ui/AlertMessage';
+import PasswordChecklist from '../../components/auth/PasswordChecklist';
+import '../../styles/cadastro.css';
 
 const CAMPOS = [
   { id: 'nome', label: 'Nome', type: 'text', placeholder: 'Seu nome completo' },

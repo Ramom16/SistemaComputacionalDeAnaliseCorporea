@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import api, { getApiError } from '../services/api';
-import DashboardNavbar from '../components/DashboardNavbar';
-import ExercicioItem from '../components/ExercicioItem';
-import { Skeleton } from '../components/Skeleton';
-import '../styles/dashboard.css';
-import '../styles/meustreinos.css';
-import '../styles/detalhestreinos.css';
+import api, { getApiError } from '../../services/api';
+import DashboardNavbar from '../../components/layout/DashboardNavbar';
+import ExercicioItem from '../../components/treinos/ExercicioItem';
+import { Skeleton } from '../../components/ui/Skeleton';
+import '../../styles/dashboard.css';
+import '../../styles/meustreinos.css';
+import '../../styles/detalhestreinos.css';
 
 export default function DetalhesTreino() {
   const navigate = useNavigate();
