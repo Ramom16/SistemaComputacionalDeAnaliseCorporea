@@ -19,21 +19,35 @@ function serie(bruto) {
 }
 
 /** Junta as 4 séries (peso/imc/tmb/ndc) em uma linha por medição, na ordem da API. */
+function classificarImc(imc) {
+  const val = Number(imc) || 0;
+  if (val <= 0) return '—';
+  if (val < 18.5) return 'Abaixo do peso';
+  if (val < 25) return 'Peso normal';
+  if (val < 30) return 'Sobrepeso';
+  if (val < 35) return 'Obesidade grau 1';
+  if (val < 40) return 'Obesidade grau 2';
+  return 'Obesidade grau 3';
+}
+
 function paraHistorico(bruto) {
   const peso = serie(bruto?.peso);
   const imc = serie(bruto?.imc);
   const tmb = serie(bruto?.tmb);
   const ndc = serie(bruto?.ndc);
 
-  return peso.map((item, i) => ({
-    id: i + 1,
-    data: item.data,
-    peso: numero(item.valor),
-    imc: Math.round(numero(imc[i]?.valor) * 10) / 10,
-    tmb: Math.round(numero(tmb[i]?.valor)),
-    ndc: Math.round(numero(ndc[i]?.valor)),
-    classificacao: 'Medição',
-  }));
+  return peso.map((item, i) => {
+    const imcVal = Math.round(numero(imc[i]?.valor) * 10) / 10;
+    return {
+      id: i + 1,
+      data: item.data,
+      peso: numero(item.valor),
+      imc: imcVal,
+      tmb: Math.round(numero(tmb[i]?.valor)),
+      ndc: Math.round(numero(ndc[i]?.valor)),
+      classificacao: classificarImc(imcVal),
+    };
+  });
 }
 
 export function useEvolucao() {

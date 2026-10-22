@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { FaFilePdf } from 'react-icons/fa';
 
-export default function RelatorioPdf({ usuario, historico = [], cards = {}, metas = {} }) {
+export default function RelatorioPdf({ usuario, historico = [], cards = {}, metas = {}, detalhesCorporais = {} }) {
   const [gerando, setGerando] = useState(false);
   const [aviso, setAviso] = useState('');
   const [erro, setErro] = useState('');
@@ -12,7 +12,7 @@ export default function RelatorioPdf({ usuario, historico = [], cards = {}, meta
     setErro('');
     try {
       const { gerarRelatorioPdf } = await import('../../services/relatorioPdf');
-      const arquivo = gerarRelatorioPdf({ usuario, historico, cards, metas });
+      const arquivo = gerarRelatorioPdf({ usuario, historico, cards, metas, detalhesCorporais });
       setAviso(`Relatório gerado com sucesso: ${arquivo}`);
     } catch (e) {
       console.error('Erro ao gerar relatório em PDF:', e);

@@ -311,7 +311,7 @@ function montarComparativo(historico, cards, metas) {
   return { linhas, pesoAlvo, pessoaPesoAlvo: Boolean(pesoAlvoInformado), altura, imcAlvo, pesoInicial, pesoAtual, imcAtual };
 }
 
-export function gerarRelatorioPdf({ usuario = {}, historico = [], cards = {}, metas = {} } = {}) {
+export function gerarRelatorioPdf({ usuario = {}, historico = [], cards = {}, metas = {}, detalhesCorporais = {} } = {}) {
   const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
   cabecalho(doc);
 
@@ -347,11 +347,18 @@ export function gerarRelatorioPdf({ usuario = {}, historico = [], cards = {}, me
   const periodo = historico.length
     ? `${historico[0].data} a ${historico.at(-1).data}`
     : 'Sem medições registradas';
+
+  const bioTexto = detalhesCorporais?.alturaCm
+    ? `${detalhesCorporais.genero || '—'} • ${detalhesCorporais.idade || '—'} anos • ${detalhesCorporais.alturaCm} cm`
+    : 'Perfil inicial';
+
   const campos = [
     ['Paciente', usuario.nome || 'Não informado'],
     ['E-mail', usuario.email || 'Não informado'],
+    ['Perfil Biométrico', bioTexto],
+    ['Nível de Atividade', detalhesCorporais?.nivelAtividade || 'Moderado'],
     ['Período analisado', periodo],
-    ['Medições registradas', String(historico.length)],
+    ['Consolidação', `${historico.length} medições (1 diária)`],
   ];
   const larguraCampo = (LARGURA_PAGINA - MARGEM * 2 - 6) / 2;
   campos.forEach(([rotulo, valor], indice) => {
@@ -359,14 +366,14 @@ export function gerarRelatorioPdf({ usuario = {}, historico = [], cards = {}, me
     const linha = Math.floor(indice / 2);
     caixa(doc, {
       x: MARGEM + coluna * (larguraCampo + 6),
-      y: y + linha * 22,
+      y: y + linha * 21,
       w: larguraCampo,
-      h: 18,
+      h: 17,
       rotulo,
       valor,
     });
   });
-  y += 2 * 22 + 4;
+  y += 3 * 21 + 4;
 
   y = secao(doc, y, 'Resumo executivo');
   const larguraResumo = (LARGURA_PAGINA - MARGEM * 2 - 10) / 3;
@@ -487,6 +494,26 @@ export function gerarRelatorioPdf({ usuario = {}, historico = [], cards = {}, me
   if (cards.totalTreinos !== undefined) {
     notas.push(
       `Treinos registrados: ${cards.totalTreinos ?? 0} • Séries concluídas: ${cards.totalExercicios ?? 0} • Tempo treinado: ${fmt(cards.tempoTreinado ?? 0, 1)} h • Gasto calórico estimado: ${Number(cards.calorias ?? 0).toLocaleString('pt-BR')} kcal.`,
+    );
+  }
+  if (detalhesCorporais?.faixaPesoIdeal?.min) {
+    notas.push(
+      `Faixa de peso ideal (OMS 18,5–24,9): ${detalhesCorporais.faixaPesoIdeal.min} kg a ${detalhesCorporais.faixaPesoIdeal.max} kg para a altura de ${detalhesCorporais.alturaCm} cm.`,
+    );
+  }
+  if (detalhesCorporais?.metaEmagrecimento) {
+    notas.push(
+      `Metas calóricas diárias estimadas: Déficit/Emagrecimento (~${detalhesCorporais.metaEmagrecimento} kcal) • Manutenção (${Math.round(detalhesCorporais.ndcAtual || 0)} kcal) • Superávit/Hipertrofia (~${detalhesCorporais.metaHipertrofia} kcal).`,
+    );
+  }
+  if (detalhesCorporais?.aguaDiariaLitros) {
+    notas.push(
+      `Ingestão de água recomendada: ${detalhesCorporais.aguaDiariaLitros} L/dia (35 ml por kg de peso corporal).`,
+    );
+  }
+  if (detalhesCorporais?.macros?.proteinaG) {
+    notas.push(
+      `Divisão sugerida de macronutrientes: Proteínas ${detalhesCorporais.macros.proteinaG}g • Carboidratos ${detalhesCorporais.macros.carboG}g • Gorduras ${detalhesCorporais.macros.gorduraG}g.`,
     );
   }
   if (notas.length) {

@@ -105,23 +105,8 @@ const DadosCorporaisService = {
                     CalculosService.gerarCalculos(
                         dadosAtualizados
                     );
-                const calculoCriado =
-                    await transaction.calculo.create({
-                        data: {
 
-                            idDados:
-                                String(dadosAtualizados.idDados),
-
-                            imc:
-                                calculos.imc,
-
-                            tmb:
-                                calculos.tmb,
-
-                            ndc:
-                                calculos.ndc
-                        }
-                    });
+                const ultimoCalculo = dadosAtualizados.calculos?.[0];
 
                 return {
                     dadosCorporais:
@@ -130,7 +115,7 @@ const DadosCorporaisService = {
                     calculos: {
                         ...calculos,
                         idCalculo:
-                            calculoCriado.idCalculo
+                            ultimoCalculo?.idCalculo || null
                     }
                 };
             }

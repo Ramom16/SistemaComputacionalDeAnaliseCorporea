@@ -5,6 +5,7 @@ import { getUsuario } from '../../services/auth';
 import { Skeleton } from '../../components/ui/Skeleton';
 
 import Header from '../../components/evolucao/Header';
+import ResumoBiometrico from '../../components/evolucao/ResumoBiometrico';
 import DashboardCards from '../../components/evolucao/DashboardCards';
 import EvolucaoGrafico from '../../components/evolucao/EvolucaoGrafico';
 import ExerciciosGrafico from '../../components/evolucao/ExercicioGrafico';
@@ -20,7 +21,7 @@ import '../../styles/dashboard.css';
 import '../../styles/evolucao.css';
 
 export default function Evolucao() {
-  const { loading, erro, cards, historico, exercicios, grupos, recordes } = useEvolucao();
+  const { loading, erro, cards, detalhesCorporais, historico, exercicios, grupos, recordes } = useEvolucao();
   const usuario = getUsuario();
   const { metas, salvar } = useMetas(usuario.id);
 
@@ -53,15 +54,22 @@ export default function Evolucao() {
         <main className="dashboard-content">
           <Header />
 
+          {/* Painel Biométrico e Metabólico Enriquecido */}
+          <ResumoBiometrico detalhes={detalhesCorporais} />
+
+          {/* Cards de Frequência e Atividades */}
           <DashboardCards cards={cards} />
 
+          {/* Editor de Metas Corporais e de Treino */}
           <MetasEditor metas={metas} onSalvar={salvar} />
 
+          {/* Download do Relatório Completo em PDF */}
           <RelatorioPdf
             usuario={usuario}
             historico={historico}
             cards={cards}
             metas={metas}
+            detalhesCorporais={detalhesCorporais}
           />
 
           <CardsCompartilhamento
@@ -70,8 +78,9 @@ export default function Evolucao() {
             nome={getUsuario().nome}
           />
 
+          {/* Gráficos com Curvas de Gradiente, KPIs e Linha de Meta */}
           <div className="graficos-grid">
-            <EvolucaoGrafico dados={historico} />
+            <EvolucaoGrafico dados={historico} metas={metas} />
             <ExerciciosGrafico dados={exercicios} />
             <GrupoMuscularGrafico dados={grupos} />
           </div>

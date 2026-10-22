@@ -193,23 +193,54 @@ atualizarDados: async (idUsuario,dados,transaction = prisma) => {
                     include: includesPadrao
                 });
 
-            // Cria um snapshot completo para gráficos
-            await tx.historicoCorporal.create({
-                data: {
-                    // Relaciona com DadosCorporais
+            // Início e fim do dia atual para consolidar 1 medição por dia
+            const hojeInicio = new Date();
+            hojeInicio.setHours(0, 0, 0, 0);
+            const hojeFim = new Date();
+            hojeFim.setHours(23, 59, 59, 999);
+
+            const historicoHoje = await tx.historicoCorporal.findFirst({
+                where: {
                     idDados: registroAtualizado.idDados,
-                    // Dados corporais da época
-                    peso_kg: Number(dados.peso_kg),
-                    altura_cm: Number(dados.altura_cm),
-                    genero,
-                    idade: Number(dados.idade),
-                    nivel_atividade,
-                    // Cálculos da época
-                    imc: calculos.imc,
-                    tmb: calculos.tmb,
-                    ndc: calculos.ndc
-                }
+                    criado_em: {
+                        gte: hojeInicio,
+                        lte: hojeFim
+                    }
+                },
+                orderBy: { criado_em: "desc" }
             });
+
+            if (historicoHoje) {
+                // Atualiza a medição de hoje para manter exatamente 1 registro diário limpo
+                await tx.historicoCorporal.update({
+                    where: { idHistorico: historicoHoje.idHistorico },
+                    data: {
+                        peso_kg: Number(dados.peso_kg),
+                        altura_cm: Number(dados.altura_cm),
+                        genero,
+                        idade: Number(dados.idade),
+                        nivel_atividade,
+                        imc: calculos.imc,
+                        tmb: calculos.tmb,
+                        ndc: calculos.ndc
+                    }
+                });
+            } else {
+                // Cria um novo snapshot completo para gráficos se for um novo dia
+                await tx.historicoCorporal.create({
+                    data: {
+                        idDados: registroAtualizado.idDados,
+                        peso_kg: Number(dados.peso_kg),
+                        altura_cm: Number(dados.altura_cm),
+                        genero,
+                        idade: Number(dados.idade),
+                        nivel_atividade,
+                        imc: calculos.imc,
+                        tmb: calculos.tmb,
+                        ndc: calculos.ndc
+                    }
+                });
+            }
             return registroAtualizado;
         }
     );
