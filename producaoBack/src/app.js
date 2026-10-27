@@ -9,10 +9,12 @@ import path from "path";
 import router from "./routes/router.js";
 import { autenticarToken } from "./middlewares/autenticarToken.js";
 
+
 dotenv.config();
 
 const app = express();
 
+app.set("trust proxy", 1);
 // 1. CABEÇALHOS DE SEGURANÇA (HELMET)
 app.use(helmet({ crossOriginResourcePolicy: { policy: "cross-origin" } }));
 
