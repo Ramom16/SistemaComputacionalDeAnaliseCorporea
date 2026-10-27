@@ -1,32 +1,55 @@
-import nodemailer from "nodemailer";
+const enviarEmail = async ({ to, subject, html }) => {
+  const apiKey = process.env.BREVO_API_KEY;
+  const from = process.env.EMAIL_FROM;
+
+  if (!apiKey) {
+    throw new Error("BREVO_API_KEY não definido no ambiente.");
+  }
+
+  if (!from) {
+    throw new Error("EMAIL_FROM não definido no ambiente.");
+  }
+
+  const formattedSender = from.match(/^\s*(.*?)\s*<([^<>]+)>\s*$/);
+  const sender = {
+    email: formattedSender ? formattedSender[2].trim() : from.trim(),
+    name: process.env.EMAIL_FROM_NAME
+      || formattedSender?.[1]?.replace(/^["']|["']$/g, "").trim()
+      || "IRONFIT"
+  };
+
+  const response = await fetch("https://api.brevo.com/v3/smtp/email", {
+    method: "POST",
+    headers: {
+      accept: "application/json",
+      "api-key": apiKey,
+      "content-type": "application/json"
+    },
+    body: JSON.stringify({
+      sender,
+      to: [{ email: to }],
+      subject,
+      htmlContent: html
+    })
+  });
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    const message = data.message || `A API da Brevo respondeu com HTTP ${response.status}.`;
+    console.error("Erro ao enviar e-mail pela Brevo:", data);
+    throw new Error(message);
+  }
+
+  return data;
+};
 
 //IMAGENS RETIRADAS DO IMGX
 
 export const enviarEmailVerificacao = async (email, link) => {
-
-  const transporter = nodemailer.createTransport({
-    host: "smtp.gmail.com",
-    port: 465,
-    secure: true,
-
-    auth: {
-      user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_PASS
-    }
-  });
-
-  await transporter.verify();
-
-  console.log("SMTP OK");
-
-  await transporter.sendMail({
-
-    from: `"IRONFIT" <${process.env.EMAIL_USER}>`,
-
+  await enviarEmail({
     to: email,
-
     subject: "Verifique sua conta - IRONFIT",
-
     html: `
     
     <!DOCTYPE html>
@@ -225,20 +248,7 @@ export const enviarEmailVerificacao = async (email, link) => {
 };
 
 export const enviarEmailRecuperacaoSenha = async (email, link) => {
-  const transporter = nodemailer.createTransport({
-    host: "smtp.gmail.com",
-    port: 465,
-    secure: true,
-    auth: {
-      user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_PASS
-    }
-  });
-
-  await transporter.verify();
-
-  await transporter.sendMail({
-    from: `"IRONFIT" <${process.env.EMAIL_USER}>`,
+  await enviarEmail({
     to: email,
     subject: "Recuperação de Senha - IRONFIT",
     html: `
@@ -295,20 +305,7 @@ export const enviarEmailRecuperacaoSenha = async (email, link) => {
 };
 
 export const enviarEmaildeContaDesativada = async (email, nome = "Atleta") => {
-  const transporter = nodemailer.createTransport({
-    host: "smtp.gmail.com",
-    port: 465,
-    secure: true,
-    auth: {
-      user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_PASS
-    }
-  });
-
-  await transporter.verify();
-
-  await transporter.sendMail({
-    from: `"IRONFIT" <${process.env.EMAIL_USER}>`,
+  await enviarEmail({
     to: email,
     subject: "Aviso de Desativação de Conta - IRONFIT",
     html: `
@@ -366,7 +363,7 @@ export const enviarEmaildeContaDesativada = async (email, nome = "Atleta") => {
           <p class="text" style="font-size:14px; color:#aaa;">
             Se você não solicitou esta ação ou acredita que isso foi um engano, entre em contato imediatamente com o suporte.
           </p>
-          <a href="mailto:${process.env.EMAIL_USER || 'suporte@ironfit.com'}" class="button">Falar com o Suporte</a>
+          <a href="mailto:${process.env.SUPPORT_EMAIL || 'suporte@ironfit.com'}" class="button">Falar com o Suporte</a>
           <div class="footer">
             Atenciosamente,<br>
             <strong>Equipe IRONFIT</strong>
@@ -380,20 +377,7 @@ export const enviarEmaildeContaDesativada = async (email, nome = "Atleta") => {
 };
 
 export const enviarEmaildeContaReativada = async (email, nome = "Atleta") => {
-  const transporter = nodemailer.createTransport({
-    host: "smtp.gmail.com",
-    port: 465,
-    secure: true,
-    auth: {
-      user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_PASS
-    }
-  });
-
-  await transporter.verify();
-
-  await transporter.sendMail({
-    from: `"IRONFIT" <${process.env.EMAIL_USER}>`,
+  await enviarEmail({
     to: email,
     subject: "Sua conta foi reativada - IRONFIT",
     html: `
@@ -455,7 +439,7 @@ export const enviarEmaildeContaReativada = async (email, nome = "Atleta") => {
           <p class="text" style="font-size:14px; color:#aaa;">
             Se você não solicitou esta reativação ou acredita que isso foi um engano, entre em contato imediatamente com o suporte.
           </p>
-          <a href="mailto:${process.env.EMAIL_USER || 'suporte@ironfit.com'}" class="button">Falar com o Suporte</a>
+          <a href="mailto:${process.env.SUPPORT_EMAIL || 'suporte@ironfit.com'}" class="button">Falar com o Suporte</a>
           <div class="footer">
             Bem-vindo de volta,<br>
             <strong>Equipe IRONFIT</strong>

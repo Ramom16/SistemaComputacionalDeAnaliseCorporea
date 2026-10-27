@@ -10,7 +10,7 @@ API REST responsável pelo cadastro e autenticação de usuários, registro de d
 - MySQL
 - JWT para autenticação
 - bcrypt para hash de senhas
-- Nodemailer para e-mails de verificação e recuperação
+- Brevo para e-mails de verificação, recuperação e notificações de conta
 - CORS
 
 ## Execução
@@ -44,13 +44,15 @@ DATABASE_URL="mysql://USUARIO:SENHA@localhost:3306/NOME_DO_BANCO"
 JWT_SECRET="uma-chave-secreta-forte"
 FRONT_URL="http://localhost:5173"
 
-EMAIL_USER="seu-email@gmail.com"
-EMAIL_PASS="sua-app-password"
+BREVO_API_KEY="xkeysib-sua-chave"
+EMAIL_FROM="noreply@seudominio.com"
+EMAIL_FROM_NAME="IRONFIT"
+SUPPORT_EMAIL="suporte@seudominio.com"
 EMAIL_TOKEN_EXPIRATION_MINUTES=5
 NODE_ENV="development"
 ```
 
-> `EMAIL_PASS` deve ser uma senha de aplicativo do Gmail, e não a senha normal da conta.
+Configure uma chave de API da Brevo em `BREVO_API_KEY` e valide o remetente (`EMAIL_FROM`) na sua conta. `EMAIL_FROM_NAME` é opcional e assume `IRONFIT`; `SUPPORT_EMAIL` também é opcional e, sem ela, os e-mails de conta usam `suporte@ironfit.com` no link de contato.
 
 ## Autenticação
 
