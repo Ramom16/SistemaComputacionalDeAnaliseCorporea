@@ -63,7 +63,7 @@ const authController = {
 
       await emailTokenRepository.criar(novoUsuario.id, tokenHash, expira_em);
 
-      const link = `${process.env.FRONT_URL || "http://localhost:5173"}/verificar-email?token=${tokenBruto}`;
+      const link = `${process.env.FRONT_URL || "https://sistema-computacional-de-analise-co-nine.vercel.app"}/verificar-email?token=${tokenBruto}`;
       await enviarEmailVerificacao(novoUsuario.email, link);
 
       return res.status(201).json({
@@ -239,7 +239,7 @@ const authController = {
 
       await emailTokenRepository.criar(usuario.id, tokenHash, expira_em);
 
-      const link = `${process.env.FRONT_URL || "http://localhost:5173"}/verificar-email?token=${tokenBruto}`;
+      const link = `${process.env.FRONT_URL || "https://sistema-computacional-de-analise-co-nine.vercel.app"}/verificar-email?token=${tokenBruto}`;
       await enviarEmailVerificacao(usuario.email, link);
 
       return res.status(200).json({
@@ -280,7 +280,7 @@ const authController = {
 
       await passwordResetTokenRepository.criar(usuario.id, tokenHash, expira_em);
 
-      const link = `${process.env.FRONT_URL || "http://localhost:5173"}/redefinir-senha?token=${tokenBruto}`;
+      const link = `${process.env.FRONT_URL || "https://sistema-computacional-de-analise-co-nine.vercel.app"}/redefinir-senha?token=${tokenBruto}`;
       await enviarEmailRecuperacaoSenha(usuario.email, link);
 
       return res.status(200).json({
