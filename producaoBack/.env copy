@@ -4,7 +4,7 @@ DB_PASS=b3sduCry6TdN6K2j
 DB_NAME=sys
 DATABASE_URL=mysql://rB89wHE5sBqxa66.root:b3sduCry6TdN6K2j@gateway01-privatelink.ap-northeast-1.prod.aws.tidbcloud.com:4000/sys
 JWT_SECRET=chave_super_secreta
-FRONT_URL=http://localhost:5173
+FRONT_URL=https://sistema-computacional-de-analise-co-nine.vercel.app/login
 NODE_ENV='dev'
 
 EMAIL_USER=sistema.verificacao.login@gmail.com

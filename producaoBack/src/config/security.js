@@ -10,7 +10,7 @@ export const securityMiddlewares = (app) => {
         "http://localhost:5173",
         "http://127.0.0.1:5173",
         "http://10.87.166.131:5173",
-        "https://sistema-computacional-de-analise-co.vercel.app",
+        "https://sistema-computacional-de-analise-co-nine.vercel.app/",
         "http://10.87.166.131:5554",
       ],
       methods: ["GET", "POST", "PUT", "DELETE"],

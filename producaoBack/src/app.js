@@ -41,7 +41,7 @@ app.use(limitadorGeral);
 app.use("/auth", limitadorAuth);
 
 // 3. CORS
-const origensPermitidas = ["http://localhost:5173", "http://127.0.0.1:5173", process.env.FRONT_URL ].filter(Boolean);
+const origensPermitidas = ["https://sistema-computacional-de-analise-co-nine.vercel.app", "http://127.0.0.1:5173", process.env.FRONT_URL ].filter(Boolean);
 
 app.use(cors({
   origin: (origin, callback) => {
