@@ -39,3 +39,5 @@ Depois de deployar ambos, atualize no Vercel:
 - `dist/` - Build pronto para deploy
 - `vercel.json` - Configuração do Vercel
 - `.vercelignore` - Arquivos para ignorar
+
+O `vercel.json` configura o fallback da aplicação SPA para `/`. Assim, rotas do React Router, como `/verificar-email?token=...`, continuam funcionando ao recarregar a página ou abrir um link diretamente.
