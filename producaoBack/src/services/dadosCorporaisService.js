@@ -40,23 +40,7 @@ const DadosCorporaisService = {
                     );
 
                 const calculoCriado =
-                    await transaction.calculo.create({
-
-                        data: {
-
-                            idDados:
-                                String(dadosCriados.idDados),
-
-                            imc:
-                                calculos.imc,
-
-                            tmb:
-                                calculos.tmb,
-
-                            ndc:
-                                calculos.ndc
-                        }
-                    });
+                    dadosCriados.calculos[0];
 
                 return {
 
