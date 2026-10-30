@@ -144,7 +144,10 @@ const authController = {
           id_criptografado: criptografarId(usuario.id),
           nome: usuario.nome,
           email: usuario.email,
-          role: usuario.role || "USER"
+          role: usuario.role || "USER",
+          fotoPerfil: usuario.perfil?.fotoPerfilMimeType
+            ? `${req.protocol}://${req.get("host")}/usuarios/${encodeURIComponent(criptografarId(usuario.id))}/foto-perfil`
+            : usuario.perfil?.fotoPerfil || null
         }
       }
     );

@@ -40,14 +40,29 @@ const usuariosRepository = {
     return await prisma.usuario.findUnique({
       where: { id: String(id) },
       include: {
-        perfil: true
+        perfil: {
+          select: {
+            idPerfil: true,
+            idUsuario: true,
+            fotoPerfil: true,
+            fotoPerfilMimeType: true
+          }
+        }
       }
     });
   },
 
   buscarPorEmail: async (email) => {
     return await prisma.usuario.findUnique({
-      where: { email }
+      where: { email },
+      include: {
+        perfil: {
+          select: {
+            fotoPerfil: true,
+            fotoPerfilMimeType: true
+          }
+        }
+      }
     });
   },
 
@@ -73,7 +88,14 @@ const usuariosRepository = {
             }
           }
         },
-        perfil: true
+        perfil: {
+          select: {
+            idPerfil: true,
+            idUsuario: true,
+            fotoPerfil: true,
+            fotoPerfilMimeType: true
+          }
+        }
       }
     });
   },
@@ -198,18 +220,42 @@ const usuariosRepository = {
   /**
    * 
    * @param {string} id id de usuario para realizar a atualização da foto de perfil
-   * @param {string} fotoPerfil Caminho ou URL da nova foto de perfil 
+   * @param {Buffer} fotoPerfilDados Conteúdo binário da foto de perfil
+   * @param {string} fotoPerfilMimeType Tipo MIME da foto de perfil
    * @returns 
    */
-  atualizarFotoPerfil: async (id, fotoPerfil) => {
+  atualizarFotoPerfil: async (id, fotoPerfilDados, fotoPerfilMimeType) => {
     return await prisma.usuario.update({
       where: { id: String(id) },
       data: {
         perfil: {
-          update: {
-            fotoPerfil: fotoPerfil
+          upsert: {
+            create: {
+              fotoPerfilDados,
+              fotoPerfilMimeType
+            },
+            update: {
+              fotoPerfil: null,
+              fotoPerfilDados,
+              fotoPerfilMimeType
+            }
           }
         }
+      },
+      select: {
+        id: true,
+        nome: true,
+        email: true
+      }
+    });
+  },
+
+  buscarFotoPerfil: async (id) => {
+    return await prisma.perfil.findUnique({
+      where: { idUsuario: String(id) },
+      select: {
+        fotoPerfilDados: true,
+        fotoPerfilMimeType: true
       }
     });
   },

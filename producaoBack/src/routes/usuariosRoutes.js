@@ -6,6 +6,11 @@ import uploadImage from "../middlewares/uploadImage.middleware.js";
 
 const router = express.Router();
 
+const tratarId = tratarIdsCriptografados(["id"]);
+
+// As imagens são públicas e usam um identificador criptografado na URL para exibição em <img>.
+router.get("/:id/foto-perfil", tratarId, usuariosController.enviarFotoPerfil);
+
 router.use(autenticarToken);
 
 // ─── Rotas ESTÁTICAS (sem parâmetro :id) — DEVEM vir ANTES das dinâmicas ──────
@@ -26,8 +31,6 @@ router.put("/push-token", usuariosController.salvarPushToken);
 router.post("/testar-notificacao", usuariosController.testarNotificacao);
 
 // ─── Rotas DINÂMICAS (com parâmetro :id) ─────────────────────────────────────
-
-const tratarId = tratarIdsCriptografados(["id"]);
 
 // Buscar usuário por id
 router.get("/:id", tratarId, usuariosController.selecionarUsuario);

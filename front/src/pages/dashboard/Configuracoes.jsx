@@ -10,6 +10,7 @@ import { senhaValida } from '../../constants/senha';
 import '../../styles/dashboard.css';
 
 const SENHA_VAZIA = { senhaAtual: '', novaSenha: '', confirmar: '' };
+const LIMITE_FOTO_BYTES = 8 * 1024 * 1024;
 
 export default function Configuracoes() {
   const navigate = useNavigate();
@@ -105,6 +106,14 @@ export default function Configuracoes() {
   const selecionarFoto = (event) => {
     const arquivo = event.target.files?.[0];
     if (!arquivo) return;
+    if (arquivo.size > LIMITE_FOTO_BYTES) {
+      setFoto(null);
+      setPreview('');
+      setFeedbackFoto({ texto: 'A imagem deve ter no máximo 8 MB.', tipo: 'erro' });
+      event.target.value = '';
+      return;
+    }
+
     setFoto(arquivo);
     setPreview(URL.createObjectURL(arquivo));
     setFeedbackFoto(null);
@@ -226,6 +235,7 @@ export default function Configuracoes() {
                     {salvandoFoto ? 'Enviando...' : 'Salvar foto'}
                   </button>
                 </div>
+                <small>PNG, JPEG ou WEBP. Tamanho máximo: 8 MB.</small>
 
                 {feedbackFoto && (
                   <p className={`calc-feedback ${feedbackFoto.tipo}`}>{feedbackFoto.texto}</p>

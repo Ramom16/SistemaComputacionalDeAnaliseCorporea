@@ -161,6 +161,16 @@ Lista todos os usuários.
 
 Busca um usuário específico pelo identificador.
 
+### Fotos de perfil
+
+`PATCH /usuarios/foto-perfil` recebe `multipart/form-data` autenticado, com o arquivo no campo `image`. Aceita PNG, JPEG e WEBP de até 8 MB; a imagem fica armazenada no banco e pode ser exibida publicamente por `GET /usuarios/:id/foto-perfil` usando o identificador criptografado retornado pela API.
+
+Antes de iniciar o backend com a nova versão, aplique a migração do banco:
+
+```bash
+npx prisma migrate deploy
+```
+
 ## Dados corporais e cálculos
 
 ### `POST /dadosCorporais`

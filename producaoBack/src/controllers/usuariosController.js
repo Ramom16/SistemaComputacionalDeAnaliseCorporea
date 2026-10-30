@@ -2,6 +2,22 @@ import usuariosRepository from "../repositories/usuariosRepository.js";
 import { anexarIdsCriptografados } from "../middlewares/tratarIdsCriptografados.js";
 import { enviarEmaildeContaDesativada, enviarEmaildeContaReativada } from "../services/emailService.js";
 import { notificarUsuario } from "../services/notificacaoService.js";
+import { criptografarId } from "../utils/cryptoUtils.js";
+
+const gerarUrlFotoPerfil = (req, usuarioId) => (
+  `${req.protocol}://${req.get("host")}/usuarios/${encodeURIComponent(criptografarId(usuarioId))}/foto-perfil`
+);
+
+const incluirUrlFotoPerfil = (usuario, req) => {
+  if (!usuario?.perfil?.fotoPerfilMimeType) return usuario;
+
+  const fotoPerfil = gerarUrlFotoPerfil(req, usuario.id);
+  return {
+    ...usuario,
+    fotoPerfil,
+    perfil: { ...usuario.perfil, fotoPerfil }
+  };
+};
 
 const usuariosController = {
   selecionarUsuario: async (req, res) => {
@@ -19,7 +35,7 @@ const usuariosController = {
         if (!resultado) {
           return res.status(404).json({ erro: "Usuário não encontrado" });
         }
-        return res.status(200).json(anexarIdsCriptografados(resultado));
+        return res.status(200).json(anexarIdsCriptografados(incluirUrlFotoPerfil(resultado, req)));
       }
 
       // Se for ADMIN listando sem query.id, lista todos os usuários cadastrados
@@ -30,7 +46,8 @@ const usuariosController = {
 
       // Se for USER normal, retorna apenas seu próprio perfil
       const usuarioAtual = await usuariosRepository.buscarPorIdComDetalhes(String(req.usuario.id));
-      return res.status(200).json(anexarIdsCriptografados(usuarioAtual ? [usuarioAtual] : []));
+      const resultado = usuarioAtual ? [incluirUrlFotoPerfil(usuarioAtual, req)] : [];
+      return res.status(200).json(anexarIdsCriptografados(resultado));
     } catch (error) {
       return res.status(500).json({ erro: error.message });
     }
@@ -123,17 +140,25 @@ const usuariosController = {
     try {
       const usuarioId = req.usuario?.id;
 
-
-      const baseUrl = `${req.protocol}://${req.get("host")}`;
-      const fotoPerfil = req.file ? `${baseUrl}/uploads/images/${req.file.filename}` : null;
-
       if (!usuarioId)
         return res.status(401).json({ erro: "Usuário não autenticado" });
 
-      if (!fotoPerfil)
+      if (!req.file)
         return res.status(400).json({ erro: "A foto de perfil é obrigatória." });
 
-      const usuarioAtualizado = await usuariosRepository.atualizarFotoPerfil(usuarioId, fotoPerfil);
+      const { buffer, mimetype } = req.file;
+      const assinaturaValida = (
+        (mimetype === "image/jpeg" && buffer[0] === 0xff && buffer[1] === 0xd8 && buffer[2] === 0xff)
+        || (mimetype === "image/png" && buffer.subarray(0, 8).equals(Buffer.from("89504e470d0a1a0a", "hex")))
+        || (mimetype === "image/webp" && buffer.toString("ascii", 0, 4) === "RIFF"
+          && buffer.toString("ascii", 8, 12) === "WEBP")
+      );
+
+      if (!assinaturaValida)
+        return res.status(400).json({ erro: "O conteúdo do arquivo não corresponde a uma imagem PNG, JPEG ou WEBP válida." });
+
+      const usuarioAtualizado = await usuariosRepository.atualizarFotoPerfil(usuarioId, buffer, mimetype);
+      const fotoPerfil = gerarUrlFotoPerfil(req, usuarioId);
 
       return res.status(200).json({
         mensagem: "Foto de perfil atualizada com sucesso.",
@@ -141,11 +166,27 @@ const usuariosController = {
           id: usuarioAtualizado.id,
           nome: usuarioAtualizado.nome,
           email: usuarioAtualizado.email,
-          fotoPerfil: usuarioAtualizado.perfil?.fotoPerfil
+          fotoPerfil
         })
       });
     } catch (error) {
-      return res.status(400).json({ erro: error.message });
+      console.error("Erro ao atualizar foto de perfil:", error);
+      return res.status(500).json({ erro: "Não foi possível salvar a foto de perfil." });
+    }
+  },
+
+  enviarFotoPerfil: async (req, res) => {
+    try {
+      const foto = await usuariosRepository.buscarFotoPerfil(req.params.id);
+      if (!foto?.fotoPerfilDados || !foto.fotoPerfilMimeType) {
+        return res.status(404).json({ erro: "Foto de perfil não encontrada." });
+      }
+
+      res.set("Cache-Control", "no-cache");
+      return res.type(foto.fotoPerfilMimeType).send(foto.fotoPerfilDados);
+    } catch (error) {
+      console.error("Erro ao buscar foto de perfil:", error);
+      return res.status(500).json({ erro: "Não foi possível carregar a foto de perfil." });
     }
   }
 };
