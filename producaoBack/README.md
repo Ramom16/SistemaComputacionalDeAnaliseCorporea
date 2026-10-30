@@ -28,6 +28,8 @@ Ou, em produção:
 npm start
 ```
 
+O `npm install` executa `prisma generate` automaticamente para manter o Prisma Client alinhado ao `schema.prisma`, inclusive em deploys de produção.
+
 A aplicação inicia na porta definida por `PORT` ou, se ausente, na porta `3000`.
 
 ```text
