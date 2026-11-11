@@ -5,10 +5,18 @@ import AuthCard from '../../../components/auth/AuthCard';
 import '../../../styles/auth.css';
 
 /**
- * Pede um novo link de verificação de e-mail.
- * Usada tanto por /verificar-email quanto por /recuperar-senha.
+ * Formulário genérico de "envie-me um link por e-mail".
+ * Usada por /verificar-email (link de verificação) e por /recuperar-senha
+ * (link de recuperação), por isso o endpoint é configurável.
  */
-export default function ReenviarEmail({ titulo, voltarPara = '/login', mensagemInicial = '' }) {
+export default function ReenviarEmail({
+  titulo,
+  voltarPara = '/login',
+  mensagemInicial = '',
+  endpoint = '/auth/reenviar-email',
+  rotuloBotao = 'Enviar novo link',
+  mensagemSucesso = 'Enviamos um novo link. Verifique seu e-mail.',
+}) {
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
   const [msg, setMsg] = useState(mensagemInicial);
@@ -26,9 +34,9 @@ export default function ReenviarEmail({ titulo, voltarPara = '/login', mensagemI
 
     setLoading(true);
     try {
-      const { data } = await api.post('/auth/reenviar-email', { email: trimmed });
+      const { data } = await api.post(endpoint, { email: trimmed });
       setTipo('sucesso');
-      setMsg(data?.msg || 'Enviamos um novo link. Verifique seu e-mail.');
+      setMsg(data?.msg || mensagemSucesso);
     } catch (error) {
       setTipo('erro');
       setMsg(getApiError(error, 'Erro ao reenviar o e-mail.'));
@@ -52,7 +60,7 @@ export default function ReenviarEmail({ titulo, voltarPara = '/login', mensagemI
           required
         />
         <button type="submit" disabled={loading}>
-          {loading ? 'Enviando...' : 'Enviar novo link'}
+          {loading ? 'Enviando...' : rotuloBotao}
         </button>
       </form>
 
