@@ -47,7 +47,10 @@ export default function RedefinirSenha() {
       endpoint: '/auth/redefinir-senha',
       payload: { token: token.trim(), novaSenha },
       fallback: 'Não foi possível redefinir sua senha.',
-      limpar: () => setNovaSenha(''),
+      limpar: () => {
+        setNovaSenha('');
+        setToken('');
+      },
     });
   };
 

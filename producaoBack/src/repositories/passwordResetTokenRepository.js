@@ -6,7 +6,9 @@ const passwordResetTokenRepository = {
       data: {
         usuarioId: String(usuarioId),
         token_hash,
-        expira_em
+        expira_em,
+        // O token nasce válido: só é marcado como usado em marcarComoUsado.
+        usado_em: null
       }
     });
   },
